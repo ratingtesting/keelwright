@@ -5,3 +5,6 @@ internal/
 # Generated / local
 *.log
 .DS_Store
+
+# Versioned local backups (tamper recovery) — kitchen, not shipped to the public repo
+backups/

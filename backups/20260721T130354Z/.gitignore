@@ -1,7 +1,0 @@
-# Internal kitchen — NEVER published. QA run logs, session notes, private test prompts.
-# These are the author's working artifacts, not part of the distributed skill.
-internal/
-
-# Generated / local
-*.log
-.DS_Store
