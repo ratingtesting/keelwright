@@ -179,6 +179,15 @@ makes "human is not the bottleneck" safe for a non-programmer.
 `state: waiting_user` in the STATUS block is the single point where a human is truly needed
 (red flag hit / Copilot approval / blocker).
 
+**Responsibility split — the AI owns the build, the human owns the business.** There is a hard
+line the autonomy dial does NOT cross. The AI's zone: architecture, code, tests, refactors, DB
+migrations, deploy. The human's zone: monetization, viral mechanics, unit economics, KPIs,
+roadmap, pricing. On anything in the human's zone the AI MUST stop, propose 2–3 options with
+trade-offs, and wait for an explicit "OK" — it may NEVER ship a business decision silently, even
+on Autopilot. This exists because the driver is a non-programmer founder: they delegate HOW to
+build, never WHAT the business should be. When unsure which zone a choice is in, treat it as the
+human's zone and ask.
+
 ---
 
 ## Risk glossary — the named failure modes this skill defends against

@@ -269,3 +269,21 @@ If you change a shared module (utils, types, shared, core):
 1. Find who imports the changed file
 2. Run ONLY the relevant tests (don't run everything)
 3. Can't tell → run the full analyze + key tests
+
+## Comments & logging discipline
+
+Comments and logs are for the human who cannot read code — keep them meaningful, not noise.
+
+**Comments:**
+- NEVER comment the obvious (`// get data from the DB` above a DB call adds nothing).
+- Use a doc-comment (`/** … */` / docstring) ONLY for (a) non-obvious BUSINESS rules —
+  *why*, not *what* (e.g. "referral reward only pays after day 3, to deter self-referral fraud"),
+  and (b) public functions used across modules.
+- NEVER leave `// TODO` / `// FIXME` in a committed file — either do it now or file it as a task.
+
+**Logging & error handling:**
+- No bare `console.log` / `print` for business logic — it leaks into prod and says nothing.
+- Wrap every DB (Supabase) or external-API call in try/catch (try/except).
+- In the catch block use a tagged, actionable format:
+  `console.error('[MODULE_NAME]: <action> failed. details:', error.message)` — so a non-coder
+  reading the logs sees WHICH part broke and WHAT it was doing, not a raw stack trace.

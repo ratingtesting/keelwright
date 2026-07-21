@@ -297,3 +297,19 @@ prefix, e.g. `API_KEY=your-api-key-here`. The real value lives only in the gitig
 `git grep '<literal-secret>'` over tracked files; absence is the on-disk proof the key never entered
 history. This is the "git status is the machine check, not the report" principle applied to the secret
 string itself — trust `git grep` over the agent's "clean" narrative.
+
+## Per-project secret & environment isolation (swarm-safe)
+
+When one human runs several apps (or a swarm of agents each on its own app), secrets and
+environments MUST NOT bleed across projects — a leaked or shared secret is a cross-project breach.
+Hard rules:
+
+- **One app = one isolated ecosystem:** its own git repo, its own secret store, its own DB
+  (e.g. Dev + Prod projects), its own deploy target. Never reuse one DB/secret set across apps.
+- **Secrets never live in a cloned/checked-out working tree.** `.env` is gitignored and provided
+  per-environment (CI/host secret store), not copied between project folders or into a shared VM
+  image that gets cloned. A cloned template must ship with `.env.example` placeholders only.
+- **Per-project deploy secrets** (GitHub Actions secrets, host env vars) are configured separately
+  for each project — never a single shared secret set fanned out to many apps.
+- Pairs with `scripts/workspace_guard.py`, which isolates FILES per owner; this rule isolates
+  SECRETS and environments per project. Both are needed before running agents in parallel.
