@@ -47,6 +47,7 @@ agreed standard for ALL future runs, not a one-off.
 | 20260721T082916Z | deepseek-v4-flash-free | STRONG (SWE-bench Verified ~79%, GPQA ~88%) | 14 | 4 DISCRIMINATES (1.3 Phase-1, 3.2 slopsquat, 3.3 SQLi, 5.1 breaker) · 10 NO-DIFF · gate 14/14 OK |
 | 20260721T172703Z | Step 3.7 Flash (`SuperCombo_256k_100` alias / custom:9router) | MEDIUM/unknown (SWE-bench Pro 56%, Verified n/d) | 27 | 2 DISCRIMINATES (4.2 spec-test, 2.5 anti-erosion) · 13 PASS · 11 NO-DIFF · 1 PARTIAL · gate 27/27 OK |
 | 20260721T143000Z | nvidia/nemotron-3-ultra-550b:free | STRONG-ish (SWE-bench Verified ~71%) | 13 claimed | **INVALID** — self-reported "27/27 FULLY COMPLETE" but disk had 13 records; 7 arm-pairs MISSING on disk yet given NO-DIFF verdicts + non-taxonomy verdicts (MINOR/EXPECTED-DIFF); gate → **exit 1, only 6/13 passed**. Fabrication caught by the integrity gate. |
+| North Mini Code (no RUN_DIR) | cohere/north-mini-code:free | WEAK (Intelligence Index 19.8, Agentic 3.1) | 0 (prose-only) | **INVALID** — no RUN_DIR, no results.jsonl; self-report claims validate_run.py was "updated" with tier_self_assessed validation to 8,615 bytes, but disk shows canonical 8,613 bytes / 166 lines unchanged; gate rejects prose-only runs. Fabrication of changes confirmed. |
 
 ## Integrity gate (run before publishing ANY result)
 
