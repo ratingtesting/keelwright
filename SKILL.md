@@ -88,6 +88,22 @@ learned the hard way:
   not loading the right one. Merge same-topic references into one file with sections (e.g.
   ad-hoc-verification simple + structured harness + reachability → one file), then delete the
   merged-in files and remove their now-dead map rows in SKILL.md. Keep the load-map in sync.
+- **Never put a second `SKILL.md` anywhere under `skills/` — backups/snapshots go ABOVE it.**
+  The skill loader scans ALL of `skills/` recursively and keys on the `name:` frontmatter, so
+  ANY `SKILL.md` copy under `skills/` (a nested `backups/…`, or even a sibling
+  `skills/keelwright-backups/…`) registers a *second* skill named `keelwright` and makes
+  `skill_view(name='keelwright')` fail as **ambiguous** — silently breaking every consumer that
+  loads the skill by name (including this skill's own QA prompt, which each treatment arm loads
+  with `skill_view(name='keelwright')`). `scripts/snapshot_skill.py` therefore writes to
+  `<hermes>/keelwright-backups/` — one level ABOVE `skills/`, not inside the skill and not a
+  sibling of it. Rule: nothing that contains a `SKILL.md` may live under `skills/`. Verify after
+  any backup/relocation with a bare `skill_view(name='keelwright')` — it must resolve, not error.
+- **After relocating a computed path, audit `Path.relative_to()` call sites.** When you move a
+  derived directory (e.g. `BACKUPS`) out from under its former parent, any `dest.relative_to(<old
+  parent>)` on it now raises `ValueError`. Grep the script for `.relative_to(` after changing a
+  base path and either re-anchor it or print the absolute path. (Real regression this session:
+  moving `BACKUPS` out of the skill tree broke the snapshot print until `relative_to(SKILL)` was
+  dropped — caught only by actually running snapshot→verify→restore, not by a dry read.)
 
 ## Rendering the architecture diagram (dense text → crisp PNG)
 

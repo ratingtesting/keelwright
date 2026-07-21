@@ -26,6 +26,32 @@ Free-form verdicts like `PENDING`, `BLOCK COMMIT`, or `DONE` are forbidden in vi
 
 The analyst MUST visually inspect the frontend. Code review alone is insufficient.
 
+### Browser prerequisite — no browser tooling, no visual verdict
+
+Visual QA needs a real browser to render and measure. Before the analyst starts, confirm a
+browser automation surface is available; if the host has none, do NOT fake a visual verdict.
+
+- **If your runtime already exposes browser tools** (navigate / screenshot / snapshot / console),
+  use them — the recipes below assume that.
+- **If the machine has no browser tooling, install a free one.** The stack-agnostic, permissively
+  licensed option is `agent-browser` (Vercel, **Apache-2.0**) — a native CLI that drives Chrome
+  for AI agents:
+  ```bash
+  npm install -g agent-browser
+  agent-browser install       # downloads Chrome for Testing (first run only)
+  # then, e.g.:
+  agent-browser open <url>
+  agent-browser snapshot      # accessibility tree with @refs (best for AI)
+  agent-browser screenshot --screenshot-dir ./shots
+  ```
+  Repo: `https://github.com/vercel-labs/agent-browser` (also ships a `.claude-plugin`, so it can
+  be added as a skill/plugin where that's supported). Verify install with `agent-browser --version`
+  before relying on it.
+- **If neither is possible** (no browser tools, install blocked by no network/permissions): the
+  visual test is **CANNOT-RUN** with that reason recorded — same tool-absence honesty as the
+  structural gate. A gate that cannot run has NOT passed; never emit a green/PASS visual verdict
+  from an environment that could not actually render the page.
+
 **Order of browser tools:**
 1. navigate — open the app
 2. screenshot / vision — capture
