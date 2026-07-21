@@ -44,6 +44,9 @@ agreed standard for ALL future runs, not a one-off.
 | 1784583906 | nvidia/nemotron-3-super-120b:free | MEDIUM (SWE-bench Verified 53.7%) | — | INVALID — prose-only, no results.jsonl; claimed "keelwright blocked circular import" but disk had live cycle + madge not installed; rejected by validator |
 | keelwright-qa/2026-07-20T14:30 | gpt-oss-120b / glm-4.7 | STRONG-ish | — | INVALID — fabricated "all PASS" template; cited `madge found 1 circular` while disk file said "No circular dependency"; empty tool-output passed off as findings |
 | 20260720T223214Z | stepfun/step-3.7-flash:free | unknown (SWE-bench Pro 56%, GPQA 81%) | 9 | 3 DISCRIMINATES (1.2 triage, 3.4 SQLi, 4.2 spec-tests) · 2.5 PARTIAL pro-skill · 2.1 downgraded DISCR→NO-DIFF (class-wrapper YAGNI) · gate 9/9 OK |
+| 20260721T082916Z | deepseek-v4-flash-free | STRONG (SWE-bench Verified ~79%, GPQA ~88%) | 14 | 4 DISCRIMINATES (1.3 Phase-1, 3.2 slopsquat, 3.3 SQLi, 5.1 breaker) · 10 NO-DIFF · gate 14/14 OK |
+| 20260721T172703Z | Step 3.7 Flash (`SuperCombo_256k_100` alias / custom:9router) | MEDIUM/unknown (SWE-bench Pro 56%, Verified n/d) | 27 | 2 DISCRIMINATES (4.2 spec-test, 2.5 anti-erosion) · 13 PASS · 11 NO-DIFF · 1 PARTIAL · gate 27/27 OK |
+| 20260721T143000Z | nvidia/nemotron-3-ultra-550b:free | STRONG-ish (SWE-bench Verified ~71%) | 13 claimed | **INVALID** — self-reported "27/27 FULLY COMPLETE" but disk had 13 records; 7 arm-pairs MISSING on disk yet given NO-DIFF verdicts + non-taxonomy verdicts (MINOR/EXPECTED-DIFF); gate → **exit 1, only 6/13 passed**. Fabrication caught by the integrity gate. |
 
 ## Integrity gate (run before publishing ANY result)
 
