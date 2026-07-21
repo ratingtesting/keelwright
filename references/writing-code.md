@@ -211,6 +211,36 @@ is cheaper than re-inventing a cure and keeps each diff reviewable.
 Reminder (reward-hacking guard): the fix is to improve the code, never to loosen the threshold or
 delete the offending test. Thresholds are guard values — changing them to pass is forbidden.
 
+### Harness Engineering (fix the system that produced the bug, not just the bug)
+
+A core loop-coding practice: the loop is only as reliable as the *harness* around it — the tests,
+linters, type-checks, security hooks, and CI gates that catch a mistake automatically. When an
+error slips through, the durable fix is not just to patch the line; it is to **strengthen the
+harness so that class of error cannot recur silently.** The better the obstacle course, the safer
+autonomy is for a non-programmer who cannot spot the mistake by eye.
+
+Before fixing an error by hand, ask: *"Can I improve a test / linter / hook so this class of bug
+gets caught mechanically next time?"* Prefer that over a one-off manual patch.
+
+- **Every fixed bug leaves a test behind.** Add a discriminating test that fails on the old
+  behavior and passes on the new (`references/discriminating-tests.md`) — so a regression re-trips
+  it automatically. A bug fixed without a test guarding it will come back.
+- **Recurring mistake → tighten the machine, not your attention.** If the same footgun appears
+  twice (a missing null-check pattern, an un-awaited promise, a forgotten auth check), encode it
+  as a lint rule / Semgrep pattern / boundary contract, not as a mental note. Human vigilance does
+  not scale across an autonomous loop; a rule does.
+- **Prefer automatic gates over manual review** wherever a check *can* be mechanized — tests,
+  type-checks, `jscpd`/`lizard` thresholds, `madge`/`import-linter` contracts, Gitleaks/Semgrep.
+  Manual review is the fallback for what genuinely cannot be mechanized (business-logic judgment),
+  not the first line of defense.
+- **The harness is the real deliverable of a hardening iteration.** When a Stability/Autoresearch
+  pass finds a repeated failure mode, the output is a stronger gate (new test, new rule, raised
+  coverage), logged in `phoenix-log.md` — that is what stops the loop repeating the mistake.
+
+This is why every ✅ in the risk glossary is *machine-enforced*: keelwright's answer to "how does a
+non-coder stay safe in an autonomous loop?" is a strong harness, not more human eyeballing.
+
+
 **Observed failure mode (2026-07-19 QA):** after Extract Method/Pull Up Method, agents self-reported “dup fixed” while `jscpd --threshold 10 --min-lines 3 --min-tokens 10` still showed 11 clones / 62.9% dup. The commit should have been blocked. Fix: after any refactor that targets duplication/complexity, rerun the exact quality scan command with the explicit threshold/min-lines/min-tokens. If the tool exits non-zero or dup% is still above the ceiling, continue refactoring. Do not mark the iteration complete until the scan is green under the ceiling.
 
 **What the structural-integrity gate now covers (spaghetti / big ball of mud — FULLY):**

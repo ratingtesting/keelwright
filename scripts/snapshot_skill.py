@@ -14,6 +14,13 @@ so recovery meant scraping the session DB. This script makes that never-again ch
 It is stdlib-only and cross-platform. Run `snapshot` before and after any risky edit, and
 `verify` on entry to catch out-of-band corruption early.
 
+BACKUPS LIVE OUTSIDE THE skills/ DIRECTORY (important): snapshots are written to
+`<hermes>/keelwright-backups/` — a sibling of `skills/`, NOT anywhere under `skills/`.
+The skill loader scans ALL of `skills/` recursively and keys on the `name:` frontmatter, so
+ANY `SKILL.md` under `skills/` (even in `skills/keelwright-backups/…`) registers a second skill
+named `keelwright` and makes `skill_view(name='keelwright')` fail as ambiguous. Writing backups
+one level above `skills/` keeps the name unambiguous and the published surface clean.
+
 USAGE
   python snapshot_skill.py snapshot [keep=10]
   python snapshot_skill.py verify
@@ -23,8 +30,9 @@ import sys, shutil, hashlib, json, time
 from pathlib import Path
 
 SKILL = Path(__file__).resolve().parent.parent          # .../skills/keelwright
-BACKUPS = SKILL / "backups"
-IGNORE = {"backups", ".git", "__pycache__", ".pytest_cache"}
+# Backups sit OUTSIDE skills/ (one level up) so nested SKILL.md copies never collide with the loader.
+BACKUPS = SKILL.parent.parent / "keelwright-backups"    # .../hermes/keelwright-backups
+IGNORE = {"backups", "keelwright-backups", ".git", "__pycache__", ".pytest_cache"}
 
 
 def _walk():
@@ -51,7 +59,7 @@ def snapshot(keep=10):
         (dest / rel).parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(f, dest / rel)
     (dest / "_manifest.json").write_text(json.dumps(_manifest(), indent=2), encoding="utf-8")
-    print(f"[snapshot] {dest.relative_to(SKILL)} — {len(list((dest).rglob('*')))} files")
+    print(f"[snapshot] {dest} — {len(list((dest).rglob('*')))} files")
     # prune old
     snaps = sorted([d for d in BACKUPS.iterdir() if d.is_dir()])
     for old in snaps[:-keep]:

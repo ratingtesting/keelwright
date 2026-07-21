@@ -10,7 +10,7 @@ description: >
   when an agent swarm writes code a human will not read line by line. The engine is
   language-agnostic; per-stack commands live in references/bindings/ (a Flutter/Dart
   example is included — copy it to make your own).
-version: 1.0.0
+version: 1.1.0
 license: CC-BY-4.0
 author: ratingtesting (https://github.com/ratingtesting)
 platforms: [windows, linux, macos]
@@ -99,7 +99,7 @@ colored borders); the risk-map is a 3-column grid with ✅/⚠ coverage badges. 
 edit `architecture.md` → mirror the change into `architecture.html` → `browser_navigate` the
 `file://` URL → `browser_vision` to confirm text is crisp and nothing overflows → copy the
 screenshot to `assets/architecture.png`. Keep `.md`, `.html`, and the SKILL.md risk glossary
-carrying the SAME risk list (currently 23 rows) so the three never drift.
+carrying the SAME risk list (currently 25 rows) so the three never drift.
 
 **Capability triage is Step 0:** Before running adversarial tests, the executing model MUST
 honestly assess whether it can reliably: (1) orchestrate delegate_task A/B with isolated
@@ -221,6 +221,8 @@ is only partially covered, it says so — no overclaiming.
 | **Token/budget burn** | per-iteration tool-call budgets | `circuit-breaker.md` | ✅ full |
 | **Style/consistency drift** (naming, async patterns) | @architecture-critic + Pink Flag (judgment only) | `writing-code.md` | ⚠️ partial (no machine detector) |
 | **Regression that passes tests** (bad deploy) | post-deploy validation loop + auto-rollback | `phases.md` | ✅ full (where metric exists) |
+| **Human as bottleneck** | autonomy dial + parallel independent loops | `phases.md` | ✅ full |
+| **Confabulation / fabricated facts** (invented URLs, versions, prices, APIs) | factual-grounding gate: verify-before-assert + say "unknown" over a guess | `security-gates.md` | ⚠️ partial (discipline, not machine-checked) |
 
 Two honest ⚠️ partials worth repeating: **style-consistency** drift and **sycophancy-as-trait**
 have no cheap machine detector — keelwright catches their measurable consequences, not the

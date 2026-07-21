@@ -171,3 +171,4 @@ Each named industry failure mode → the layer that closes it. ✅ machine-enfor
 | Style/consistency drift | @architecture-critic + Pink Flag | ⚠️ partial (no machine detector) |
 | Regression that passes tests | post-deploy validation + rollback | ✅ where metric exists |
 | Human as bottleneck | autonomy dial + parallel loops | ✅ |
+| Confabulation / fabricated facts | factual-grounding gate (verify-before-assert) | ⚠️ partial (discipline) |

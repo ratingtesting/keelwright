@@ -44,6 +44,12 @@ risk: silent overwrite] or (b) warn the second user [safer, a bit more work]. I 
 found a real security hole, the plain sentence still says clearly that data could leak — simpler
 words, same severity.
 
+**Be concise (token-economy + clarity).** Plain does not mean padded. Report in 1–3 tight
+sentences: what happened, what it means for the product, what (if anything) you need from the
+human. Drop filler openers ("Certainly", "As you can see"), don't restate the request back, and
+don't dump a wall of technical detail the driver can't use. Brevity is part of respecting a
+non-coder's attention — and it keeps loop iterations cheap.
+
 ## Phase 3 — Building (iterative)
 
 One task per iteration. Full cycle is in SKILL.md ("One Phase-3 iteration").

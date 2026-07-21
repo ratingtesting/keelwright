@@ -161,6 +161,32 @@ Do NOT `git stash` before any commit on a fresh repo — on empty history `git s
 drops the working-tree edit (nothing to diff against), so the change vanishes. Commit the
 baseline first.
 
+## Gate 5b — Factual grounding (anti-confabulation)
+
+Distinct from R7 (which reconciles *claimed work* against the diff) and R8 (which verifies
+*package names*): this gate governs **facts the agent states to the human** — external URLs,
+API endpoints, CLI flags, model/library versions, prices, service capabilities. LLMs confabulate
+these fluently and a non-programmer cannot catch a plausible-sounding wrong version or a made-up
+flag. That is a silent failure mode of its own, so it gets an explicit discipline:
+
+- **Verify before you assert.** Before stating any external fact (a URL, a package version, a
+  price, an API signature, "service X supports Y"), confirm it this session — a `web_search`, a
+  registry/`curl` lookup (same tools as R8 dependency vetting), or reading the actual docs/file.
+  Do NOT state it from memory as fact.
+- **"Unknown" beats a confident guess.** If you cannot verify, say so plainly ("I couldn't
+  confirm this — needs a check") instead of inventing a clean-looking answer. A wrong fact stated
+  confidently is worse than an admitted gap, because the non-coder driver will act on it.
+- **Never fabricate** URLs, shell commands, CLI flags, prices, or version numbers to fill a hole.
+- **Don't cite what you didn't read.** Never say "the docs say…" / "per the changelog…" unless
+  you actually opened it this session. (Mirrors the disk-over-narrative rule: read the source,
+  don't paraphrase from memory.)
+- **Own the correction fast.** If the human catches an unverified claim, correct it immediately
+  and re-verify — no defending the guess.
+
+This is a **discipline, not a machine gate** (there is no cheap detector for a confident-but-wrong
+fact — same honesty as the sycophancy ⚠️). It pairs with plain-language reporting: the human is
+trusting your words *because* they can't read the code, so an unchecked fact does outsized damage.
+
 ## Gate 6 — Slopsquatting (R8)
 
 Before installing ANY package an agent proposes: verify it EXISTS, is not brand-new, and is not
