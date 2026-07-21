@@ -1,0 +1,327 @@
+{
+  ".gitignore": {
+    "sha256": "19fedc0315643cfca5a236c7ef63c5302810b00eade7820cc43f88f0a9d3c1f8",
+    "lines": 7,
+    "bytes": 216
+  },
+  "LICENSE": {
+    "sha256": "76c40266979bcd5e8e628afba28be9092fd1625b6f11603fa64f460ce0841684",
+    "lines": 39,
+    "bytes": 1826
+  },
+  "SKILL.md": {
+    "sha256": "d3e7870d10933ea938811a350bf8b799a7a29063def1e95498f22ac4ac4a9a21",
+    "lines": 505,
+    "bytes": 36215
+  },
+  "assets/architecture.html": {
+    "sha256": "e2d61b1cc0b14c730b8cf56f21e4a95300c9499b7d8d831a0b7a5d222bb1d977",
+    "lines": 255,
+    "bytes": 19084
+  },
+  "assets/architecture.md": {
+    "sha256": "826334d1b2db6a0c462806eeca6112b7055e1f6eb09050fb868c7296eb60f880",
+    "lines": 173,
+    "bytes": 13696
+  },
+  "assets/architecture.png": {
+    "sha256": "1483798eafc250e32444e3577ee393a1f16e40759d71fc2a1ec416e58cc69fd2",
+    "lines": 966,
+    "bytes": 325113
+  },
+  "internal/ab-eval-harness-pitfalls.md": {
+    "sha256": "f589845ec4214fd2f1ec095099619903c7af227d50f3ac6e58f6f491cf3a7567",
+    "lines": 56,
+    "bytes": 3715
+  },
+  "internal/ad-hoc-verification-windows.md": {
+    "sha256": "0795c0da54d318f805220db304b9bf2bc35265c34c3451da362d4951692f8728",
+    "lines": 274,
+    "bytes": 16528
+  },
+  "internal/after-arm-persistence.md": {
+    "sha256": "bd4759ad7504c45258752ab0f1bad2405c8141838bb3f20672afc88b3caf8b7a",
+    "lines": 24,
+    "bytes": 1092
+  },
+  "internal/long-run-qa-protocol.md": {
+    "sha256": "4351f6ff3d9ebfee1e84e5eba2744f3315102d04fcd5599e565fc1ac4aa01a88",
+    "lines": 56,
+    "bytes": 2660
+  },
+  "internal/qa-battle-test-2026-07-19.md": {
+    "sha256": "94e9b0182e534cd2a549c98330287eba1d7f84a9934902ae014c7c6e5a7f4d3b",
+    "lines": 123,
+    "bytes": 9559
+  },
+  "internal/qa-hardening-run-2026-07-20-session.md": {
+    "sha256": "b166851a5fbc0f02e96040e5419e566c22e26fc95477e6dff10bf88a8fd48505",
+    "lines": 147,
+    "bytes": 9018
+  },
+  "internal/qa-hardening-run-2026-07-20.md": {
+    "sha256": "589f8a02c237b1721ce138774861e10c4490cef6cb0f6706c715ecc836e8f645",
+    "lines": 11,
+    "bytes": 784
+  },
+  "internal/README.md": {
+    "sha256": "0259c59a0c4f0060f288333913063748ec088b3ad8fbfac4798307d2fb586cd8",
+    "lines": 20,
+    "bytes": 1180
+  },
+  "internal/session-2026-07-19-api-key-env-pattern.md": {
+    "sha256": "501d8bc11b068d96e2da3766381355f11d89ec37bd4deffd8c7f5d8587242004",
+    "lines": 44,
+    "bytes": 1800
+  },
+  "internal/skill-behavior-ab-testing.md": {
+    "sha256": "3bc560504ff6cbae0d3161ccfe9bc2783b9deaa33b85168106eb4c7b97dfe0da",
+    "lines": 188,
+    "bytes": 13227
+  },
+  "internal/vetting-qa-reports.md": {
+    "sha256": "34f32798405a4865b5327302be4903a2c5ac3b88c99523ec4a9f6516172231ff",
+    "lines": 43,
+    "bytes": 2778
+  },
+  "internal/windows-verify-patterns.md": {
+    "sha256": "f61f3bd26eba264470b4c5dbae51a367781ee4f1ec8e7dee4bee6ea2a8db9270",
+    "lines": 58,
+    "bytes": 2792
+  },
+  "qa-results/20260720T200131Z_vibe.summary.md": {
+    "sha256": "1d0542af098ced65523387051c31306743c0e47b3d33e4c570804736083fecc2",
+    "lines": 31,
+    "bytes": 2627
+  },
+  "qa-results/20260720T200338Z.results.jsonl": {
+    "sha256": "ba32aa1b3ecd4cb663ce93a4c8f5087d8f634a13ba552c801a34c264b7f4937a",
+    "lines": 6,
+    "bytes": 4881
+  },
+  "qa-results/20260720T200338Z.summary.md": {
+    "sha256": "bc17a22883c6b04a189d55f956026b80d0feb48850329c8d12122f47d969f59f",
+    "lines": 41,
+    "bytes": 3393
+  },
+  "qa-results/20260720T223214Z.results.jsonl": {
+    "sha256": "cea0616fc4e98a8965b33f38ef4e6b461b738457b05cf36fe53b8f76fc3f85cc",
+    "lines": 9,
+    "bytes": 7891
+  },
+  "qa-results/20260720T223214Z.summary.md": {
+    "sha256": "2bd59ec5bb369bb63340fd22e0c68a996f68f120865bf1a262ae8d26aaf15687",
+    "lines": 40,
+    "bytes": 3113
+  },
+  "qa-results/kw20260720T200333Z.results.jsonl": {
+    "sha256": "2e966fe53349ba28009db893afeb1f6209c74c1a1873ce014cbb9772cd6d9440",
+    "lines": 9,
+    "bytes": 7225
+  },
+  "qa-results/kw20260720T200333Z.summary.md": {
+    "sha256": "759c5ba0f7d6b904aef945a360bf89a929bc98287d78c29a04ac6381f4d3522b",
+    "lines": 38,
+    "bytes": 2621
+  },
+  "qa-results/README.md": {
+    "sha256": "c83d5fb78a5d74ce2e7d08cb0839e456444df849cb5ab7b5c0073c75ed62c982",
+    "lines": 57,
+    "bytes": 4013
+  },
+  "references/ad-hoc-verification.md": {
+    "sha256": "ae54669bc5580e4bc4d5e1bd3524af0d873113d1fe10142b62b528c70363f2ec",
+    "lines": 224,
+    "bytes": 12881
+  },
+  "references/browser-tool-workarounds.md": {
+    "sha256": "71f033e25f2e426f0dc1ae094277b03b1aa8de1217e9db0439714212bbc0492d",
+    "lines": 73,
+    "bytes": 3373
+  },
+  "references/circuit-breaker.md": {
+    "sha256": "e77d5fa79fca50592f4e8a5601cfdff3a684f02176bc8a20736af663d2d0313e",
+    "lines": 138,
+    "bytes": 7046
+  },
+  "references/discriminating-tests.md": {
+    "sha256": "53494fd1cb49e74e73a672aae3217ae83ed884869d05e87ed6517c931c29b79d",
+    "lines": 108,
+    "bytes": 5561
+  },
+  "references/external-skill-audit-tools.md": {
+    "sha256": "3ee024fda9e2fd1de5b2baaaa09de1194e601104138e1112aed7df1e06475d94",
+    "lines": 75,
+    "bytes": 3818
+  },
+  "references/gitleaks-windows-pitfalls.md": {
+    "sha256": "70cfd36f5b82165b0ba37808406f0e4fddb5522c562e9f85675e8fe42edf8a7c",
+    "lines": 34,
+    "bytes": 1538
+  },
+  "references/jscpd-rust-port-gotchas.md": {
+    "sha256": "ad4f8cd2a774e3e41ecbd15b3bcea11ab44b6076448cd0257fe920ecf8b3f70d",
+    "lines": 63,
+    "bytes": 3777
+  },
+  "references/match-loop.md": {
+    "sha256": "6f34d5ffb4693bceeb4fe75c24312c8940f5e872579fc0105122f701eb28d8f1",
+    "lines": 125,
+    "bytes": 6646
+  },
+  "references/phases.md": {
+    "sha256": "3020df76990df075691dfbc348e15919ab9a8504058611b20cf0172f927ed93a",
+    "lines": 299,
+    "bytes": 16866
+  },
+  "references/provenance.md": {
+    "sha256": "89339d622a09832104bae79aaeb9788108e91d3e745ce397d979a16daba8c3f0",
+    "lines": 66,
+    "bytes": 4312
+  },
+  "references/python-stateful-test-isolation.md": {
+    "sha256": "16faf2891cb670008a2b1ee32ed0cc8d9516b5602db67df2e25c6385a90c87d0",
+    "lines": 87,
+    "bytes": 2740
+  },
+  "references/qa-results-20260721.md": {
+    "sha256": "fcc1b92aa690c07eca220f0b868a0cb83f6575d47d58e713a38189fb8038be55",
+    "lines": 132,
+    "bytes": 7215
+  },
+  "references/qa-testing-hard-won.md": {
+    "sha256": "7fcdfc0ffcec74e26068f25de535b5ee60792840d089cda3cccfaa545f0fa588",
+    "lines": 12,
+    "bytes": 1869
+  },
+  "references/qa-testing.md": {
+    "sha256": "91216916cf32542685f40ec6a5dc0675d943fb45687f4ac4436e2f806ba72ddd",
+    "lines": 330,
+    "bytes": 29799
+  },
+  "references/qa-trap-catalog.md": {
+    "sha256": "b27722065e9ebd7152f6620bbd2b087eb78d3c919bca8c310af8fd795caead6a",
+    "lines": 114,
+    "bytes": 9352
+  },
+  "references/r3-review-protocol.md": {
+    "sha256": "451a666d4378a991779646bbffa4fd6489dab6061ae1e6e42ca83ca16eda55db",
+    "lines": 56,
+    "bytes": 3062
+  },
+  "references/refactoring-catalog.md": {
+    "sha256": "361328a5bc6f0a59249390e8894e2b0bedc42e36855296c9596e4c8fd22c1b64",
+    "lines": 93,
+    "bytes": 5455
+  },
+  "references/revert-evidence-pitfall.md": {
+    "sha256": "a82e0218a9f2b26a051a52693911ebe41e47d5ff288f47462334d569a4d50769",
+    "lines": 38,
+    "bytes": 1793
+  },
+  "references/reward-hacking-bait.md": {
+    "sha256": "2cdcc1d68e3a7b7f1d58ccca2f6ba5bf4bdd76d4b3ca3629d88eb0da711901ca",
+    "lines": 66,
+    "bytes": 3801
+  },
+  "references/security-gates.md": {
+    "sha256": "65cb09227a165fd26d69d42745a3ebc07c04bb32fced60cab286e1dd1a9ab55c",
+    "lines": 299,
+    "bytes": 19556
+  },
+  "references/sql-injection-fix-patterns.md": {
+    "sha256": "fb625108331890edf9bc185ad90379e20fc88cda5c83695d6696ae358ac360fe",
+    "lines": 72,
+    "bytes": 2929
+  },
+  "references/stability-and-learning.md": {
+    "sha256": "432839402c68ff9b546d4a4ce66f095f4d514e1edccbf07e991eaf24597dc419",
+    "lines": 145,
+    "bytes": 6175
+  },
+  "references/writing-code.md": {
+    "sha256": "d4cd0d11728b3ada29eb0db1d098f5f00a8bdfb78ba352eb057f22c6678db01f",
+    "lines": 271,
+    "bytes": 17528
+  },
+  "references/bindings/flutter-example.md": {
+    "sha256": "d14a186e8d087466019883f4aaaf4d44eee693fdd9fc7d980310e3ad79ea4645",
+    "lines": 78,
+    "bytes": 3650
+  },
+  "references/bindings/python.md": {
+    "sha256": "0df1e161c420b18ef905012d489459bc91dea9152c915542ede867b4473eec44",
+    "lines": 115,
+    "bytes": 4883
+  },
+  "references/bindings/supabase-example.md": {
+    "sha256": "f27d37ab4b30e19906c9696b6b828b937bf84ed3d77db7a84d1d4c49f3ba31fa",
+    "lines": 64,
+    "bytes": 3427
+  },
+  "scripts/ad_hoc_verify_template.py": {
+    "sha256": "4094cc055adf070364270324c6e618fec3183140f7534699c82e9d6faae5ce50",
+    "lines": 52,
+    "bytes": 2066
+  },
+  "scripts/ad_hoc_verify_user_service.py": {
+    "sha256": "a338761daeace8dbdb8e126e0265eb82d0ec4b69fe0260230c1a190f00fdeaf8",
+    "lines": 65,
+    "bytes": 1528
+  },
+  "scripts/hermes-verify-sqlfix.py": {
+    "sha256": "ddffe964bbc0acfc964443a9f42330b0bf180a3720a21cdc0d24598b0c956efe",
+    "lines": 82,
+    "bytes": 2754
+  },
+  "scripts/red_battery.py": {
+    "sha256": "79788b2a26b7c000ac4b727062f5a3b6bf2f23a843c54cb2ce33b0fa8eab7971",
+    "lines": 60,
+    "bytes": 2119
+  },
+  "scripts/snapshot_skill.py": {
+    "sha256": "2d4e38abc8d6f04da00eabf6e44a98dacc15ac3274a5a9d92e0193b179c13c1e",
+    "lines": 117,
+    "bytes": 4411
+  },
+  "scripts/validate_run.py": {
+    "sha256": "8c4d7784b15a9928083ba32622b28a646b1fceb4379d999992222a9394fc6144",
+    "lines": 166,
+    "bytes": 8447
+  },
+  "scripts/workspace_guard.py": {
+    "sha256": "9c9c7c956293bc214c9019ca92109cd8738d753afc16b7fb4bfb9a35195d1148",
+    "lines": 160,
+    "bytes": 6648
+  },
+  "templates/pre-commit-config.yaml": {
+    "sha256": "3cf727c88489e2eca1a205b507b0483626696f7a1c5920f977fba08d9159c4ec",
+    "lines": 63,
+    "bytes": 1679
+  },
+  "templates/qa-master-prompt.md": {
+    "sha256": "7f334d29b1e17e093748a181275a8eb9a1d6d50eca27d7ea913606babb921081",
+    "lines": 191,
+    "bytes": 21223
+  },
+  "templates/qa-prompt-final.md": {
+    "sha256": "e13e002c18e88606d3b3f81128307849ab04947c311cb7c8a5137f7eda81051c",
+    "lines": 133,
+    "bytes": 14292
+  },
+  "templates/qa-prompt-hardened-medium.md": {
+    "sha256": "b789d1d6ef5a6b31d3daf5aadbcdaa503229e7c1060ed0bb91d66a082d2f8345",
+    "lines": 108,
+    "bytes": 11532
+  },
+  "templates/r3-review-report.md": {
+    "sha256": "0c23c5f09b3fd8ded5ea6548f25cd4ea86c79ffad93b06046370307c3c1bd9d4",
+    "lines": 78,
+    "bytes": 2068
+  },
+  "templates/test_working_days_discriminating.py": {
+    "sha256": "1f1ac107f292dea36c62508176e67007e7c84f060c4786188883a1009be537a2",
+    "lines": 51,
+    "bytes": 1508
+  }
+}
