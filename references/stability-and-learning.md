@@ -33,6 +33,36 @@ Every 3 iterations (or before any progress claim) scan 5 named failure modes:
 - **Action:** launch the Match Loop (visual inspection, `match-loop.md`)
 - **Escalate after:** 1 round of visual QA still failing
 
+## Layer 3c: Context Compaction (long-horizon loops)
+
+On loops exceeding ~20 iterations, the context window fills with accumulated tool outputs,
+error traces, and intermediate state. Recall degrades ("context rot") and the model starts
+forgetting earlier decisions — the exact failure mode the Ralph Wiggum loop was designed to
+prevent, but compaction addresses it from the OTHER direction: instead of fresh context from
+files each turn, you **compress** the existing context to make room.
+
+**When to compact:** when the context window is >70% full, or when the model starts repeating
+itself or contradicting earlier decisions.
+
+**How to compact (three levers):**
+
+1. **Tool output trimming** — before tool results enter context, strip verbose/repetitive
+   output. Keep only the fields that matter (exit code, key lines, error message). Raw
+   command output is usually the biggest token hog.
+
+2. **Structured summaries** — every N iterations, write a compact summary to PROGRESS.md:
+   what changed, what worked, what failed, current state. Then clear the verbose history
+   and re-hydrate from the summary file. The summary is the durable memory; the context
+   window is transient.
+
+3. **Sub-agent delegation** — for heavy subtasks (code review, test generation, research),
+   spawn a fresh subagent via `delegate_task`. It gets its own clean context window. The
+   parent only receives the result summary, not the full working memory. This is the most
+   aggressive compaction: the parent never sees the subtask's context at all.
+
+**Rule of thumb:** if you're past iteration 20 and haven't compacted, you're accumulating
+garbage. Write a summary, trim the history, or delegate the next subtask to a fresh context.
+
 ## Layer 3b: Autoresearch Loop (bounded Modify→Verify→Decide)
 
 Use when the user explicitly asks for iterative improvement toward a measurable metric.

@@ -10,7 +10,7 @@ description: >
   when an agent swarm writes code a human will not read line by line. The engine is
   language-agnostic; per-stack commands live in references/bindings/ (a Flutter/Dart
   example is included — copy it to make your own).
-version: 1.2.0
+version: 1.3.0
 license: CC-BY-4.0
 author: ratingtesting (https://github.com/ratingtesting)
 platforms: [windows, linux, macos]
@@ -44,6 +44,12 @@ language, not jargon:
   business terms, not implementation terms.
 This layer is cross-cutting: it applies to Phase-1 questions, every gate outcome, the circuit-breaker
 report, and the final summary. Full pattern → `references/phases.md` (Plain-language reporting).
+
+**Conciseness (token economy in loops).** Plain language does not mean verbose. In loop contexts
+(every iteration sends a report back), brevity saves tokens and money. Default to 1–2 sentences
+for gate outcomes and status updates. Reserve longer explanations for escalation reports and
+final summaries. The driver understands their product — you don't need to re-explain the
+product, just say what happened and what's next.
 
 **Provenance & licensing:** adapted from community loop-coding patterns (Ralph loop,
 execution-loop, match-loop, autoresearch-loop, coding-framework — all MIT-0) plus references
@@ -141,9 +147,10 @@ methodology catches. See `references/qa-testing.md` for full protocol.
 | Security gates R1-R12, third-party skill audit, overnight preflight | `references/security-gates.md` |
 | How to write code: reuse ladder, layers, dependency vetting | `references/writing-code.md` |
 | Code smells + refactoring techniques + pattern-justify (name → technique) | `references/refactoring-catalog.md` |
-| Stability (5 failure modes), Phoenix, Autoresearch, self-improve cron | `references/stability-and-learning.md` |
+| Stability (5 failure modes + context compaction for long loops), Phoenix, Autoresearch, self-improve cron | `references/stability-and-learning.md` |
 | Visual QA (Generator ↔ Analyst) | `references/match-loop.md` |
 | How to adversarially battle-test this skill (A/B, fact-check on disk, traps, capability triage) | `references/qa-testing.md` |
+| Audit existing autonomous loops against 7 principles (present/partial/missing, severity-ordered) | `references/loop-audit-checklist.md` |
 | Reusable discriminating-trap catalog (criteria, on-disk evidence, stricter-variant ladder) | `references/qa-trap-catalog.md` |
 | Copy-paste master QA prompt (one prompt, all model tiers) | `templates/qa-master-prompt.md` |
 | FINAL autonomous QA prompt (runs to report unattended, self-recovers, auto-installs tools) | `templates/qa-prompt-final.md` |
@@ -184,6 +191,28 @@ skill entirely — put it in your project's own agent-instructions file, not her
 
 ---
 
+## Loop Design: before any loop starts (5 whiteboard questions)
+
+Before Phase 1, before any code — answer these five questions on paper. If you can answer
+them, the implementation is a few hours. If you skip them, you are building a demo, not a
+production loop.
+
+1. **What triggers it?** Time (cron), interval (heartbeat), external event (webhook/hook),
+   or a goal the agent chases until met? The trigger pattern determines the entire loop
+   architecture — see `circuit-breaker.md` for rate limiting on external triggers.
+2. **What does it check each cycle?** The single observation that decides whether there is
+   work to do. If this is vague ("look at the project"), the loop will spin without purpose.
+3. **What action does it take?** One well-scoped action per cycle. If the action is "fix
+   everything", the loop has no convergence criterion.
+4. **When does it stop?** This must be **machine-checkable**, not "when it's done."
+   `tests pass` ✓. `improve the code` ✗. `covered competitors X, Y, Z with sources` ✓.
+5. **When does it escalate to a human?** The path out when the goal can't be met. If there
+   is no escalation path, the loop either runs forever or silently fails.
+
+For an audit of an EXISTING loop → `references/loop-audit-checklist.md`.
+
+---
+
 ## Autonomy dial — so the human isn't the bottleneck
 
 Industry canon: HITL (Human-In-The-Loop) ↔ AFK (Away From Keyboard). Pick the level by the
@@ -208,8 +237,17 @@ migrations, deploy. The human's zone: monetization, viral mechanics, unit econom
 roadmap, pricing. On anything in the human's zone the AI MUST stop, propose 2–3 options with
 trade-offs, and wait for an explicit "OK" — it may NEVER ship a business decision silently, even
 on Autopilot. This exists because the driver is a non-programmer founder: they delegate HOW to
-build, never WHAT the business should be. When unsure which zone a choice is in, treat it as the
+When unsure which zone a choice is in, treat it as the
 human's zone and ask.
+
+**Autonomous loops need a human at the boundary.** For long-running autonomous loops
+(webhook-triggered, cron-driven, goal-chasing), the autonomy dial has a SEPARATE constraint:
+the loop may automate reversible internal work freely, but **any irreversible or outward-facing
+action** (publishing, merging, deleting data, sending messages, deploying to prod) MUST stop and
+wait for human approval — even on Autopilot. This is the semi-autonomous principle: the agent
+runs freely up to the point of an irreversible action, then hands back. Full autonomy is safe
+only when every possible action is reversible and contained within the workspace. If the loop
+touches anything outside the workspace, it is not fully autonomous — gate the external actions.
 
 ---
 

@@ -49,10 +49,11 @@ Use this before calling `delegate_task`. Skipping it produces invalid treatment 
 
 1. **Skill-in-context check** — Does the `context` contain the exact `skill_view(name='keelwright')` call and the needed reference paths? If not, the treatment arm never loaded the skill.
 2. **Isolation check** — Does each arm get its own fresh working directory? No shared files between control and treatment.
-3. **Fact-check plan** — Do you know exactly which files/commands will prove the verdict? Not just "read the report" but `read_file`, `git diff`, `sha256`, `terminal` run, `browser_snapshot`.
-4. **Criterion-before-run check** — Is the PASS/NO-DIFF/FAIL criterion written down *before* dispatch, with concrete on-disk evidence, not vague wording like "should be better"?
-5. **Infra-resilience check** — If transport error happens, will you retry up to 2x and then mark INCONCLUSIVE, not fabricate results?
-6. **Seed-verification check** — After `cp`-ing shared inputs into each arm dir, `ls` BOTH arm dirs to confirm the seed actually landed (never `2>/dev/null` the check). An arm that lands in an EMPTY dir will invent its own inputs/test and silently invalidate the A/B.
+3. **Skill-tree isolation check** — Before ANY unattended run, make the skill tree read-only: `python scripts/workspace_guard.py isolate-skill-tree <skill_dir>`. This is the ONLY isolation that actually holds — prompt-level П10/П11 are instructions, not a sandbox. After the run: `restore-skill-tree`, then `snapshot verify-additions` to check for leaks. Only then `git add` by explicit path (never `-A`). (Learned 2026-07-21: Nemotron, Step 3.7, and North Mini Code all wrote into the skill dir despite П10/П11 — Nemotron even overwrote validate_run.py itself.)
+4. **Fact-check plan** — Do you know exactly which files/commands will prove the verdict? Not just "read the report" but `read_file`, `git diff`, `sha256`, `terminal` run, `browser_snapshot`.
+5. **Criterion-before-run check** — Is the PASS/NO-DIFF/FAIL criterion written down *before* dispatch, with concrete on-disk evidence, not vague wording like "should be better"?
+6. **Infra-resilience check** — If transport error happens, will you retry up to 2x and then mark INCONCLUSIVE, not fabricate results?
+7. **Seed-verification check** — After `cp`-ing shared inputs into each arm dir, `ls` BOTH arm dirs to confirm the seed actually landed (never `2>/dev/null` the check). An arm that lands in an EMPTY dir will invent its own inputs/test and silently invalidate the A/B.
 
 If any item fails, stop and patch the dispatch. Do not send a treatment arm that cannot prove its claim.
 

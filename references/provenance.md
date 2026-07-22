@@ -18,9 +18,19 @@ freely, including commercially, no attribution required — credited here anyway
 - match-loop — Generator ↔ visual Analyst loop
 - autoresearch-loop — bounded modify-verify-decide with rollback proof, escalation, lessons
 - coding-framework — reuse ladder, `/do` workflow, dependency vetting, auto-review
+- vibe-coding-guardrails — machine-enforced safety gates against AI-code risks
 
 Plus widely documented concepts: the Ralph loop (Geoffrey Huntley), Loop Stability Check, and the
 Phoenix cross-run learning pattern.
+
+## Design references (structural patterns, not copied text)
+
+The loop design section and audit checklist draw on structural patterns from:
+
+- **Loop Engineering** (maxmilian/loop-engineering, MIT) — 7 principles for designing/reviewing
+  autonomous agent loops; specifically the whiteboard-first design process (Principle 0),
+  the semi-autonomous escalation boundary (Principle 7), and the review-mode diagnostic
+  checklist structure. No text is reproduced; these are adapted concepts in our own wording.
 
 **Refactoring vocabulary** (`refactoring-catalog.md`): the code-smell, technique, and design-pattern
 NAMES are established industry terminology, used as facts — not copied text. Sources credited:

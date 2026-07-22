@@ -60,6 +60,27 @@ redundant shell calls (re-reading the same files, retrying the same failing comm
 tokens/quota before the no-progress cap trips. The budget is the fast inner brake; the four caps
 are the slow outer brake. Exhausting a budget is a normal signal to re-plan, not a failure.
 
+## Rate limiting for external-trigger loops (webhook / cron / event-driven)
+
+The four caps above bound a **manually-started** loop. But hook-triggered or cron-driven loops
+face a different threat: **event storms**. A webhook firing 10,000 times can drain a day's budget
+in minutes if each event spawns a full loop iteration.
+
+| Guard | Purpose | Default |
+|---|---|---|
+| **Rate limit** | max N iterations per time window | 10 per minute |
+| **Debounce** | merge identical events within window | 5-second window |
+| **Backpressure queue** | buffer events, process one at a time | FIFO, max depth 100 |
+
+Rules:
+- Rate limit is a **hard stop** — excess events are dropped with a log, not queued forever.
+- Debounce merges identical payloads (same webhook event ID / same cron trigger) within the
+  window — only the last one is processed.
+- Backpressure queue has a max depth; events beyond it are dropped. An unbounded queue is just
+  a slower infinite loop.
+- These guards live in the **controller code**, not in the agent prompt — you cannot trust the
+  agent to enforce its own rate limit.
+
 ## Reference runner (Python, stdlib only)
 
 ```python
