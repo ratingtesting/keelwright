@@ -33,6 +33,10 @@ Three things this diagram must make obvious at a glance:
   │    ⭐ freedom = blast radius (auth/money/prod → Copilot: approve each). │
   │ 🗂 TRIAGE  Trivial │ Low │ Standard │ High │ Critical                  │
   │    ⭐ machinery = risk. Trivial → Express path, no per-iter scans.      │
+  │                                                                          │
+  │ ⬚ LOOP DESIGN 5 whiteboard questions (before Phase 1)                   │
+  │    trigger · check · action · stop · escalate                            │
+  │    ⭐ answer before any code; skip = building a demo.                    │
   └──────────────────────────────────┬───────────────────────────────────┘
                                       ▼
   ┌──────────────────────────────────────────────────────────────────────┐
@@ -169,6 +173,9 @@ Each named industry failure mode → the layer that closes it. ✅ machine-enfor
 | Model version drift | R9 pin | ⚠️ warning |
 | Token/budget burn | per-iteration budgets | ✅ |
 | Style/consistency drift | @architecture-critic + Pink Flag | ⚠️ partial (no machine detector) |
+| Loop design absence | 5 whiteboard questions (Loop Design) | ✅ |
+| Context rot in long loops | compaction (trim/summarize/delegate) | ✅ |
+| Event storm / rate limiting | rate limit + debounce + backpressure | ✅ |
 | Regression that passes tests | post-deploy validation + rollback | ✅ where metric exists |
 | Human as bottleneck | autonomy dial + parallel loops | ✅ |
 | Confabulation / fabricated facts | factual-grounding gate (verify-before-assert) | ⚠️ partial (discipline) |

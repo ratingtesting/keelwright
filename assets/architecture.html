@@ -133,6 +133,11 @@
         <div>Requirements → Planning</div>
         <div class="tiny"><span class="star">★</span> no acceptance criteria? ⛔ STOP, ask. Never invents scope</div>
       </div>
+      <div class="box flex1">
+        <div class="title" style="font-size:12px"><span class="c-sl">⬚ LOOP DESIGN</span></div>
+        <div>5 whiteboard questions before any code</div>
+        <div class="tiny"><span class="star">★</span> trigger · check · action · stop · escalate — skip = demo</div>
+      </div>
     </div>
   </div>
   <div class="arrowdown">▼</div>
@@ -164,6 +169,8 @@
         <ul>
           <li class="catch">catches: doom loop + token/$ burn</li>
           <li>4 caps: 50 iters / 5 no-progress / 2h / 3× repeat</li>
+          <li>+ RATE LIMITING (event-driven loops)</li>
+          <li>  rate limit · debounce · backpressure queue</li>
           <li>+ PER-ITER BUDGETS ≤10 shell / 5 file / 3 external</li>
           <li>→ graceful STOP with report</li>
         </ul>
@@ -174,6 +181,8 @@
           <li class="catch">catches: goal drift, oscillation, thrash</li>
           <li>dead-retry · oscillation · drift · amplification · feedback-starvation</li>
           <li>ESCALATION: 3→REFINE 5→PIVOT 2→ask 3→blocker</li>
+          <li>+ CONTEXT COMPACTION (iter > 20)</li>
+          <li>  trim · summarize · delegate-to-subagent</li>
           <li>a "keep" resets the counters</li>
         </ul>
       </div>
@@ -220,8 +229,8 @@
   <!-- RISK MAP -->
   <div class="riskmap">
     <span class="rtag">documented 2026</span>
-    <h3>🗺 КАРТА РИСКОВ ВАЙБ/ЛУП-КОДИНГА → ЧЕМ ЗАКРЫТО В KEELWRIGHT</h3>
-    <div class="rsub">Каждая известная боль вайб/луп-кодинга → механизм, который её закрывает. <span class="c-em">✅</span> = машинно/на диске · <span class="c-am">⚠</span> = частично (честно: нет дешёвого машинного детектора)</div>
+    <h3>🗺 VIBE/LOOP-CODING RISK MAP → WHAT KEELWRIGHT COVERS</h3>
+    <div class="rsub">Every known vibe/loop-coding pain → the mechanism that closes it. <span class="c-em">✅</span> = machine-enforced / on-disk · <span class="c-am">⚠</span> = partial (honest: no cheap machine detector)</div>
     <div class="rgrid">
       <div class="ritem"><span class="rn">Context rot / decay</span><span class="rb">✅</span><br><span class="rm">fresh-context + PROGRESS.md</span></div>
       <div class="ritem"><span class="rn">Ralph (Wiggum) loop</span><span class="rb">✅</span><br><span class="rm">state in files, not chat</span></div>
@@ -248,8 +257,11 @@
       <div class="ritem warn"><span class="rn">Model version drift</span><span class="rb">⚠</span><br><span class="rm">R9 pin (warn)</span></div>
       <div class="ritem warn"><span class="rn">Style / consistency drift</span><span class="rb">⚠</span><br><span class="rm">critic + Pink Flag (no machine detector)</span></div>
       <div class="ritem warn"><span class="rn">Confabulation / fabricated facts</span><span class="rb">⚠</span><br><span class="rm">factual-grounding: verify-before-assert</span></div>
+      <div class="ritem"><span class="rn">Loop design absence</span><span class="rb">✅</span><br><span class="rm">5 whiteboard questions</span></div>
+      <div class="ritem"><span class="rn">Context rot in long loops</span><span class="rb">✅</span><br><span class="rm">compaction (trim/summarize/delegate)</span></div>
+      <div class="ritem"><span class="rn">Event storm / rate limiting</span><span class="rb">✅</span><br><span class="rm">rate limit + debounce + backpressure</span></div>
     </div>
-    <div class="rlegend"><b>Честность как фича:</b> три ⚠ (стилевая консистентность, sycophancy-как-черта и конфабуляция фактов) не закрыть дешёвым машинным детектором — keelwright ловит их измеримые последствия и вводит дисциплину проверки, а не саму диспозицию. Всё, что помечено ✅, — machine-enforced или проверено на диске, не «на глаз».</div>
+    <div class="rlegend"><b>Honesty as a feature:</b> three ⚠ (style consistency, sycophancy-as-trait, confabulation) cannot be closed by a cheap machine detector — keelwright catches their measurable consequences and enforces verification discipline, not the disposition itself. Everything marked ✅ is machine-enforced or verified on disk, not "eyeball it."</div>
   </div>
 
   <div class="foot">keelwright by ratingtesting · CC BY 4.0 · source of truth: assets/architecture.md</div>
