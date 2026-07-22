@@ -24,6 +24,7 @@ one level above `skills/` keeps the name unambiguous and the published surface c
 USAGE
   python snapshot_skill.py snapshot [keep=10]
   python snapshot_skill.py verify
+  python snapshot_skill.py verify-additions
   python snapshot_skill.py restore [<snapshot_name>]
 """
 import sys, shutil, hashlib, json, time
@@ -95,6 +96,39 @@ def verify(shrink_pct=30):
     return 1 if problems else 0
 
 
+def verify_additions():
+    """Detect foreign writes by comparing the live tree against git HEAD.
+    
+    snapshot verify only detects SHRINKAGE (truncation). A foreign agent that ADDS files
+    or EDITS existing files without removing content passes verify silently. This command
+    catches that by checking git diff against the last known-good commit.
+    """
+    import subprocess as _sp
+    git_dir = SKILL / ".git"
+    if not git_dir.exists():
+        print("[verify-additions] no .git in skill dir — cannot detect foreign writes.")
+        return 1
+    r = _sp.run(["git", "-C", str(SKILL), "log", "--oneline", "-1"], capture_output=True, text=True)
+    if r.returncode != 0:
+        print("[verify-additions] git log failed"); return 1
+    commit = r.stdout.strip().split()[0]
+    r2 = _sp.run(["git", "-C", str(SKILL), "diff", "--name-only", "HEAD"], capture_output=True, text=True)
+    changed = [l.strip() for l in r2.stdout.splitlines() if l.strip()]
+    r3 = _sp.run(["git", "-C", str(SKILL), "ls-files", "--others", "--exclude-standard"], capture_output=True, text=True)
+    new_files = [l.strip() for l in r3.stdout.splitlines() if l.strip()]
+    EXPECTED = {"PROGRESS.md","phoenix-log.md","autoresearch-lessons.md",".loop_state",".loop_stopped"}
+    new_files = [f for f in new_files if Path(f).name not in EXPECTED]
+    problems = []
+    for f in changed: problems.append(f"[MODIFIED] {f} — changed since {commit}")
+    for f in new_files: problems.append(f"[UNTRACKED] {f} — new file (foreign write?)")
+    for p in problems: print(p)
+    if problems:
+        print(f"\n=== verify-additions vs {commit}: {len(problems)} ALERT(S) ===")
+    else:
+        print(f"\n=== verify-additions vs {commit}: CLEAN ===")
+    return 1 if problems else 0
+
+
 def restore(name=None):
     snap = (BACKUPS / name) if name else _newest()
     if not snap or not snap.is_dir():
@@ -116,6 +150,8 @@ def main():
         sys.exit(snapshot(int(sys.argv[2]) if len(sys.argv) > 2 else 10))
     if cmd == "verify":
         sys.exit(verify())
+    if cmd == "verify-additions":
+        sys.exit(verify_additions())
     if cmd == "restore":
         sys.exit(restore(sys.argv[2] if len(sys.argv) > 2 else None))
     sys.exit(__doc__)

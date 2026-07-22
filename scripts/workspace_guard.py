@@ -21,13 +21,17 @@ USAGE
   # 2. Verify a workspace still belongs to its owner and nothing leaked in/out:
   python workspace_guard.py verify <workspace_dir> <owner_id>
 
-  # 3. Check a whole run: every <RUN_DIR>/<test>/<arm> is sealed to a distinct owner and
+  # 3. Make skill tree read-only (prevent QA models from writing to it):
+  #    python workspace_guard.py isolate-skill-tree <skill_dir>
+  #    python workspace_guard.py restore-skill-tree <skill_dir>
+  #
+  # 4. Check a whole run: every <RUN_DIR>/<test>/<arm> is sealed to a distinct owner and
   #    no arm's files appear under another arm (cross-arm contamination = code blending):
   python workspace_guard.py audit  <run_dir>
 
 Exit 0 = clean. Exit 1 = isolation violated (do NOT trust results / do NOT merge code).
 """
-import sys, json, hashlib, time
+import sys, json, hashlib, time, os, stat
 from pathlib import Path
 
 SEAL = ".keelwright-seal"
@@ -143,6 +147,65 @@ def audit(run_dir: Path) -> int:
     return 1 if errs else 0
 
 
+
+def _set_readonly(path: Path, readonly: bool):
+    """Set or clear read-only attribute on file (Windows) or permission bit (POSIX)."""
+    try:
+        if os.name == 'nt':
+            import ctypes
+            attrs = ctypes.windll.kernel32.GetFileAttributesW(str(path))
+            if readonly:
+                attrs |= stat.FILE_ATTRIBUTE_READONLY
+            else:
+                attrs &= ~stat.FILE_ATTRIBUTE_READONLY
+            ctypes.windll.kernel32.SetFileAttributesW(str(path), attrs)
+        else:
+            st = os.stat(path)
+            if readonly:
+                os.chmod(path, st.st_mode & ~(stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH))
+            else:
+                os.chmod(path, st.st_mode | stat.S_IWUSR)
+    except Exception as e:
+        print(f"  warning: could not set readonly on {path}: {e}")
+
+
+def isolate_skill_tree(skill_dir: Path) -> int:
+    """Make the skill tree read-only to prevent QA models from writing to it.
+    
+    This is the REAL isolation — prompt-level П10/П11 are not enforced by weak models.
+    Run before any unattended/QA session. Restore with restore-skill-tree after.
+    """
+    SKILL_EXTS = {".md", ".py", ".yaml", ".yml", ".html", ".png", ".jpg", ".json", ".txt"}
+    IGNORE = {".git", "backups", "__pycache__", ".pytest_cache", "internal"}
+    
+    count = 0
+    for f in skill_dir.rglob("*"):
+        if f.is_file():
+            if any(p in IGNORE for p in f.relative_to(skill_dir).parts):
+                continue
+            if f.suffix.lower() in SKILL_EXTS or f.name in {".gitignore", "LICENSE"}:
+                _set_readonly(f, True)
+                count += 1
+    print(f"[isolate] {skill_dir}: {count} files set read-only")
+    print(f"[isolate] Restore with: python workspace_guard.py restore-skill-tree <path>")
+    return 0
+
+
+def restore_skill_tree(skill_dir: Path) -> int:
+    """Restore write permissions after an isolated session."""
+    IGNORE = {".git", "backups", "__pycache__", ".pytest_cache", "internal"}
+    
+    count = 0
+    for f in skill_dir.rglob("*"):
+        if f.is_file():
+            if any(p in IGNORE for p in f.relative_to(skill_dir).parts):
+                continue
+            _set_readonly(f, False)
+            count += 1
+    print(f"[restore] {skill_dir}: {count} files restored to writable")
+    return 0
+
+
 def main():
     if len(sys.argv) < 3:
         sys.exit(__doc__)
@@ -153,6 +216,10 @@ def main():
         sys.exit(verify(Path(sys.argv[2]), sys.argv[3]))
     if cmd == "audit":
         sys.exit(audit(Path(sys.argv[2])))
+    if cmd == "isolate-skill-tree" and len(sys.argv) >= 3:
+        sys.exit(isolate_skill_tree(Path(sys.argv[2])))
+    if cmd == "restore-skill-tree" and len(sys.argv) >= 3:
+        sys.exit(restore_skill_tree(Path(sys.argv[2])))
     sys.exit(__doc__)
 
 

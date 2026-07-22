@@ -10,7 +10,7 @@ description: >
   when an agent swarm writes code a human will not read line by line. The engine is
   language-agnostic; per-stack commands live in references/bindings/ (a Flutter/Dart
   example is included — copy it to make your own).
-version: 1.1.0
+version: 1.2.0
 license: CC-BY-4.0
 author: ratingtesting (https://github.com/ratingtesting)
 platforms: [windows, linux, macos]
@@ -88,6 +88,11 @@ learned the hard way:
   not loading the right one. Merge same-topic references into one file with sections (e.g.
   ad-hoc-verification simple + structured harness + reachability → one file), then delete the
   merged-in files and remove their now-dead map rows in SKILL.md. Keep the load-map in sync.
+- **Before any unattended/QA run: isolate the skill tree.** Prompt-level rules (П10/П11) are
+  not enforced by weak models — they WILL write into the skill dir. Run
+  `python scripts/workspace_guard.py isolate-skill-tree <skill_dir>` before the run. After the
+  run: `restore-skill-tree`, then `snapshot verify-additions` to check for leaks. Only then
+  `git add` by explicit path (never `-A`). This is the only isolation that actually holds.
 - **Never put a second `SKILL.md` anywhere under `skills/` — backups/snapshots go ABOVE it.**
   The skill loader scans ALL of `skills/` recursively and keys on the `name:` frontmatter, so
   ANY `SKILL.md` copy under `skills/` (a nested `backups/…`, or even a sibling
@@ -145,6 +150,8 @@ methodology catches. See `references/qa-testing.md` for full protocol.
 | Published QA run results (sanitized, tier-by-benchmark) + how to add a run | `qa-results/README.md` |
 | MANDATORY pre-publish integrity gate — rejects fabricated/contaminated QA results | `scripts/validate_run.py` |
 | INFRASTRUCTURE workspace isolation (seal/verify/audit) — prevents swarm/arm code-blend | `scripts/workspace_guard.py` |
+| INFRASTRUCTURE skill-tree read-only isolation (isolate-skill-tree / restore-skill-tree) — the only enforcement that holds against QA models writing to the skill dir | `scripts/workspace_guard.py` |
+| Snapshot verify-additions — detects foreign writes by comparing against git HEAD (verify alone only catches shrinkage) | `scripts/snapshot_skill.py` |
 | jscpd node-CLI vs Rust-port `cpd 5.x` flags + the silent "0 files analyzed" min-tokens trap | `references/jscpd-rust-port-gotchas.md` |
 | Third-party skill audit tools (SkillSpector etc.) | `references/external-skill-audit-tools.md` |
 | Per-stack commands (test/lint/build/quality) | `references/bindings/<your-stack>.md` |
@@ -505,7 +512,34 @@ otherwise.
   `hard-gate-summary.md` will happily bless. Real case: run `20260720T200131Z_vibe` self-reported
   a discriminating PASS that was two hardcoded `run.py` scripts in a sibling dir while the actual
   arm dirs were empty — the gate flags it (only 2/6 records survive).
-- **Strong-model NO-DIFF is NOT a skill failure.** When A/B-testing this skill against a
+- **`git add -A` at commit time sweeps in stale, unrelated edits — inspect the staging area
+  first.** A blanket `git add -A` stages everything in the working tree, including uncommitted
+  changes left behind by a PRIOR session or another agent. Real case this session: `git add -A`
+  pulled stale SKILL.md maintaining-notes from an earlier turn into an unrelated commit. Before
+  every commit run `git status --short`; if a staged file is one you did not touch this turn,
+  decide deliberately — do not let add-all make the call. Prefer staging named paths (`git add
+  <path>…`) over `-A`.
+- **`snapshot verify` returning CLEAN proves nothing if the snapshot was taken AFTER a rogue
+  write.** `snapshot_skill.py verify` compares the live tree against the NEWEST snapshot and only
+  flags files that SHRANK or vanished — it does NOT catch foreign additions or edits, and a
+  snapshot taken on top of already-modified state bakes that state in as the new baseline. Real
+  case: QA executors wrote 5 new files + edited SKILL.md and 7 references; a snapshot taken
+  afterward reported CLEAN. **Use `verify-additions`** (compares against git HEAD) and always
+  `git diff HEAD` against your last known-good commit, not against a post-hoc snapshot.
+- **QA/unattended runs CAN write into the skill dir despite П10/П11 — the prompt rule is not
+  an enforced sandbox.** Observed: executor models left uncommitted edits and new files under
+  `references/`, `scripts/`, and in SKILL.md, dated to the run window, even though the QA prompt
+  forbids touching the skill tree. **Use `workspace_guard.py isolate-skill-tree <skill_dir>`**
+  before any unattended run to make files read-only at the OS level. Restore with
+  `restore-skill-tree` after. This is the only isolation that actually holds.
+- **Classify the executor model by BENCHMARK, never by its alias/route name — Gate 5b applies to
+  yourself.** A local alias like `SuperCombo_256k_100` / `custom:9router` says nothing about tier;
+  it may route to a medium model (real case: it was Step 3.7 Flash, SWE-bench Pro ~56%), not a
+  "strong orchestrator." Read `.run_meta.json` `tier_by_benchmark` and the published
+  SWE-bench/GPQA number instead. `unknown` is the honest tier when the gating benchmark is
+  unpublished — do not upgrade a guess to "strong." A wrong tier label inverts the meaning of
+  every NO-DIFF in the report.
+- **Strong-model NO-DIFF is NOT a skill failure.**
   strong orchestrator model (e.g. SuperCombo-Orchestrator), hardened checks may return
   NO-DIFF across the board — the strong model applies equivalent reasoning natively,
   without loading the skill. That is testing outside the skill's design envelope (its
@@ -530,3 +564,32 @@ otherwise.
   tautological test (passes by construction against broken code) or an out-of-scope edit
   slips into a commit. Verification gate 8a checks that YOUR claimed change is on disk; it
   does NOT check that someone else's uncommitted change is absent — that check is this step.
+- **`snapshot verify` is misleading after rogue writes — the real integrity check is `git diff
+  HEAD`.** `snapshot_skill.py verify` compares the live tree against the NEWEST snapshot and
+  only flags files that SHRANK (truncation) or vanished. It does NOT catch foreign additions
+  or edits, and a snapshot taken on top of already-modified state bakes that state in as the
+  new baseline. Real case (2026-07-21): QA executors wrote 5 new files + edited SKILL.md
+  (+39 lines) and 7 references into the skill dir between runs; a snapshot taken afterward
+  reported CLEAN because it captured the modified tree. The real integrity check is `git
+  status` / `git diff HEAD` against your last known-good COMMIT, plus comparing file mtimes
+  to your last commit time — not `verify` alone. Snapshot BEFORE risky work (and before any
+  unattended run touches the tree), then diff against THAT, never against a post-hoc snapshot.
+- **`git add -A` at commit time sweeps in stale, unrelated edits — inspect the staging area
+  first.** A blanket `git add -A` stages everything in the working tree, including uncommitted
+  changes left behind by a PRIOR session or another agent that you did not make this turn.
+  They then ride into your commit silently and the commit message misdescribes the diff.
+  Before every commit run `git status --short` and skim `git diff --cached`; if a staged file
+  is one you did not touch this turn, decide deliberately (keep it and mention it in the
+  message, `git restore --staged <f>` to leave it unstaged, or `git checkout` to drop it) —
+  do not let add-all make the call. Prefer staging named paths (`git add <path> …`) over `-A`
+  when you know exactly what changed. Real case this session: `git add -A` pulled two stale
+  SKILL.md maintaining-notes from an earlier turn into an unrelated commit.
+- **Classify the executor model by BENCHMARK, never by its alias/route name — Gate 5b applies
+  to yourself.** A local alias like `SuperCombo_256k_100` / `custom:9router` says nothing
+  about tier; it may route to a medium model (real case: it was Step 3.7 Flash, SWE-bench
+  Pro ~56%, medium), not a "strong orchestrator." Read `.run_meta.json`
+  `tier_by_benchmark` and the published SWE-bench/GPQA number instead of inferring tier from
+  a confident-sounding alias. `unknown` is the honest tier when the gating benchmark
+  (SWE-bench Verified) is unpublished — do not upgrade a guess to "strong." A wrong tier
+  label inverts the meaning of every NO-DIFF in the report (strong NO-DIFF = "skill doesn't
+  get in the way"; medium/weak NO-DIFF = "trap too easy").
