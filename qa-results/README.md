@@ -61,6 +61,20 @@ of code under supervision*, not as *autonomous QA orchestrators*. The QA methodo
 triage (Step 0) is what should stop such a model up front. A valid weak-tier discrimination run
 remains unachieved on available free models, and is documented here as an open gap rather than faked.
 
+### Second batch (2026-07-22, v1.3.0 traps included) — verified on disk
+
+| RUN_ID | executor | tier | tests | result |
+|--------|----------|------|-------|--------|
+| 20260722T143000Z | nvidia/nemotron-3-ultra-550b:free | STRONG-ish (SWE-bench Verified ~71%) | 5 | **VALID** — 2 DISCRIMINATES (1.3 R2 secrets, 1.3 R3 business-logic) · 3 NO-DIFF · gate 5/5 exit 0 |
+| 20260722T082559Z | tencent/hy3:free | STRONG (SWE-bench Verified 78%, GPQA 90.4) | 34 | **VALID** — 3 DISCRIMINATES (1.1 autonomy-dial, 2.1 reuse-ladder, 7.2 personas) · 30 NO-DIFF · 1 CANNOT-RUN (5.5 Phoenix) · gate 34/34 exit 0 |
+| 20260722T091303Z | stepfun/step-3.7-flash:free | unknown (SWE-bench Pro 56%) | 32 | **VALID (null result)** — 0 DISCRIMINATES · 2 NO-DIFF · 10 PARTIAL · 19 INCONCLUSIVE · 1 CANNOT-RUN · gate 32/32 exit 0. No trap discriminated this run. |
+| 20260721T152310Z | stepfun/step-3.7-flash:free | unknown | 29 | **INVALID** — self-reported 9 DISCRIMINATES, but all 9 have api_calls_control=0 AND api_calls_treatment=0 (П2: static harness, no agent ran the A/B). Gate → exit 1, 16/29. |
+
+Notes: v1.3.0 traps (loop-design, compaction, loop-audit) were NO-DIFF on Hy3 (strong) — expected
+outside the design envelope. The two strong-tier valid runs (Hy3, Nemotron) confirm the skill
+discriminates on autonomy-dial, reuse-ladder, personas, and R2/R3 gates even against strong models.
+Step 3.7 produced one valid null result (0 DISC) and one INVALID (static-harness fabrication).
+
 ## Integrity gate (run before publishing ANY result)
 
 `scripts/validate_run.py <run_dir> <results.jsonl>` mechanically rejects fabricated results
