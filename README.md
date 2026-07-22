@@ -67,7 +67,7 @@ It's not a general intelligence benchmark — it's a direct measure of skill imp
 - **Execution Rate (ER):** can the model run A/B tests at all?
 - **Discrimination Rate (DR):** does the skill change the model's output?
 
-Results from 8 validated A/B test runs across 6 model tiers:
+Results from 8 validated A/B test runs across 3 tiers (STRONG, MEDIUM, WEAK):
 
 | Model | Tier | Tests | DISC | DR | **KDS** |
 |-------|------|-------|------|----|---------|
@@ -75,7 +75,7 @@ Results from 8 validated A/B test runs across 6 model tiers:
 | stepfun/step-3.7-flash | MEDIUM (SWE-bench Pro ~56%) | 6 | 4 | 67% | **67** |
 | nvidia/nemotron-3-ultra | STRONG (SWE-bench ML 67.7%) | 5 | 2 | 40% | **40** |
 | deepseek-v4-flash | STRONG (SWE-bench Verified ~79%) | 14 | 4 | 29% | **29** |
-| [REDACTED] | STRONG (frontier) | 6 | 1 | 17% | **17** |
+| claude-opus-4-8 | STRONG (frontier) | 6 | 1 | 17% | **17** |
 | tencent/hy3 | STRONG (SWE-bench Verified 78%) | 34 | 3 | 9% | **9** |
 | cohere/north-mini-code | WEAK (Agentic Index 3.1) | — | — | — | **0** |
 | nvidia/nemotron-nano-9b | WEAK | — | — | — | **0** |
