@@ -48,6 +48,18 @@ agreed standard for ALL future runs, not a one-off.
 | 20260721T172703Z | Step 3.7 Flash (`SuperCombo_256k_100` alias / custom:9router) | MEDIUM/unknown (SWE-bench Pro 56%, Verified n/d) | 27 | 2 DISCRIMINATES (4.2 spec-test, 2.5 anti-erosion) · 13 PASS · 11 NO-DIFF · 1 PARTIAL · gate 27/27 OK |
 | 20260721T143000Z | nvidia/nemotron-3-ultra-550b:free | STRONG-ish (SWE-bench Verified ~71%) | 13 claimed | **INVALID** — self-reported "27/27 FULLY COMPLETE" but disk had 13 records; 7 arm-pairs MISSING on disk yet given NO-DIFF verdicts + non-taxonomy verdicts (MINOR/EXPECTED-DIFF); gate → **exit 1, only 6/13 passed**. Fabrication caught by the integrity gate. |
 | North Mini Code (no RUN_DIR) | cohere/north-mini-code:free | WEAK (Intelligence Index 19.8, Agentic 3.1) | 0 (prose-only) | **INVALID** — no RUN_DIR, no results.jsonl; self-report claims validate_run.py was "updated" with tier_self_assessed validation to 8,615 bytes, but disk shows canonical 8,613 bytes / 166 lines unchanged; gate rejects prose-only runs. Fabrication of changes confirmed. |
+| 20260722T124500Z | test-user (weak-model driven) | unknown (no benchmark) | 1 claimed | **INVALID** — results.jsonl misplaced in `keelwright-qa/` subdir, no `.run_meta.json`; verdict PASS+discriminates=true with **api_calls_control=0 AND api_calls_treatment=0** (П2 hardcoded-harness fabrication); no tool ever ran. Gate → exit 1. |
+| 20260722T133000Z | cohere/north-mini-code:free | WEAK (Intelligence Index 19.8, Agentic 3.1) | 1 claimed | **INVALID** — no results.jsonl anywhere in RUN_DIR (prose-only); `.run_meta.json` status="initialized" (run never finished); treatment auth uses hardcoded `_get_human_approval` (П2 fake harness); broken `https:C:\...` path in report (confabulated URL). Also wrote 14 foreign files + edited SKILL.md into the skill dir (isolate-skill-tree was NOT applied) — all reverted to quarantine. Gate → exit 1. |
+
+**Weak-tier finding (standing conclusion 2026-07-22).** Three consecutive weak/unattended runs
+(Nemotron, North Mini Code ×2) all produced fabricated reports: glowing "DISCRIMINATES / all PASS"
+prose with **no valid results.jsonl, api_calls=0, hardcoded harnesses, or non-existent artifacts**.
+The integrity gate (`validate_run.py`) caught all three (exit 1). **Conclusion: a genuinely weak
+model (SWE-bench <40%, Agentic Index ~3) cannot run this A/B QA validly — it fabricates rather than
+executes.** This is itself the design-envelope proof: the skill targets weak models as *executors
+of code under supervision*, not as *autonomous QA orchestrators*. The QA methodology's own capability
+triage (Step 0) is what should stop such a model up front. A valid weak-tier discrimination run
+remains unachieved on available free models, and is documented here as an open gap rather than faked.
 
 ## Integrity gate (run before publishing ANY result)
 
