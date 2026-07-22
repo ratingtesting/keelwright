@@ -1,15 +1,15 @@
 ---
 name: keelwright
 description: >
-  Stack-agnostic engine for vibe/loop coding by non-programmers: autonomous iterative
-  development (phases → iterations → backpressure gates) + machine-enforced safety
-  (OWASP/secrets/business-logic + third-party skill audit) + autonomy dial
-  (Autopilot/Checkpoint/Copilot) + self-learning (Phoenix/Autoresearch/cron) +
-  circuit-breaker limits against wasted token spend. Load before any loop/agent coding
-  session, before committing a feature, when starting an autonomous/unattended run, or
-  when an agent swarm writes code a human will not read line by line. The engine is
-  language-agnostic; per-stack commands live in references/bindings/ (a Flutter/Dart
-  example is included — copy it to make your own).
+  Engine for vibe-coders and loop-coders who ship AI-generated code they can't read line
+  by line. Covers 28 known failure modes: SQL injection, hardcoded secrets, hallucinated
+  packages (slopsquatting), reward hacking (AI deletes tests to pass), doom loops (runaway
+  token burn), false reports, missing auth, business logic bypasses, over-engineering, and
+  more. Machine-enforced — not prompt suggestions. Autonomy dial (Autopilot/Checkpoint/
+  Copilot) lets you approve what matters; AI handles the rest. Self-healing loop with
+  circuit-breaker limits and Phoenix restart. Plain-language reports for non-developers.
+  Proven by adversarial A/B testing: Keelwright Score (KDS) up to 83/100 on strong models
+  (SWE-bench 78%). Load before any loop/agent coding session, autonomous run, or commit.
 version: 1.3.0
 license: CC-BY-4.0
 author: ratingtesting (https://github.com/ratingtesting)
@@ -126,7 +126,7 @@ colored borders); the risk-map is a 3-column grid with ✅/⚠ coverage badges. 
 edit `architecture.md` → mirror the change into `architecture.html` → `browser_navigate` the
 `file://` URL → `browser_vision` to confirm text is crisp and nothing overflows → copy the
 screenshot to `assets/architecture.png`. Keep `.md`, `.html`, and the SKILL.md risk glossary
-carrying the SAME risk list (currently 25 rows) so the three never drift.
+carrying the SAME risk list (currently 28 rows) so the three never drift.
 
 **Capability triage is Step 0:** Before running adversarial tests, the executing model MUST
 honestly assess whether it can reliably: (1) orchestrate delegate_task A/B with isolated
@@ -492,8 +492,33 @@ only genuine out-of-band user messages from your runtime.
 ```
 all tasks done → project-wide quality scan → final gates →
 git push (per git-safety rules: new branch, never main without asking) →
-CI → report to the human (what shipped, what was found/fixed, what's tech debt)
-```
+_A genuine weak-tier run (low-benchmark ~7–9B executor) is still pending — that is the run
+expected to show the skill rescuing a model that fails traps natively._
+
+## Keelwright Score (KDS)
+
+**KDS = ER × DR / 100** — one number (0–100) per model, measuring how well it understands
+and applies the skill's checks. Published in `qa-results/README.md`.
+
+- **ER** (Execution Rate): `valid_tests / total_tests × 100` — can the model run A/B tests?
+- **DR** (Discrimination Rate): `DISCRIMINATES / valid_tests × 100` — does the skill change behavior?
+
+| KDS | Meaning |
+|-----|---------|
+| 0 | Below threshold — model can't execute A/B tests |
+| 1–10 | Weak/medium — skill adds some checks |
+| 10–30 | Medium-strong — skill adds meaningful checks |
+| 30–50 | Strong — skill adds security & quality gates |
+| 50+ | Frontier — skill deeply understood and applied |
+
+KDS is NOT a general intelligence benchmark. It measures "how much does keelwright improve
+this model's outcomes" — a dimension no SWE-bench or GPQA captures. A strong model with
+high SWE-bench may have low KDS (it already knows the checks); a medium model may have
+high KDS (skill fills gaps it can't fill alone).
+
+**Key result:** Laguna S 2.1 (SWE-Bench ML 78.5%) scored KDS 83 — highest recorded.
+Step 3.7 Flash (SWE-Bench Pro ~56%) scored KDS 67 — medium model gets MORE value from
+the skill than some strong models. Weak models (North Mini, Nemotron Nano 9B) scored 0.
 
 ## Critical principle (from adapting rules across systems)
 
@@ -608,3 +633,15 @@ otherwise.
 - **`git add -A` is a trap** (consolidated above — always stage by explicit path.)
 - **Classify by benchmark, not alias** (consolidated above — read `.run_meta.json`, not the
   route name.)
+- **CANNOT-RUN with empty arms is expected, not INVALID.** When a test is marked CANNOT-RUN
+  (e.g. 5.5 Phoenix needs ≥3 sessions, 7.4 Visual needs browser), both arm dirs will be
+  empty — the model correctly didn't run the test. Do NOT treat CANNOT-RUN + empty arms as
+  INVALID. The integrity gate may flag it; filter CANNOT-RUN records before running the gate,
+  or accept that CANNOT-RUN records with empty arms are legitimate non-executions.
+- **QA data contamination: past-run data mixed into current run.** A model may copy results
+  or artifacts from previous QA runs into the current RUN_DIR, producing inflated DISCRIMINATE
+  counts that don't reflect actual A/B execution. Always verify: (1) every test_id in
+  results.jsonl has corresponding arm dirs with model-produced files, (2) api_calls > 0 for
+  PASS/DISCRIMINATES verdicts, (3) check file mtimes against run start time. Real case:
+  Step 3.7 SuperCombo_256k_100 run mixed data from past sessions — caught by comparing
+  test_ids against actual arm dirs on disk.
