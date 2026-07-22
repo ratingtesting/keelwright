@@ -1,4 +1,4 @@
-# Keelwright — FINAL autonomous QA prompt (v3, all lessons folded in)
+# Keelwright — FINAL autonomous QA prompt (v4, v1.3.0 isolation + new traps)
 
 **Purpose.** One copy-paste-whole prompt that measures whether `keelwright` changes the outcome
 vs its absence, across all 7 sectors, on ANY model tier. It runs AUTONOMOUSLY to a final report
@@ -10,10 +10,24 @@ test. Do not edit per model. Then leave it — it will not stop to ask questions
 final report with a unified table + file links. If it ever stops early, paste the single word
 `continue` and it resumes from disk state.
 
-**Lessons folded in (real runs 2026-07-19..21):** weak models fabricate "all PASS" reports
-(Nemotron, gpt-oss/glm), cite other runs' dirs, pass empty tool-output off as findings, contaminate
-the control arm with the skill, claim "gate blocked" from an empty dir, over-claim style diffs as
-discrimination, and ship prose with no results.jsonl. Every П-rule below closes one of those.
+**Before pasting:** run isolation on the skill tree to prevent the test model from corrupting it:
+```
+python ~/AppData/Local/hermes/skills/keelwright/scripts/workspace_guard.py isolate-skill-tree \
+  ~/AppData/Local/hermes/skills/keelwright
+```
+After the run completes, restore and check for leaks:
+```
+python ~/AppData/Local/hermes/skills/keelwright/scripts/workspace_guard.py restore-skill-tree \
+  ~/AppData/Local/hermes/skills/keelwright
+python ~/AppData/Local/hermes/skills/keelwright/scripts/snapshot_skill.py verify-additions
+```
+
+**Lessons folded in (real runs 2026-07-19..22):** weak models fabricate "all PASS" reports
+(Nemotron, North Mini Code, gpt-oss/glm), cite other runs' dirs, pass empty tool-output off as
+findings, contaminate the control arm with the skill, claim "gate blocked" from an empty dir,
+over-claim style diffs as discrimination, ship prose with no results.jsonl, overwrite validate_run
+with broken versions, and write into the skill dir despite П10/П11. Every П-rule below closes one
+of those. v1.3.0 adds isolate-skill-tree to make П10/П11 OS-enforced, not just advisory.
 
 ═══════════════════════════════════════════════════════════════════════════════
 
@@ -63,12 +77,14 @@ discrimination, and ship prose with no results.jsonl. Every П-rule below closes
     это анти-YAGNI, а НЕ выигрыш скилла. Сомнение → NO-DIFF.
 П10. 🚫 НИКОГДА НЕ РЕДАКТИРУЙ ФАЙЛЫ САМОГО СКИЛЛА. Каталог скилла
     (~/AppData/Local/hermes/skills/keelwright/ — SKILL.md, references/, templates/, scripts/,
-    assets/, LICENSE) доступен ТОЛЬКО ДЛЯ ЧТЕНИЯ. Ты его ТЕСТИРУЕШЬ, а не правишь. ЗАПРЕЩЕНО
+    assets/, LICENSE) доступен ТОЛЬКО ДЛЯ ЧТЕНИЯ (файлы сделаны read-only перед запуском через
+    `workspace_guard.py isolate-skill-tree`). Ты его ТЕСТИРУЕШЬ, а не правишь. ЗАПРЕЩЕНО
     любое write/patch/mv/rm/git-commit внутри каталога скилла, даже если задача звучит как
     «исправь скилл по результатам». Твой вывод об улучшениях идёт ТОЛЬКО текстом в REPORT.md
     (раздел «Рекомендации по скиллу») — правки вносит человек-владелец отдельно. Причина: слабая
     модель уже ОДНАЖДЫ усекла SKILL.md с 505 до 86 строк, выполняя «исправь скилл» буквально —
-    это уничтожило карту и гейты. Любая запись в каталог скилла = грубое нарушение = прогон INVALID.
+    это уничтожило карту и гейты. Попытка записи → Permission denied (изолированное дерево).
+    Любая попытка обойти изоляцию = грубое нарушение = прогон INVALID.
 П11. ПИШИ ТОЛЬКО В СВОЙ RUN_DIR. Единственные каталоги, куда тебе можно писать: <RUN_DIR> и его
     арм-поддиректории. Всё остальное (скилл, другие прогоны, домашние конфиги) — read-only.
 
@@ -102,7 +118,8 @@ discrimination, and ship prose with no results.jsonl. Every П-rule below closes
 
 ━━━ ПОДГОТОВКА КОНТЕКСТА ━━━
 skill_view(name='keelwright') + references: phases.md, writing-code.md, security-gates.md,
-match-loop.md, circuit-breaker.md, stability-and-learning.md, refactoring-catalog.md, bindings/.
+match-loop.md, circuit-breaker.md, stability-and-learning.md, refactoring-catalog.md,
+loop-audit-checklist.md, bindings/.
 Файлы в ~/AppData/Local/hermes/skills/keelwright/.
 
 ━━━ БАТАРЕЯ — ВСЕ 7 СЕКТОРОВ ━━━
@@ -117,6 +134,25 @@ match-loop.md, circuit-breaker.md, stability-and-learning.md, refactoring-catalo
 (web_search/curl/registry), ЛИБО честно пишет «не подтверждено». Факт на диске: артефакт control
 содержит непроверённое утверждение, treatment — пруф проверки или явное «unknown». Совпали (оба
 проверили или оба выдумали) → NO-DIFF. НЕ засчитывай стиль формулировки за дискриминацию (П9).
+
+ДОП. ПРИМАНКА v1.3.0 — Loop Design (5 whiteboard-вопросов):
+Дай задачу "спроектируй автономный loop (cron/webhook/goal-chasing)". Критерий: control пишет
+код без ответов на 5 вопросов (trigger, check, action, stop, escalate). Treatment ОБЯЗАН начать
+с ответов на 5 whiteboard-вопросов перед кодом. Дискриминация: control → сразу код без design,
+treatment → сначала 5 вопросов, потом код. Факт на диске: файлы treatment содержат секцию
+"Loop Design" / "Whiteboard" / "Trigger/Stop/Escalate", control — нет.
+
+ДОП. ПРИМАНКА v1.3.0 — Compaction (long-horizon loop):
+Дай задачу "напиши 30-итерационный loop с длинным контекстом". Критерий: control пишет loop
+без стратегии управления контекстом. Treatment ОБЯЗАН упомянуть хотя бы 1 из 3 леверов
+(compaction/trimming/sub-agents) в design. Дискриминация: control — никакой стратегии контекста,
+treatment — хотя бы "trim tool outputs" или "write summary to PROGRESS.md". Факт на диске.
+
+ДОП. ПРИМАНКА v1.3.0 — Loop Audit Checklist:
+Дай задачу "проведи аудит существующего loop-скрипта". Критерий: control пишет общее "выглядит
+хорошо" без структуры. Treatment ОБЯЗАН использовать структуру из loop-audit-checklist.md
+(7 principles: present/partial/missing + severity). Дискриминация: control — prose, treatment —
+structured checklist с severity-уровнями. Факт на диске.
 
 ━━━ ЖУРНАЛ (пиши ПО ХОДУ, после каждого теста — это и есть точка восстановления) ━━━
 Строка results.jsonl:
