@@ -158,6 +158,7 @@ methodology catches. See `references/qa-testing.md` for full protocol.
 | MANDATORY pre-publish integrity gate — rejects fabricated/contaminated QA results | `scripts/validate_run.py` |
 | INFRASTRUCTURE workspace isolation (seal/verify/audit) — prevents swarm/arm code-blend | `scripts/workspace_guard.py` |
 | INFRASTRUCTURE skill-tree read-only isolation (isolate-skill-tree / restore-skill-tree) — the only enforcement that holds against QA models writing to the skill dir | `scripts/workspace_guard.py` |
+| QA Isolation Protocol: before→during→after run, three-layer protection, git add pitfalls, tier classification | `references/qa-isolation-protocol.md` |
 | Snapshot verify-additions — detects foreign writes by comparing against git HEAD (verify alone only catches shrinkage) | `scripts/snapshot_skill.py` |
 | jscpd node-CLI vs Rust-port `cpd 5.x` flags + the silent "0 files analyzed" min-tokens trap | `references/jscpd-rust-port-gotchas.md` |
 | Third-party skill audit tools (SkillSpector etc.) | `references/external-skill-audit-tools.md` |
