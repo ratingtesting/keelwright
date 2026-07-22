@@ -284,7 +284,10 @@ is only partially covered, it says so — no overclaiming.
 | **Style/consistency drift** (naming, async patterns) | @architecture-critic + Pink Flag (judgment only) | `writing-code.md` | ⚠️ partial (no machine detector) |
 | **Regression that passes tests** (bad deploy) | post-deploy validation loop + auto-rollback | `phases.md` | ✅ full (where metric exists) |
 | **Human as bottleneck** | autonomy dial + parallel independent loops | `phases.md` | ✅ full |
-| **Confabulation / fabricated facts** (invented URLs, versions, prices, APIs) | factual-grounding gate: verify-before-assert + say "unknown" over a guess | `security-gates.md` | ⚠️ partial (discipline, not machine-checked) |
+| Confabulation / fabricated facts | factual-grounding gate: verify-before-assert + say "unknown" over a guess | `security-gates.md` | ⚠️ partial (discipline, not machine-checked) |
+| Loop design absence | 5 whiteboard questions (trigger/check/action/stop/escalate) before any code | SKILL.md §Loop Design | ✅ |
+| Context rot in long loops (>20 iter) | compaction: tool-output trimming + structured summaries + sub-agent delegation | `stability-and-learning.md` | ✅ |
+| Event storm / rate limiting | rate limit + debounce + backpressure queue for webhook/cron-driven loops | `circuit-breaker.md` | ✅ |
 
 Two honest ⚠️ partials worth repeating: **style-consistency** drift and **sycophancy-as-trait**
 have no cheap machine detector — keelwright catches their measurable consequences, not the
