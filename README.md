@@ -127,6 +127,25 @@ Results from 8 validated A/B test runs across 3 tiers (STRONG, MEDIUM, WEAK):
 
 All results are machine-verified on disk. Raw data in [`qa-results/`](qa-results/).
 
+### Verify it yourself
+
+KDS is reproducible. Every number in the scoreboard comes from a public `results.jsonl`
+file that anyone can audit. If you want to run the same test on your own model:
+
+1. **Load keelwright** into a fresh coding session on your model
+2. **Paste** the QA prompt from [`templates/qa-prompt-final.md`](templates/qa-prompt-final.md)
+3. **Wait** for the run to complete (the prompt runs unattended)
+4. **Validate** with `python scripts/validate_run.py <run_dir> <run_dir>/results.jsonl`
+5. **Calculate:** KDS = (valid_tests with api_calls > 0) / total_tests × 100
+
+The integrity gate (`validate_run.py`) is the same gate we use. It catches fabricated
+results (api_calls=0, empty arms, false evidence). If your model's KDS differs from
+ours — that's a real data point, not an error.
+
+You can also review the raw A/B data yourself: every record in `results.jsonl` contains
+the control output, treatment output, verdict, and on-disk evidence path. No trust
+required — verify on disk.
+
 ---
 
 ## The 28 risks keelwright covers
