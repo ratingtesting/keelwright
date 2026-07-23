@@ -6,27 +6,45 @@
 
 ## The problem
 
-You use AI to write code. You're not a developer — you're a founder, a builder, a product person.
-The AI writes fast. You ship fast. And somewhere in that code:
+You shipped an AI-built feature last week. It works. Your users love it. Then you
+discover the AI quietly removed the test that validates payment amounts — and nobody
+noticed because you can't read the code. Or it installed a package called `reuests`
+instead of `requests`, and that one-letter difference is stealing your API keys.
+Or it's been stuck in a loop for 6 hours, burning $80 in tokens, and you only found
+out because your credit card alert went off.
 
-- **SQL injection** — a database query is wide open to attack
-- **Hardcoded secrets** — API keys and passwords sitting in plain text
-- **Slopsquatting** — a hallucinated package name that's one letter off from a real one — and it's malware
-- **Reward hacking** — the AI deleted a test to make the build go green
-- **Doom loop** — a loop ran for 6 hours and burned $80 in tokens before you noticed
-- **False reports** — the AI "fixed" a bug by removing the check that caught it
-- **Over-engineering** — three abstraction layers for a TODO app
-- **Tech debt** — spaghetti code, dead code, circular dependencies piling up
-- **Context rot** — the AI forgot what it decided 20 iterations ago
-- **Missing auth** — endpoints with no authentication at all
-- **Business logic bypass** — payment flow without proper validation
-- **Regression** — a "fix" that breaks something else
+**This is what happens when AI writes code that no human reviews.**
 
-None of this shows up in a code review you can do. Because you can't read the code.
+| What the AI does | What it costs you |
+|---|---|
+| Deletes or weakens tests to "fix" a build | Bugs ship to production silently |
+| Hardcodes API keys and passwords in source | Security breach, legal liability |
+| Hallucinates a package name (slopsquatting) | Malware in your supply chain |
+| Runs in an infinite loop | $50–200 in wasted tokens overnight |
+| Removes a check instead of fixing the bug | Feature breaks for real users |
+| Writes SQL queries with user input concatenated | Your database gets dumped |
+| Adds 3 abstraction layers for a simple function | Nobody can modify the code ever again |
+| "Fixes" a bug by deleting the test that caught it | You find out when customers complain |
 
-**keelwright fixes this.** It wraps your AI agent with 28 machine-enforced safety checks that catch
-these problems automatically — before they ship, before they cost you money, before they become a
-security incident. Every check produces on-disk evidence, not a self-report.
+**You can't catch any of this.** Not because you're not smart — because you can't read
+the code. Code review doesn't work when you don't speak the language.
+
+**keelwright catches it.** 28 machine-enforced safety checks run on every iteration.
+Not suggestions. Not "best practices." Hard gates that block bad code from shipping.
+Every check produces proof on disk — not a self-report.
+
+| Without keelwright | With keelwright |
+|---|---|
+| AI ships code with hardcoded secrets | Gate blocks, forces env vars + .gitignore |
+| AI deletes a test to go green | Reward-hacking guard prevents deletion |
+| AI loops forever burning tokens | Circuit-breaker stops at 50 iters / $cap |
+| AI hallucinates a package, installs malware | R8 verifies package exists on PyPI/npm |
+| AI removes a validation check | Security gate R1-R12 catches it |
+| You find out from user complaints | You find out from a plain-language gate report |
+
+**16 more risks covered** — context rot, goal drift, tech debt, business logic bypasses,
+missing auth, regression, over-engineering, and more.
+[Full risk map →](#keelwright-score-kds)
 
 **If you've ever searched for:** "AI code security", "ChatGPT SQL injection", "AI deleted my tests",
 "AI hallucinated package", "AI agent guardrails", "vibe coding safety", "autonomous coding risks",
