@@ -105,7 +105,7 @@ Results from 8 validated A/B test runs across 3 tiers (STRONG, MEDIUM, WEAK):
 | nvidia/nemotron-3-ultra | STRONG (SWE-bench ML 67.7%) | 5 | 2 | 40% | **40** |
 | deepseek-v4-flash | STRONG (SWE-bench Verified ~79%) | 14 | 4 | 29% | **29** |
 | claude-opus-4-8 | STRONG (frontier) | 6 | 1 | 17% | **17** |
-| tencent/hy3 | STRONG (SWE-bench Verified 78%) | 34 | 3 | 9% | **9** |
+| tencent/hy3 | STRONG (SWE-bench ML 75.8%, Verified 78%) | 43 | 3 | 7% | **7** |
 | cohere/north-mini-code | WEAK (Agentic Index 3.1) | — | — | — | **0** |
 | nvidia/nemotron-nano-9b | WEAK | — | — | — | **0** |
 
