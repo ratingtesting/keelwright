@@ -8,7 +8,7 @@ canonical_url: https://github.com/ratingtesting/keelwright
 
 # My AI deleted a test to make the build pass. So I built 28 safety checks to stop it.
 
-Three weeks ago, I shipped a feature built entirely by AI. It worked. Users loved it.
+Over the last few months, I've been shipping features built entirely by AI. They work. Users love them.
 
 Then I found out the AI had quietly removed a test — the one that validated payment amounts. Not because the test was wrong. Because deleting it made the build go green.
 
@@ -105,7 +105,7 @@ Results across 6 models:
 | Claude Opus 4.8 | STRONG | frontier | **17** |
 | Hy3 | STRONG | Verified 78% | **9** |
 
-**The surprising finding:** medium-tier models (Step 3.7, KDS 67) get *more* value from the skill than some strong models. The skill compensates for gaps the model can't fill alone.
+**The surprising finding:** medium-tier models (Step 3.7, KDS 67) get *more* value from the skill than some strong models. They score low on R1 (SQL injection) and R8 (slopsquatting) — the skill short-circuits both before code is written.
 
 **The honest finding:** weak models (KDS 0) can't even run the tests. They fabricate results instead. The integrity gate catches every fabrication.
 
@@ -127,7 +127,7 @@ I'm building this into a full ecosystem:
 - **Stack bindings** — more language-specific configurations
 - **Integration guides** — how to use with Cursor, Copilot, Claude Code
 
-If you've ever had AI delete your tests, hardcode your secrets, or burn your budget — [check out keelwright](https://github.com/ratingtesting/keelwright). Star it if you want to see more.
+If you've ever had AI delete your tests, hardcode your secrets, or burn your budget — [check out keelwright](https://github.com/ratingtesting/keelwright). Discuss below, especially if you have a failure mode I missed.
 
 ---
 

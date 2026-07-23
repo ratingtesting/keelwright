@@ -164,7 +164,7 @@ required — verify on disk.
 | R10 | Doom loop | Runaway agent burning tokens indefinitely |
 | R11 | Context loss | Agent forgets earlier decisions mid-loop |
 | R12 | Scope creep | Agent rewrites things it wasn't asked to touch |
-| + 16 more | Loop design, compaction, rate limiting, circuit-breaker, Phoenix, Match loop... | See `assets/architecture.md` |
+| + 20 more | Loop design, compaction, rate limiting, circuit-breaker, Phoenix, Match loop... | See `assets/architecture.md` |
 
 ---
 
