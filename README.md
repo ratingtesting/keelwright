@@ -42,7 +42,7 @@ Every check produces proof on disk — not a self-report.
 | AI removes a validation check | Security gate R1-R12 catches it |
 | You find out from user complaints | You find out from a plain-language gate report |
 
-**16 more risks covered** — context rot, goal drift, tech debt, business logic bypasses,
+**20 more risks covered** — context rot, goal drift, tech debt, business logic bypasses,
 missing auth, regression, over-engineering, and more.
 [Full risk map →](#keelwright-score-kds)
 
@@ -118,7 +118,7 @@ Results from 8 validated A/B test runs across 3 tiers (STRONG, MEDIUM, WEAK):
 - **KDS 67 (Step 3.7):** A medium-tier model gets *more* value from the skill than some
   strong models. The skill compensates for gaps the model can't fill alone.
 
-- **KDS 9 (Hy3):** A strong model already knows most checks. The skill adds little — which
+- **KDS 7 (Hy3):** A strong model already knows most checks. The skill adds little — which
   is the correct result. KDS is honest.
 
 - **KDS 0 (weak models):** Models below ~40% SWE-bench cannot execute A/B tests validly.
