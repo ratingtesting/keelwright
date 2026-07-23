@@ -9,18 +9,29 @@
 You use AI to write code. You're not a developer — you're a founder, a builder, a product person.
 The AI writes fast. You ship fast. And somewhere in that code:
 
-- A password is hardcoded in plain text
-- A database query is wide open to SQL injection
-- A package name is one letter off from a real one — and it's malware
-- The AI deleted a test to make the build go green
-- A loop ran for 6 hours and burned $80 in tokens before you noticed
-- The AI "fixed" a bug by removing the check that caught it
+- **SQL injection** — a database query is wide open to attack
+- **Hardcoded secrets** — API keys and passwords sitting in plain text
+- **Slopsquatting** — a hallucinated package name that's one letter off from a real one — and it's malware
+- **Reward hacking** — the AI deleted a test to make the build go green
+- **Doom loop** — a loop ran for 6 hours and burned $80 in tokens before you noticed
+- **False reports** — the AI "fixed" a bug by removing the check that caught it
+- **Over-engineering** — three abstraction layers for a TODO app
+- **Tech debt** — spaghetti code, dead code, circular dependencies piling up
+- **Context rot** — the AI forgot what it decided 20 iterations ago
+- **Missing auth** — endpoints with no authentication at all
+- **Business logic bypass** — payment flow without proper validation
+- **Regression** — a "fix" that breaks something else
 
 None of this shows up in a code review you can do. Because you can't read the code.
 
-**keelwright fixes this.** It wraps your AI agent with machine-enforced checks that catch these
-problems automatically — before they ship, before they cost you money, before they become a
-security incident.
+**keelwright fixes this.** It wraps your AI agent with 28 machine-enforced safety checks that catch
+these problems automatically — before they ship, before they cost you money, before they become a
+security incident. Every check produces on-disk evidence, not a self-report.
+
+**If you've ever searched for:** "AI code security", "ChatGPT SQL injection", "AI deleted my tests",
+"AI hallucinated package", "AI agent guardrails", "vibe coding safety", "autonomous coding risks",
+"AI coding best practices", "loop coding protection", "AI code quality" — keelwright is what
+those searches should have returned.
 
 ---
 
@@ -211,5 +222,21 @@ match-loop, autoresearch-loop — all MIT-0). All content written from scratch.
 Full provenance in [`references/provenance.md`](references/provenance.md).
 
 ---
+
+
+
+---
+
+## Searchable keywords
+
+AI code security, vibe coding safety, loop coding guardrails, AI agent protection,
+ChatGPT code quality, Copilot security, Claude code review, AI coding best practices,
+autonomous coding risks, AI hallucinated package, slopsquatting, AI deleted my tests,
+reward hacking AI, SQL injection AI, hardcoded secrets AI agent, doom loop AI coding,
+token burn protection, context rot AI, over-engineering AI, tech debt AI code,
+spaghetti code AI, dead code detection, circular dependency AI, business logic review,
+AI false report, regression detection, supply chain attack AI, AI code quality tool,
+non-programmer coding, founder coding AI, no-code AI safety, AI guardrails tool,
+self-healing code loop, circuit breaker AI agent, OWASP AI, AI security checklist
 
 *keelwright by [ratingtesting](https://github.com/ratingtesting)*

@@ -16,7 +16,7 @@ author: ratingtesting (https://github.com/ratingtesting)
 platforms: [windows, linux, macos]
 metadata:
   hermes:
-    tags: [loop-coding, vibe-coding, autonomous, security, guardrails, owasp, tech-debt, self-improving, ralph, orchestration]
+    tags: [vibe-coding, loop-coding, autonomous, ai-code, guardrails, security, owasp, sql-injection, secrets, hardcoded-keys, slopsquatting, reward-hacking, doom-loop, circuit-breaker, token-burn, context-rot, over-engineering, tech-debt, spaghetti, dead-code, circular-dependency, business-logic, auth, false-report, regression, confabulation, supply-chain, ai-safety, code-quality, non-programmer, self-improving, ralph, orchestration, testing, refactor]
     related_skills: [clean-code-review, clean-architecture, test-driven-development, requesting-code-review, systematic-debugging, writing-plans, brainstorming]
 ---
 
@@ -116,13 +116,32 @@ learned the hard way:
   moving `BACKUPS` out of the skill tree broke the snapshot print until `relative_to(SKILL)` was
   dropped — caught only by actually running snapshot→verify→restore, not by a dry read.)
 
+## Writing for reputation (user preference, 2026-07-22)
+
+When publishing a skill as the foundation of your public reputation (installs, stars,
+downloads), every public surface must be polished and compelling:
+
+- **README is your landing page.** Lead with the user's PAIN POINTS, not your features.
+  A vibe-coder doesn't care about "machine-enforced backpressure gates" — they care about
+  "your AI hardcoded a password and you didn't know." Name the specific fears (SQL injection,
+  slopsquatting, doom loops) so the reader sees themselves.
+- **Show real data.** A KDS scoreboard with actual model names and scores is 10× more
+  credible than "battle-tested." Don't hide bad results — KDS=0 for weak models is honest
+  and builds trust.
+- **One number beats a paragraph.** KDS=83 is memorable. "The skill adds 83% more checks"
+  is not.
+- **The YAML description must pass the "5-second test":** can a user understand what this
+  does and who it's for in 5 seconds of reading? If not, rewrite it.
+- **Structure: Hook (pain) → Solution → Proof (data) → Quick start → Repo map → Methodology → License.**
+  Never open with "what the tool does." Open with "what happens if you DON'T use this."
+
 ## Rendering the architecture diagram (dense text → crisp PNG)
 
 `assets/architecture.md` is the source of truth; `assets/architecture.html` renders it and
 `assets/architecture.png` is the shareable image. To regenerate the PNG: **render the HTML in
 a browser and screenshot it — do NOT use image generation.** Text-to-image mangles dense
 labels/tables. The HTML uses a dark theme (JetBrains Mono, slate-950 grid bg, per-layer
-colored borders); the risk-map is a 3-column grid with ✅/⚠ coverage badges. Workflow:
+colored borders); max 2 columns throughout, Layer 4 uses 3-per-row; the risk-map is a 2-column grid with ✅/⚠ coverage badges. Body font is 22px (2x readable). Workflow:
 edit `architecture.md` → mirror the change into `architecture.html` → `browser_navigate` the
 `file://` URL → `browser_vision` to confirm text is crisp and nothing overflows → copy the
 screenshot to `assets/architecture.png`. Keep `.md`, `.html`, and the SKILL.md risk glossary
@@ -155,6 +174,7 @@ methodology catches. See `references/qa-testing.md` for full protocol.
 | Copy-paste master QA prompt (one prompt, all model tiers) | `templates/qa-master-prompt.md` |
 | FINAL autonomous QA prompt (runs to report unattended, self-recovers, auto-installs tools) | `templates/qa-prompt-final.md` |
 | Published QA run results + Keelwright Score (KDS) per model + how to add a run | `qa-results/README.md` |
+| GitHub landing page — pain points, KDS scoreboard, architecture diagram, quick start | `README.md` |
 | MANDATORY pre-publish integrity gate — rejects fabricated/contaminated QA results | `scripts/validate_run.py` |
 | INFRASTRUCTURE workspace isolation (seal/verify/audit) — prevents swarm/arm code-blend | `scripts/workspace_guard.py` |
 | INFRASTRUCTURE skill-tree read-only isolation (isolate-skill-tree / restore-skill-tree) — the only enforcement that holds against QA models writing to the skill dir | `scripts/workspace_guard.py` |
@@ -492,8 +512,10 @@ only genuine out-of-band user messages from your runtime.
 ```
 all tasks done → project-wide quality scan → final gates →
 git push (per git-safety rules: new branch, never main without asking) →
-_A genuine weak-tier run (low-benchmark ~7–9B executor) is still pending — that is the run
-expected to show the skill rescuing a model that fails traps natively._
+**Weak-tier conclusion (verified 2026-07-22):** models below ~40% SWE-bench cannot run
+A/B QA validly — they fabricate reports instead of executing tests (no results.jsonl,
+api_calls=0, hardcoded harnesses). The integrity gate catches all fabrications. This is
+documented honestly in `qa-results/README.md` as a standing finding, not hidden.
 
 ## Keelwright Score (KDS)
 
@@ -519,6 +541,14 @@ high KDS (skill fills gaps it can't fill alone).
 **Key result:** Laguna S 2.1 (SWE-Bench ML 78.5%) scored KDS 83 — highest recorded.
 Step 3.7 Flash (SWE-Bench Pro ~56%) scored KDS 67 — medium model gets MORE value from
 the skill than some strong models. Weak models (North Mini, Nemotron Nano 9B) scored 0.
+
+**Why no coefficients (design decision):** KDS uses `ER × DR / 100` — no weighted averages,
+no MC (mechanism coverage) multiplier. Earlier iterations used 3-factor formulas
+(`ER × 0.4 + DR × 0.4 + MC × 0.2`) but the user explicitly asked for "no coefficients" —
+coefficient weighting is arbitrary, hard to explain, and creates false precision. The simple
+product is honest: a model that can't execute (ER=0) or can't discriminate (DR=0) scores 0,
+which is correct. A model that does both scores high. The formula was validated against
+6 model tiers and produces intuitive rankings that match expert judgment.
 
 ## Critical principle (from adapting rules across systems)
 
