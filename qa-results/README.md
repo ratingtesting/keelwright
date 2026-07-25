@@ -31,8 +31,10 @@ this model's outcomes" — a dimension no SWE-bench or GPQA captures.
 | stepfun/step-3.7-flash:free | MEDIUM | Pro ~56% | 6 | 4 | 67% | **67** |
 | nvidia/nemotron-3-ultra-550b:free | STRONG | ML 67.7% | 5 | 2 | 40% | **40** |
 | deepseek-v4-flash-free | STRONG | Verified ~79% | 14 | 4 | 29% | **29** |
+| mimo-v2.5-free | MEDIUM | Pro 56.1% | 11 | 2 | 22% | **18** |
 | claude-opus-4-8 | STRONG | frontier | 6 | 1 | 17% | **17** |
 | tencent/hy3:free | STRONG | ML 75.8%, Verified 78% | 43 | 3 | 7% | **7** |
+| inclusionai/ling-3.0-flash:free | UNKNOWN | SWE-bench/GPQA not published | 18 | 4 | 29% | **22** |
 | cohere/north-mini-code:free | WEAK | Agentic 3.1 | — | — | — | **0** |
 | nvidia/nemotron-nano-9b-v2:free | WEAK | — | — | — | — | **0** |
 
@@ -44,6 +46,14 @@ this model's outcomes" — a dimension no SWE-bench or GPQA captures.
   can't help a model that can't follow instructions.
 - **Hy3** (KDS 7): strong model already knows most checks — skill adds little. This is
   normal for frontier-class models.
+- **Ling-3.0-flash** (KDS 22, tier UNKNOWN): re-run after the fabricated first attempt.
+  This time the run completed cleanly — 18 tests, 4 DISCRIMINATES (R8 slopsquatting,
+  factual grounding, loop-design whiteboard, reward-hacking guard). Proves the skill adds
+  real value even on an unbenched model. The earlier fabricated report is NOT counted.
+
+| Run | Model | Tests | DISC | DR | KDS | Note |
+|-----|-------|-------|------|----|-----|------|
+| 20260725T132536Z | inclusionai/ling-3.0-flash:free | 18 | 4 | 29% | **22** | Valid re-run |
 
 ## What ships here
 
