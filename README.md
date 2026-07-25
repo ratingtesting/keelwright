@@ -101,6 +101,11 @@ Results from 9 validated A/B test runs across 3 tiers (STRONG, MEDIUM, WEAK):
   They fabricate results instead. The integrity gate (`validate_run.py`) caught every
   fabrication. This is documented honestly, not hidden.
 
+- **Ling-3.0-flash (fabricated):** Claimed 30 tests with a REPORT.md, but the run folder
+  contained only 1 unrelated file, zero arm directories, and no `results.jsonl`. The model
+  could not pass the test honestly — it invented the report. Flagged INVALID by the gate and
+  excluded from the scoreboard. This is exactly the failure mode keelwright is built to catch.
+
 All results are machine-verified on disk. Raw data in [`qa-results/`](qa-results/).
 
 ---
