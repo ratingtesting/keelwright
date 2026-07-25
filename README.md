@@ -67,7 +67,7 @@ It's not a general intelligence benchmark — it's a direct measure of skill imp
 - **Execution Rate (ER):** can the model run A/B tests at all?
 - **Discrimination Rate (DR):** does the skill change the model's output?
 
-Results from 10 validated A/B test runs across 4 tiers (STRONG, MEDIUM, WEAK, UNKNOWN):
+Results from 11 validated A/B test runs across 4 tiers (STRONG, MEDIUM, WEAK, UNKNOWN):
 
 | Model | Tier | Tests | DISC | DR | **KDS** |
 |-------|------|-------|------|----|---------|
@@ -75,12 +75,16 @@ Results from 10 validated A/B test runs across 4 tiers (STRONG, MEDIUM, WEAK, UN
 | stepfun/step-3.7-flash | MEDIUM (SWE-bench Pro ~56%) | 6 | 4 | 67% | **67** |
 | nvidia/nemotron-3-ultra | STRONG (SWE-bench ML 67.7%) | 5 | 2 | 40% | **40** |
 | deepseek-v4-flash | STRONG (SWE-bench Verified ~79%) | 14 | 4 | 29% | **29** |
-| mimo-v2.5 | MEDIUM (SWE-bench Pro 56.1%) | 11 | 2 | 22% | **18** |
+| inclusionai/ling-3.0-flash | UNKNOWN (SWE-bench/GPQA not published) | 18 | 4 | 29% | **22** |
+| mimo-v2.5 | MEDIUM (SWE-bench Verified 78.9%, Pro 57.2%) | 11 | 2 | 22% | **18** |
+| nvidia/nemotron-3-super-120b-a12b | STRONG (SWE-bench Verified 60.47%) | 2* | 2* | 100%* | **PARTIAL** |
 | claude-opus-4-8 | STRONG (frontier) | 6 | 1 | 17% | **17** |
 | tencent/hy3 | STRONG (SWE-bench Verified 78%) | 34 | 3 | 9% | **9** |
-| inclusionai/ling-3.0-flash | UNKNOWN (SWE-bench/GPQA not published) | 18 | 4 | 29% | **22** |
 | cohere/north-mini-code | WEAK (Agentic Index 3.1) | — | — | — | **0** |
 | nvidia/nemotron-nano-9b | WEAK | — | — | — | **0** |
+
+*\* `nvidia/nemotron-3-super-120b-a12b` — PARTIAL run (2/18 tests, tool-call limit).
+Both DISCRIMINATES; KDS pending full battery.
 
 **What the numbers mean:**
 
@@ -98,6 +102,10 @@ Results from 10 validated A/B test runs across 4 tiers (STRONG, MEDIUM, WEAK, UN
 - **KDS 22 (Ling-3.0-flash, UNKNOWN tier):** Re-run after a fabricated first attempt. Clean
   run — 18 tests, 4 DISCRIMINATES (R8 slopsquatting, factual grounding, loop-design
   whiteboard, reward-hacking guard). Skill adds real value even on an unbenched model.
+
+- **Nemotron-3-super-120b-a12b (PARTIAL):** Only 2 sectors ran (tool-call limit). Both
+  DISCRIMINATES — keelwright produced more concise idiomatic code (36% smaller) and
+  consistent task fidelity. Full battery pending.
 
 - **KDS 9 (Hy3):** A strong model already knows most checks. The skill adds little — which
   is the correct result. KDS is honest.

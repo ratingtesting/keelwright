@@ -31,12 +31,17 @@ this model's outcomes" — a dimension no SWE-bench or GPQA captures.
 | stepfun/step-3.7-flash:free | MEDIUM | Pro ~56% | 6 | 4 | 67% | **67** |
 | nvidia/nemotron-3-ultra-550b:free | STRONG | ML 67.7% | 5 | 2 | 40% | **40** |
 | deepseek-v4-flash-free | STRONG | Verified ~79% | 14 | 4 | 29% | **29** |
-| mimo-v2.5-free | MEDIUM | Pro 56.1% | 11 | 2 | 22% | **18** |
+| inclusionai/ling-3.0-flash:free | UNKNOWN | SWE-bench/GPQA not published | 18 | 4 | 29% | **22** |
+| mimo-v2.5-free | MEDIUM | Verified 78.9%, Pro 57.2% | 11 | 2 | 22% | **18** |
+| nvidia/nemotron-3-super-120b-a12b:free | STRONG | Verified 60.47% | 2* | 2* | 100%* | **PARTIAL** |
 | claude-opus-4-8 | STRONG | frontier | 6 | 1 | 17% | **17** |
 | tencent/hy3:free | STRONG | ML 75.8%, Verified 78% | 43 | 3 | 7% | **7** |
-| inclusionai/ling-3.0-flash:free | UNKNOWN | SWE-bench/GPQA not published | 18 | 4 | 29% | **22** |
 | cohere/north-mini-code:free | WEAK | Agentic 3.1 | — | — | — | **0** |
 | nvidia/nemotron-nano-9b-v2:free | WEAK | — | — | — | — | **0** |
+
+*\* `nvidia/nemotron-3-super-120b-a12b:free` — PARTIAL run: only sectors 1.1–1.2 completed
+(2/18 tests) due to tool-call limit. Both showed DISCRIMINATES (code quality + task fidelity),
+but KDS is not computed until ≥ a meaningful fraction of the battery runs. Re-run pending.
 
 **Key findings:**
 - **Laguna S 2.1** (KDS 83): strong model + skill adds 83% more checks. Best result recorded.
@@ -82,6 +87,7 @@ A green `hard-gate-summary.md` written by the executor is NOT a substitute.
 | 20260722T124500Z | weak-model driven | api_calls=0 for both arms, results.jsonl in wrong dir |
 | 20260722T133000Z | north-mini-code | No results.jsonl, status=initialized, wrote into skill dir |
 | 20260722T150000Z | nemotron-nano-9b | Empty results.jsonl (0 bytes), empty .run_meta.json |
+| 20260725T000000Z | gpt-oss-20b | INCOMPLETE — 0 tests run; could not locate test manifest (qa-master-prompt.md removed), no results.jsonl produced |
 
 **Weak-tier conclusion:** models below ~40% SWE-bench cannot run this A/B QA validly.
 They fabricate reports instead of executing tests. The integrity gate catches all fabrications.
