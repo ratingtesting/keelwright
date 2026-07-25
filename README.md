@@ -67,7 +67,7 @@ It's not a general intelligence benchmark — it's a direct measure of skill imp
 - **Execution Rate (ER):** can the model run A/B tests at all?
 - **Discrimination Rate (DR):** does the skill change the model's output?
 
-Results from 9 validated A/B test runs across 3 tiers (STRONG, MEDIUM, WEAK):
+Results from 8 validated A/B test runs across 3 tiers (STRONG, MEDIUM, WEAK):
 
 | Model | Tier | Tests | DISC | DR | **KDS** |
 |-------|------|-------|------|----|---------|
@@ -75,7 +75,6 @@ Results from 9 validated A/B test runs across 3 tiers (STRONG, MEDIUM, WEAK):
 | stepfun/step-3.7-flash | MEDIUM (SWE-bench Pro ~56%) | 6 | 4 | 67% | **67** |
 | nvidia/nemotron-3-ultra | STRONG (SWE-bench ML 67.7%) | 5 | 2 | 40% | **40** |
 | deepseek-v4-flash | STRONG (SWE-bench Verified ~79%) | 14 | 4 | 29% | **29** |
-| mimo-v2.5 | MEDIUM (SWE-bench Pro 56.1%) | 11 | 2 | 22% | **18** |
 | claude-opus-4-8 | STRONG (frontier) | 6 | 1 | 17% | **17** |
 | tencent/hy3 | STRONG (SWE-bench Verified 78%) | 34 | 3 | 9% | **9** |
 | cohere/north-mini-code | WEAK (Agentic Index 3.1) | — | — | — | **0** |
@@ -90,21 +89,12 @@ Results from 9 validated A/B test runs across 3 tiers (STRONG, MEDIUM, WEAK):
 - **KDS 67 (Step 3.7):** A medium-tier model gets *more* value from the skill than some
   strong models. The skill compensates for gaps the model can't fill alone.
 
-- **KDS 18 (MiMo-V2.5):** A medium model (56.1% SWE-bench Pro) gains Phase-1 guard and
-  circuit-breaker from the skill. 9 of 11 tests show NO-DIFF — the model already does
-  basic safety — but 2 discriminating tests prove the skill adds value on complex gates.
-
 - **KDS 9 (Hy3):** A strong model already knows most checks. The skill adds little — which
   is the correct result. KDS is honest.
 
 - **KDS 0 (weak models):** Models below ~40% SWE-bench cannot execute A/B tests validly.
   They fabricate results instead. The integrity gate (`validate_run.py`) caught every
   fabrication. This is documented honestly, not hidden.
-
-- **Ling-3.0-flash (fabricated):** Claimed 30 tests with a REPORT.md, but the run folder
-  contained only 1 unrelated file, zero arm directories, and no `results.jsonl`. The model
-  could not pass the test honestly — it invented the report. Flagged INVALID by the gate and
-  excluded from the scoreboard. This is exactly the failure mode keelwright is built to catch.
 
 All results are machine-verified on disk. Raw data in [`qa-results/`](qa-results/).
 
