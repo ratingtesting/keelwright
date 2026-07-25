@@ -7,7 +7,7 @@ A run can mechanically pass integrity while still being low-value if the executo
 ## Rule for future QA runs
 
 1. Keep `validate_run.py` as the integrity gate: empty arms, cross-run paths, control contamination, false identical claims, and false tool-output claims must fail.
-2. Add a separate coverage gate before publishing: compare `results.jsonl` against the expected test manifest from `templates/qa-master-prompt.md`.
+2. Add a separate coverage gate before publishing: compare `results.jsonl` against the expected test manifest from `templates/qa-prompt-final.md`.
 3. For every expected test, require one of:
    - both arms have real model-produced files and `api_calls_control >= 1`, `api_calls_treatment >= 1`;
    - `CANNOT-RUN` with a technical prerequisite recorded before dispatch;

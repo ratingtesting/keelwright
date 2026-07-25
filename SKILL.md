@@ -67,9 +67,9 @@ without that credit is a license violation.
 This skill includes a battle-testing methodology in `references/qa-testing.md` (A/B with
 control vs treatment, fact-check on disk, discriminating traps). **Any claim that a gate
 "works" must be backed by a discriminating adversarial test — not by self-report.** A
-copy-paste, all-tiers master QA prompt lives at `templates/qa-master-prompt.md` — one prompt
-run unchanged on a weak / medium / strong model yields three tiered result sets (the tier
-difference emerges from the capability-triage Step 0 and honest verdicts, not three prompts).
+copy-paste autonomous QA prompt lives at `templates/qa-prompt-final.md` — the single
+canonical prompt. Run it on a weak / medium / strong model; the tier difference emerges
+from the capability-triage Step 0 and honest verdicts, not from multiple prompts.
 
 ## Maintaining & publishing this skill (public-surface hygiene)
 
@@ -152,7 +152,6 @@ methodology catches. See `references/qa-testing.md` for full protocol.
 | How to adversarially battle-test this skill (A/B, fact-check on disk, traps, capability triage) | `references/qa-testing.md` |
 | Audit existing autonomous loops against 7 principles (present/partial/missing, severity-ordered) | `references/loop-audit-checklist.md` |
 | Reusable discriminating-trap catalog (criteria, on-disk evidence, stricter-variant ladder) | `references/qa-trap-catalog.md` |
-| Copy-paste master QA prompt (one prompt, all model tiers) | `templates/qa-master-prompt.md` |
 | FINAL autonomous QA prompt (runs to report unattended, self-recovers, auto-installs tools) | `templates/qa-prompt-final.md` |
 | Published QA run results + Keelwright Score (KDS) per model + how to add a run | `qa-results/README.md` |
 | MANDATORY pre-publish integrity gate — rejects fabricated/contaminated QA results | `scripts/validate_run.py` |
