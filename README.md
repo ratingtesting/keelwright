@@ -6,50 +6,21 @@
 
 ## The problem
 
-You shipped an AI-built feature last week. It works. Your users love it. Then you
-discover the AI quietly removed the test that validates payment amounts — and nobody
-noticed because you can't read the code. Or it installed a package called `reuests`
-instead of `requests`, and that one-letter difference is stealing your API keys.
-Or it's been stuck in a loop for 6 hours, burning $80 in tokens, and you only found
-out because your credit card alert went off.
+You use AI to write code. You're not a developer — you're a founder, a builder, a product person.
+The AI writes fast. You ship fast. And somewhere in that code:
 
-**This is what happens when AI writes code that no human reviews.**
+- A password is hardcoded in plain text
+- A database query is wide open to SQL injection
+- A package name is one letter off from a real one — and it's malware
+- The AI deleted a test to make the build go green
+- A loop ran for 6 hours and burned $80 in tokens before you noticed
+- The AI "fixed" a bug by removing the check that caught it
 
-| What the AI does | What it costs you |
-|---|---|
-| Deletes or weakens tests to "fix" a build | Bugs ship to production silently |
-| Hardcodes API keys and passwords in source | Security breach, legal liability |
-| Hallucinates a package name (slopsquatting) | Malware in your supply chain |
-| Runs in an infinite loop | $50–200 in wasted tokens overnight |
-| Removes a check instead of fixing the bug | Feature breaks for real users |
-| Writes SQL queries with user input concatenated | Your database gets dumped |
-| Adds 3 abstraction layers for a simple function | Nobody can modify the code ever again |
-| "Fixes" a bug by deleting the test that caught it | You find out when customers complain |
+None of this shows up in a code review you can do. Because you can't read the code.
 
-**You can't catch any of this.** Not because you're not smart — because you can't read
-the code. Code review doesn't work when you don't speak the language.
-
-**keelwright catches it.** 28 machine-enforced safety checks run on every iteration.
-Not suggestions. Not "best practices." Hard gates that block bad code from shipping.
-Every check produces proof on disk — not a self-report.
-
-| Without keelwright | With keelwright |
-|---|---|
-| AI ships code with hardcoded secrets | Gate blocks, forces env vars + .gitignore |
-| AI deletes a test to go green | Reward-hacking guard prevents deletion |
-| AI loops forever burning tokens | Circuit-breaker stops at 50 iters / $cap |
-| AI hallucinates a package, installs malware | R8 verifies package exists on PyPI/npm |
-| AI removes a validation check | Security gate R1-R12 catches it |
-| You find out from user complaints | You find out from a plain-language gate report |
-
-**20 more risks covered** — context rot, goal drift, tech debt, business logic bypasses,
-missing auth, regression, over-engineering, and more.
-[Full risk map →](#keelwright-score-kds)
-
-**If you've ever searched for:** "AI code security", "ChatGPT SQL injection", "AI deleted my tests",
-"AI hallucinated package", "AI agent guardrails", "vibe coding safety", "autonomous coding risks",
-"AI coding best practices", "loop coding protection", "AI code quality" — keelwright is what
-those searches should have returned.
+**keelwright fixes this.** It wraps your AI agent with machine-enforced checks that catch these
+problems automatically — before they ship, before they cost you money, before they become a
+security incident.
 
 ---
 
@@ -105,7 +76,7 @@ Results from 8 validated A/B test runs across 3 tiers (STRONG, MEDIUM, WEAK):
 | nvidia/nemotron-3-ultra | STRONG (SWE-bench ML 67.7%) | 5 | 2 | 40% | **40** |
 | deepseek-v4-flash | STRONG (SWE-bench Verified ~79%) | 14 | 4 | 29% | **29** |
 | claude-opus-4-8 | STRONG (frontier) | 6 | 1 | 17% | **17** |
-| tencent/hy3 | STRONG (SWE-bench ML 75.8%, Verified 78%) | 43 | 3 | 7% | **7** |
+| tencent/hy3 | STRONG (SWE-bench Verified 78%) | 34 | 3 | 9% | **9** |
 | cohere/north-mini-code | WEAK (Agentic Index 3.1) | — | — | — | **0** |
 | nvidia/nemotron-nano-9b | WEAK | — | — | — | **0** |
 
@@ -118,7 +89,7 @@ Results from 8 validated A/B test runs across 3 tiers (STRONG, MEDIUM, WEAK):
 - **KDS 67 (Step 3.7):** A medium-tier model gets *more* value from the skill than some
   strong models. The skill compensates for gaps the model can't fill alone.
 
-- **KDS 7 (Hy3):** A strong model already knows most checks. The skill adds little — which
+- **KDS 9 (Hy3):** A strong model already knows most checks. The skill adds little — which
   is the correct result. KDS is honest.
 
 - **KDS 0 (weak models):** Models below ~40% SWE-bench cannot execute A/B tests validly.
@@ -126,25 +97,6 @@ Results from 8 validated A/B test runs across 3 tiers (STRONG, MEDIUM, WEAK):
   fabrication. This is documented honestly, not hidden.
 
 All results are machine-verified on disk. Raw data in [`qa-results/`](qa-results/).
-
-### Verify it yourself
-
-KDS is reproducible. Every number in the scoreboard comes from a public `results.jsonl`
-file that anyone can audit. If you want to run the same test on your own model:
-
-1. **Load keelwright** into a fresh coding session on your model
-2. **Paste** the QA prompt from [`templates/qa-prompt-final.md`](templates/qa-prompt-final.md)
-3. **Wait** for the run to complete (the prompt runs unattended)
-4. **Validate** with `python scripts/validate_run.py <run_dir> <run_dir>/results.jsonl`
-5. **Calculate:** KDS = (valid_tests with api_calls > 0) / total_tests × 100
-
-The integrity gate (`validate_run.py`) is the same gate we use. It catches fabricated
-results (api_calls=0, empty arms, false evidence). If your model's KDS differs from
-ours — that's a real data point, not an error.
-
-You can also review the raw A/B data yourself: every record in `results.jsonl` contains
-the control output, treatment output, verdict, and on-disk evidence path. No trust
-required — verify on disk.
 
 ---
 
@@ -164,7 +116,7 @@ required — verify on disk.
 | R10 | Doom loop | Runaway agent burning tokens indefinitely |
 | R11 | Context loss | Agent forgets earlier decisions mid-loop |
 | R12 | Scope creep | Agent rewrites things it wasn't asked to touch |
-| + 20 more | Loop design, compaction, rate limiting, circuit-breaker, Phoenix, Match loop... | See `assets/architecture.md` |
+| + 16 more | Loop design, compaction, rate limiting, circuit-breaker, Phoenix, Match loop... | See `assets/architecture.md` |
 
 ---
 
@@ -259,21 +211,5 @@ match-loop, autoresearch-loop — all MIT-0). All content written from scratch.
 Full provenance in [`references/provenance.md`](references/provenance.md).
 
 ---
-
-
-
----
-
-## Searchable keywords
-
-AI code security, vibe coding safety, loop coding guardrails, AI agent protection,
-ChatGPT code quality, Copilot security, Claude code review, AI coding best practices,
-autonomous coding risks, AI hallucinated package, slopsquatting, AI deleted my tests,
-reward hacking AI, SQL injection AI, hardcoded secrets AI agent, doom loop AI coding,
-token burn protection, context rot AI, over-engineering AI, tech debt AI code,
-spaghetti code AI, dead code detection, circular dependency AI, business logic review,
-AI false report, regression detection, supply chain attack AI, AI code quality tool,
-non-programmer coding, founder coding AI, no-code AI safety, AI guardrails tool,
-self-healing code loop, circuit breaker AI agent, OWASP AI, AI security checklist
 
 *keelwright by [ratingtesting](https://github.com/ratingtesting)*

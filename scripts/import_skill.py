@@ -1,0 +1,185 @@
+#!/usr/bin/env python3
+"""import_skill.py — install keelwright from a portable .zip on a new machine
+
+Unpacks the exported .zip, verifies file integrity against _MANIFEST.json, installs
+the skill to the Hermes skills directory, runs post-install checks, and reports.
+
+Stdlib only. Usage:
+  python import_skill.py keelwright-export-20260725T120000Z.zip
+  python import_skill.py keelwright-export-*.zip --force
+"""
+import zipfile, hashlib, os, sys, time, argparse, json
+from pathlib import Path
+
+HERMES_SKILLS = Path(os.environ.get(
+    "HERMES_SKILLS",
+    os.path.expanduser("~/AppData/Local/hermes/skills")))
+
+SKILL_NAME = "keelwright"
+INSTALL_TO = HERMES_SKILLS / SKILL_NAME
+POST_INSTALL_CHECKS = [
+    ("SKILL.md YAML", "python -c \"import yaml; yaml.safe_load(open(\\\"{skill}/SKILL.md\\\", encoding=\\\"utf-8\\\").read().split(\\\"---\\\")[1]); print(\\\"OK\\\")\""),
+    ("snapshot verify", "python \"{skill}/scripts/snapshot_skill.py\" verify"),
+    ("validate_run.py", "python \"{skill}/scripts/validate_run.py\" 2>&1 | head -1"),
+    ("workspace_guard.py", "python \"{skill}/scripts/workspace_guard.py\" 2>&1 | head -1"),
+]
+
+
+def verify_manifest(zf: zipfile.ZipFile, manifest_data: dict) -> list:
+    """Verify every file in the manifest exists in the zip with matching sha256."""
+    errors = []
+    for entry in manifest_data.get("entries", []):
+        path = entry["path"]
+        expected_sha = entry["sha256"]
+        try:
+            info = zf.getinfo(path)
+        except KeyError:
+            errors.append(f"[MISSING] {path} in manifest but not in zip")
+            continue
+        data = zf.read(path)
+        actual_sha = hashlib.sha256(data).hexdigest()
+        if actual_sha != expected_sha:
+            errors.append(f"[TAMPER] {path}: manifest={expected_sha[:12]} actual={actual_sha[:12]}")
+    return errors
+
+
+def find_hermes_skills_dir() -> Path:
+    """Auto-detect the Hermes skills directory across platforms."""
+    candidates = [
+        Path(os.path.expanduser("~/AppData/Local/hermes/skills")),
+        Path(os.path.expanduser("~/.local/share/hermes/skills")),
+        Path(os.path.expanduser("~/.hermes/skills")),
+    ]
+    for c in candidates:
+        if c.exists():
+            return c
+    # Create the Windows one by default
+    return candidates[0]
+
+
+def extract_skill(zf: zipfile.ZipFile, target: Path, include_internal: bool):
+    """Extract skill files to target, skipping internal/ unless requested."""
+    target.mkdir(parents=True, exist_ok=True)
+    skip_prefixes = () if include_internal else ("internal/", "backups/")
+    count = 0
+    for info in zf.infolist():
+        if info.is_dir():
+            continue
+        arcname = info.filename
+        # Skip non-skill files (QA run data lives elsewhere)
+        if arcname.startswith("kw-qa/") or arcname.startswith("2026"):
+            continue
+        if arcname.startswith("_"):
+            continue  # manifest, context-transfer
+        if not include_internal and any(arcname.startswith(p) for p in skip_prefixes):
+            print(f"  [SKIP] {arcname}")
+            continue
+        # Extract
+        data = zf.read(info.filename)
+        dest = target / arcname
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_bytes(data)
+        count += 1
+    return count
+
+
+def run_checks(skill_dir: Path):
+    """Run post-install verification checks."""
+    import subprocess
+    results = []
+    for label, cmd_template in POST_INSTALL_CHECKS:
+        cmd = cmd_template.replace("{skill}", str(skill_dir).replace("\\", "/"))
+        try:
+            r = subprocess.run(
+                cmd, shell=True, capture_output=True, text=True, timeout=30,
+                cwd=str(skill_dir))
+            output = (r.stdout + r.stderr).strip()
+            ok = r.returncode == 0
+            results.append((label, ok, output.split("\n")[0] if output else "no output"))
+        except subprocess.TimeoutExpired:
+            results.append((label, False, "TIMEOUT"))
+        except Exception as e:
+            results.append((label, False, str(e)[:80]))
+    return results
+
+
+def import_skill(zip_path: Path, force: bool = False, include_internal: bool = True):
+    if not zip_path.exists():
+        print(f"[ERROR] {zip_path} not found"); return 1
+
+    print(f"Import from: {zip_path} ({zip_path.stat().st_size//1024}KB)")
+
+    with zipfile.ZipFile(zip_path) as zf:
+        # 1. Read manifest
+        if "_MANIFEST.json" not in zf.namelist():
+            print("[WARN] No _MANIFEST.json — cannot verify integrity before install")
+            manifest = {}
+        else:
+            manifest = json.loads(zf.read("_MANIFEST.json"))
+            print(f"Manifest: {manifest.get('files', '?')} files, "
+                  f"exported {manifest.get('exported', '?')}")
+
+        # 2. Verify integrity
+        print("\n--- Integrity check ---")
+        errors = verify_manifest(zf, manifest)
+        if errors:
+            for e in errors:
+                print(f"  {e}")
+            print(f"\n[FAIL] {len(errors)} integrity errors — refusing to install.")
+            return 1
+        print(f"  All {len(manifest.get('entries', []))} files verified OK")
+
+        # 3. Check target
+        env_override = os.environ.get("HERMES_SKILLS")
+        if env_override:
+            INSTALL_TO = Path(env_override) / SKILL_NAME
+        else:
+            INSTALL_TO = find_hermes_skills_dir() / SKILL_NAME
+        if INSTALL_TO.exists() and not force:
+            print(f"\n[STOP] {INSTALL_TO} already exists. Use --force to overwrite.")
+            return 1
+
+        # 4. Extract
+        print(f"\n--- Install to {INSTALL_TO} ---")
+        count = extract_skill(zf, INSTALL_TO, include_internal)
+        print(f"  Installed {count} files")
+
+        # 5. Extract context-transfer prompt
+        if "_CONTEXT-TRANSFER-PROMPT.md" in zf.namelist():
+            ct_dest = Path(os.path.expanduser("~/kw-qa")) / "CONTEXT-TRANSFER-PROMPT.md"
+            ct_dest.parent.mkdir(parents=True, exist_ok=True)
+            ct_dest.write_bytes(zf.read("_CONTEXT-TRANSFER-PROMPT.md"))
+            print(f"  Context-transfer prompt → {ct_dest}")
+
+    # 6. Post-install checks
+    print(f"\n--- Post-install checks ---")
+    checks = run_checks(INSTALL_TO)
+    all_ok = True
+    for label, ok, output in checks:
+        status = "OK" if ok else "FAIL"
+        print(f"  [{status}] {label}: {output}")
+        if not ok:
+            all_ok = False
+
+    # 7. Summary
+    print(f"\n=== IMPORT {'SUCCESS' if all_ok else 'PARTIAL'} ===")
+    print(f"  Skill: {INSTALL_TO}")
+    print(f"  Files: {count}")
+    if all_ok:
+        print(f"  Status: ready to use. Load with skill_view(name='keelwright')")
+    else:
+        print(f"  Status: installed but some checks failed — review above")
+    return 0 if all_ok else 1
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Import keelwright skill from .zip")
+    parser.add_argument("zipfile", help="Path to the exported .zip")
+    parser.add_argument("--force", action="store_true", help="Overwrite existing skill")
+    parser.add_argument("--no-internal", action="store_true", help="Skip internal/ files")
+    args = parser.parse_args()
+    return import_skill(Path(args.zipfile), args.force, not args.no_internal)
+
+
+if __name__ == "__main__":
+    exit(main())
