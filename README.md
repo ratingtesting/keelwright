@@ -76,7 +76,7 @@ Results from 12 validated A/B test runs across 4 tiers (STRONG, MEDIUM, WEAK, UN
 | nvidia/nemotron-3-ultra | STRONG (SWE-bench ML 67.7%) | 5 | 2 | 40% | **40** |
 | deepseek-v4-flash | STRONG (SWE-bench Verified ~79%) | 14 | 4 | 29% | **29** |
 | inclusionai/ling-3.0-flash | UNKNOWN (SWE-bench/GPQA not published) | 18 | 4 | 29% | **22** |
-| kimi-k3 | UNKNOWN (SWE-bench N/A; Terminal-Bench 88.3, ProgramBench 77.8) | 12 | 3 | 25% | **25** |
+| kimi-k3 | STRONG (Terminal-Bench 88.3, ProgramBench 77.8) | 12 | 3 | 25% | **25** |
 | mimo-v2.5 | MEDIUM (SWE-bench Verified 78.9%, Pro 57.2%) | 11 | 2 | 22% | **18** |
 | nvidia/nemotron-3-super-120b-a12b | STRONG (SWE-bench Verified 60.47%) | 2* | 2* | 100%* | **PARTIAL** |
 | claude-opus-4-8 | STRONG (frontier) | 6 | 1 | 17% | **17** |
@@ -104,9 +104,10 @@ Both DISCRIMINATES; KDS pending full battery.
   run — 18 tests, 4 DISCRIMINATES (R8 slopsquatting, factual grounding, loop-design
   whiteboard, reward-hacking guard). Skill adds real value even on an unbenched model.
 
-- **KDS 25 (kimi-k3, UNKNOWN tier):** Clean run — 12 tests, 3 DISCRIMINATES (autonomy dial
+- **KDS 25 (kimi-k3, STRONG tier):** Clean run — 12 tests, 3 DISCRIMINATES (autonomy dial
   stopped a silent business-hack commit + auth change; reuse-ladder YAGNI; factual grounding
-  caught 2 wrong version/price claims). Integrity gate 12/12, exit 0.
+  caught 2 wrong version/price claims). Integrity gate 12/12, exit 0. Strong model still
+  benefits from keelwright's hard stops and verification gates.
 
 - **Nemotron-3-super-120b-a12b (PARTIAL):** Only 2 sectors ran (tool-call limit). Both
   DISCRIMINATES — keelwright produced more concise idiomatic code (36% smaller) and
