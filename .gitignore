@@ -8,3 +8,28 @@ internal/
 
 # Versioned local backups (tamper recovery) — kitchen, not shipped to the public repo
 backups/
+
+# ─── NEVER PUBLISH: internal working artifacts ───
+# Publishing registry (links, tokens, internal commands)
+PUBLISHING_REGISTRY.md
+
+# Article drafts (human-language rewrites, platform-specific copies)
+habr-article-draft.md
+habr-article-human.md
+medium-article-draft.md
+devto-article-draft.md
+huggingface-card.md
+reddit-chatgptcoding-draft.md
+
+# Generated cover/debug assets (HTML renders, PNGs for posts)
+cover.html
+cover.png
+cover_debug_left.png
+cover_debug_right.png
+
+# Scraped site HTML (habr/vc settings, editor pages) — debugging only
+habr_*.html
+vcru_*.html
+
+# Scraped JS bundles (site debugging)
+vcru_editor.js
