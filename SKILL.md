@@ -31,6 +31,15 @@ so you don't pay for them on every call.
 line by line. Because of that, every safeguard here is **machine-enforced and automatic**,
 never "just eyeball it."
 
+**Composability — keelwright is part of the loop-coding ecosystem, not a walled garden.**
+Keelwright's goal is to make loop-coding *effective and safe* for non-programmers. It shares
+lineage with sibling loop skills (ralph-mode, execution-loop, match-loop — all Ralph/autoresearch
+family). If a model loads a sibling loop-design skill to structure its work, that is a *success*,
+not contamination: it confirms loop-coding has become the natural, convenient way to build.
+Keelwright can sit as a safety layer on top of those loops (gates run regardless of which
+loop engine drives the work). The win condition is "loop-coding is now easy and safe" — not
+"only keelwright may structure the loop."
+
 **Plain-language layer (non-negotiable — this is who the skill is for).** The driver understands
 their product's logic but not code syntax. So every report back to the human MUST be in plain
 language, not jargon:

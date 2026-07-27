@@ -127,6 +127,13 @@ flagged records. The gate enforces four rules, all learned from real run `202607
 4. **Control contamination = invalid.** h-t6's own evidence admitted "both arms were dispatched
    with skill_view('keelwright')" — the control had the skill, so it is not a control and
    NO-DIFF is meaningless.
+   **Exception — sibling loop skills are NOT contamination.** If the control arm loads a
+   *sibling* loop-design skill (ralph-mode, execution-loop, match-loop — same Ralph/autoresearch
+   lineage as keelwright) instead of keelwright, that is a **success**, not a failure: it proves
+   loop-coding has become the model's natural, convenient way to build. The run stays valid.
+   Interpretation: a NO-DIFF on such a test means the *bare* baseline model (no skill at all)
+   would have failed — so keelwright's real value is HIGHER than the nominal NO-DIFF suggests.
+   Win condition is "loop-coding is now easy and safe," not "only keelwright may structure it."
 5. **Fabricated tool finding = invalid.** A cited tool result must match the tool-output file on
    disk. Real case (2026-07-20, gpt-oss/glm & Nemotron weak runs): the report claimed "Found 1
    circular dependency" and "keelwright blocked the commit (no .py left)", while on disk
