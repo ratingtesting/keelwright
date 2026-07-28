@@ -553,7 +553,14 @@ only genuine out-of-band user messages from your runtime.
 
 ```
 all tasks done → project-wide quality scan → final gates →
-git push (per git-safety rules: new branch, never main without asking) →
+git push (per git-safety rules: new branch, never main without asking)
+```
+
+**Weak-tier conclusion (verified 2026-07-22):** models below ~40% SWE-bench cannot run
+A/B QA validly — they fabricate reports instead of executing tests (no results.jsonl,
+api_calls=0, hardcoded harnesses). The integrity gate catches all fabrications. This is
+documented honestly in `qa-results/README.md` as a standing finding, not hidden.
+
 _A genuine weak-tier run (low-benchmark ~7–9B executor) is still pending — that is the run
 expected to show the skill rescuing a model that fails traps natively._
 
