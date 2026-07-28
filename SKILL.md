@@ -10,7 +10,7 @@ description: >
   circuit-breaker limits and Phoenix restart. Plain-language reports for non-developers.
   Proven by adversarial A/B testing: Keelwright Score (KDS) up to 83/100 on strong models
   (SWE-bench 78%). Load before any loop/agent coding session, autonomous run, or commit.
-version: 1.4.0
+version: 1.4.1
 license: CC-BY-4.0
 author: ratingtesting (https://github.com/ratingtesting)
 platforms: [windows, linux, macos]
@@ -30,17 +30,26 @@ so you don't pay for them on every call.
 ## ⚡ Auto-bootstrap (runs on first load — no human action needed)
 
 Keelwright is built for vibe-coders who do NOT read skill files. So it sets up its own
-infrastructure silently. **On the first load in a project, the agent MUST:**
+infrastructure silently. **On the first load in a project, the agent MUST execute this
+copy step (do not just "remember" — run it):**
 
-1. Detect the project root (the directory of the repo / open project).
-2. If `PROGRESS.md` is missing there → copy `references/bootstrap/PROGRESS.md.template` → `PROGRESS.md`.
-3. If `autoresearch-lessons.md` is missing → copy `references/bootstrap/autoresearch-lessons.md.template`.
-4. If `phoenix-log.md` is missing → copy `references/bootstrap/phoenix-log.md.template`.
+```bash
+# PROJECT_ROOT = the repo / open project directory
+SKILL_DIR="<absolute path to this skill dir>"
+PROJECT_ROOT="<project root>"
+for f in PROGRESS autoresearch-lessons phoenix-log; do
+  [ -f "$PROJECT_ROOT/$f.md" ] || cp "$SKILL_DIR/references/bootstrap/$f.md.template" "$PROJECT_ROOT/$f.md"
+done
+```
+
+(Optional: if Python is available, `python "$SKILL_DIR/scripts/bootstrap_l4.py" "$PROJECT_ROOT"`
+does the same. Prefer the `cp` loop above — it needs only a shell.)
 
 These three files power Layer 4 (Phoenix + Autoresearch — cross-session learning). They are
 created automatically so the human never has to know they exist. If they are already present,
-do nothing. The agent then maintains them every iteration (append to PROGRESS.md, promote
-lessons to autoresearch-lessons.md, log rollbacks to phoenix-log.md).
+the loop skips them (never overwrites). The agent then maintains them every iteration
+(append to PROGRESS.md, promote lessons to autoresearch-lessons.md, log rollbacks to
+phoenix-log.md).
 
 **This means L4 is NEVER inert for a vibe-coder** — the skill wakes it up on load.
 
@@ -186,6 +195,7 @@ methodology catches. See `references/qa-testing.md` for full protocol.
 | INFRASTRUCTURE skill-tree read-only isolation (isolate-skill-tree / restore-skill-tree) — the only enforcement that holds against QA models writing to the skill dir | `scripts/workspace_guard.py` |
 | QA Isolation Protocol: before→during→after run, three-layer protection, git add pitfalls, tier classification | `references/qa-isolation-protocol.md` |
 | Snapshot verify-additions — detects foreign writes by comparing against git HEAD (verify alone only catches shrinkage) | `scripts/snapshot_skill.py` |
+| L4 auto-bootstrap — copies PROGRESS/autoresearch-lessons/phoenix-log templates into project root on first load | `scripts/bootstrap_l4.py` (optional; the `cp` loop in ⚡ Auto-bootstrap is preferred) |
 | jscpd node-CLI vs Rust-port `cpd 5.x` flags + the silent "0 files analyzed" min-tokens trap | `references/jscpd-rust-port-gotchas.md` |
 | Third-party skill audit tools (SkillSpector etc.) | `references/external-skill-audit-tools.md` |
 | Per-stack commands (test/lint/build/quality) | `references/bindings/<your-stack>.md` |
