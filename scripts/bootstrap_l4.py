@@ -50,13 +50,19 @@ def _normalize_path(p: str) -> str:
 
 
 def main() -> int:
-    if len(sys.argv) < 2:
-        # No project root given — default to current working directory.
-        project_root = os.getcwd()
-    else:
-        project_root = _normalize_path(sys.argv[1])
+    # The project root must be passed EXPLICITLY. Silently falling back to os.getcwd()
+    # meant that when the agent invoked this at skill-load time from an arbitrary
+    # directory, three files were created in whatever tree the process happened to sit
+    # in — a different repo, a home directory, or a system path. Writing outside the
+    # intended project is worse than doing nothing, so refuse instead of guessing.
+    if len(sys.argv) < 2 or not sys.argv[1].strip():
+        print("[keelwright bootstrap] ERROR: project root argument is required.")
+        print("  Usage: python bootstrap_l4.py <project-root>")
+        print("  Refusing to guess from the current directory — that risks creating")
+        print("  files in an unrelated tree.")
+        return 2
 
-    project_root = os.path.abspath(project_root)
+    project_root = os.path.abspath(_normalize_path(sys.argv[1]))
 
     if not os.path.isdir(project_root):
         print(f"[keelwright bootstrap] ERROR: project root not found: {project_root}")

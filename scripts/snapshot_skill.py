@@ -10,6 +10,10 @@ so recovery meant scraping the session DB. This script makes that never-again ch
   * `verify`    — compare the live skill against the newest snapshot; flag any file that SHRANK
                   by more than a threshold (a truncation/corruption signal) or vanished.
   * `restore`   — copy a chosen snapshot (default: newest) back over the live skill.
+              Dry run unless `--yes`. Files added since the snapshot are reported but
+              KEPT unless `--prune` (a planted file is not in the snapshot, so a plain
+              restore would leave it behind while looking clean).
+              Usage: restore [snapshot-name] [--prune] [--yes]
 
 It is stdlib-only and cross-platform. Run `snapshot` before and after any risky edit, and
 `verify` on entry to catch out-of-band corruption early.
@@ -129,16 +133,60 @@ def verify_additions():
     return 1 if problems else 0
 
 
-def restore(name=None):
+def restore(name=None, prune=False, yes=False):
+    """Copy a snapshot back over the live skill.
+
+    IMPORTANT: by default this OVERWRITES files present in the snapshot but does NOT
+    delete files added since it was taken. That matters for tamper recovery: a planted
+    file is not in the snapshot, so a plain restore leaves it in place and the tree only
+    looks clean. Extra files are therefore always reported, and `--prune` removes them
+    for a true byte-for-byte rollback.
+    """
     snap = (BACKUPS / name) if name else _newest()
     if not snap or not snap.is_dir():
         print(f"[restore] snapshot not found: {name}"); return 1
-    for f in snap.rglob("*"):
-        if f.is_file() and f.name != "_manifest.json":
-            rel = f.relative_to(snap)
-            (SKILL / rel).parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(f, SKILL / rel)
-    print(f"[restore] restored live skill from {snap.name}")
+
+    snap_files = {f.relative_to(snap) for f in snap.rglob("*")
+                  if f.is_file() and f.name != "_manifest.json"}
+    live_files = {f.relative_to(SKILL) for f in SKILL.rglob("*")
+                  if f.is_file() and not any(p in ("backups", ".git", "__pycache__")
+                                             for p in f.relative_to(SKILL).parts)}
+    extra = sorted(live_files - snap_files)
+
+    print(f"[restore] snapshot: {snap.name}")
+    print(f"[restore] will overwrite {len(snap_files)} file(s) in {SKILL}")
+    if extra:
+        print(f"[restore] {len(extra)} file(s) exist live but NOT in the snapshot:")
+        for rel in extra[:20]:
+            print(f"           + {rel}")
+        if len(extra) > 20:
+            print(f"           ... and {len(extra) - 20} more")
+        print("[restore] these are NOT part of the snapshot. If you are recovering from")
+        print("          tampering, treat them as suspect — a planted file would appear here.")
+        if not prune:
+            print("[restore] they will be LEFT IN PLACE. Use --prune to delete them.")
+
+    if not yes:
+        print("[restore] DRY RUN — nothing written. Re-run with --yes to apply.")
+        return 0
+
+    for rel in snap_files:
+        dest = SKILL / rel
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(snap / rel, dest)
+
+    removed = 0
+    if prune:
+        for rel in extra:
+            try:
+                (SKILL / rel).unlink()
+                removed += 1
+            except OSError as e:
+                print(f"[restore] could not remove {rel}: {e}")
+
+    print(f"[restore] restored {len(snap_files)} file(s) from {snap.name}"
+          + (f"; removed {removed} extra file(s)" if prune else
+             (f"; {len(extra)} extra file(s) left in place" if extra else "")))
     return 0
 
 
@@ -153,7 +201,11 @@ def main():
     if cmd == "verify-additions":
         sys.exit(verify_additions())
     if cmd == "restore":
-        sys.exit(restore(sys.argv[2] if len(sys.argv) > 2 else None))
+        flags = {a for a in sys.argv[2:] if a.startswith("--")}
+        positional = [a for a in sys.argv[2:] if not a.startswith("--")]
+        sys.exit(restore(positional[0] if positional else None,
+                         prune="--prune" in flags,
+                         yes="--yes" in flags))
     sys.exit(__doc__)
 
 

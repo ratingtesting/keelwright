@@ -17,11 +17,18 @@ HERMES_SKILLS = Path(os.environ.get(
 
 SKILL_NAME = "keelwright"
 INSTALL_TO = HERMES_SKILLS / SKILL_NAME
+
+# Post-install checks as ARGUMENT VECTORS, never shell strings.
+# {skill} is substituted as a single argv element, so a path containing spaces,
+# quotes, &, ; or | is passed verbatim to the process instead of being parsed by a
+# shell. Building these as strings + shell=True was a command-injection vector: the
+# install path is attacker-influenceable via HERMES_SKILLS.
+# Each entry: (label, [argv...]) — {skill} placeholders are replaced per element.
 POST_INSTALL_CHECKS = [
-    ("SKILL.md YAML", "python -c \"import yaml; yaml.safe_load(open(\\\"{skill}/SKILL.md\\\", encoding=\\\"utf-8\\\").read().split(\\\"---\\\")[1]); print(\\\"OK\\\")\""),
-    ("snapshot verify", "python \"{skill}/scripts/snapshot_skill.py\" verify"),
-    ("validate_run.py", "python \"{skill}/scripts/validate_run.py\" 2>&1 | head -1"),
-    ("workspace_guard.py", "python \"{skill}/scripts/workspace_guard.py\" 2>&1 | head -1"),
+    ("SKILL.md YAML", ["{python}", "{skill}/scripts/_check_yaml.py", "{skill}/SKILL.md"]),
+    ("snapshot verify", ["{python}", "{skill}/scripts/snapshot_skill.py", "verify"]),
+    ("validate_run.py", ["{python}", "{skill}/scripts/validate_run.py"]),
+    ("workspace_guard.py", ["{python}", "{skill}/scripts/workspace_guard.py"]),
 ]
 
 
@@ -90,14 +97,19 @@ def run_checks(skill_dir: Path):
     implicitly — it must stay behind the explicit --run-checks flag, because a .zip is
     untrusted input and its manifest is self-attested (an attacker who edits a script
     also recomputes its SHA256, so integrity verification does not establish trust).
+
+    Commands run as argument vectors with shell=False: no shell parses the install
+    path, so metacharacters in it cannot become commands.
     """
     import subprocess
     results = []
-    for label, cmd_template in POST_INSTALL_CHECKS:
-        cmd = cmd_template.replace("{skill}", str(skill_dir).replace("\\", "/"))
+    skill_str = str(skill_dir).replace("\\", "/")
+    for label, argv_template in POST_INSTALL_CHECKS:
+        argv = [part.replace("{skill}", skill_str).replace("{python}", sys.executable)
+                for part in argv_template]
         try:
             r = subprocess.run(
-                cmd, shell=True, capture_output=True, text=True, timeout=30,
+                argv, shell=False, capture_output=True, text=True, timeout=30,
                 encoding="utf-8", errors="replace",
                 cwd=str(skill_dir))
             output = (r.stdout + r.stderr).strip()
@@ -152,12 +164,17 @@ def import_skill(zip_path: Path, force: bool = False, include_internal: bool = T
         count = extract_skill(zf, INSTALL_TO, include_internal)
         print(f"  Installed {count} files")
 
-        # 5. Extract context-transfer prompt
+        # 5. Extract context-transfer prompt — INSIDE the skill dir only.
+        # It used to land in ~/kw-qa/, i.e. outside the install target: content from an
+        # untrusted archive was planted into a shared working directory that other runs
+        # read from, with nothing tying it to the skill it came from. Keeping it under
+        # the skill keeps every imported byte inside one reviewable, removable tree.
         if "_CONTEXT-TRANSFER-PROMPT.md" in zf.namelist():
-            ct_dest = Path(os.path.expanduser("~/kw-qa")) / "CONTEXT-TRANSFER-PROMPT.md"
+            ct_dest = INSTALL_TO / "imported" / "CONTEXT-TRANSFER-PROMPT.md"
             ct_dest.parent.mkdir(parents=True, exist_ok=True)
             ct_dest.write_bytes(zf.read("_CONTEXT-TRANSFER-PROMPT.md"))
             print(f"  Context-transfer prompt → {ct_dest}")
+            print(f"  (from the archive — review before feeding it to an agent)")
 
     # 6. Post-install checks — OPT-IN ONLY.
     # These execute code from the archive you just unpacked. A .zip is untrusted input,
