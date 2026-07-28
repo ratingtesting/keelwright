@@ -10,7 +10,7 @@ description: >
   circuit-breaker limits and Phoenix restart. Plain-language reports for non-developers.
   Proven by adversarial A/B testing: Keelwright Score (KDS) up to 83/100 on strong models
   (SWE-bench 78%). Load before any loop/agent coding session, autonomous run, or commit.
-version: 1.4.4
+version: 1.4.5
 license: MIT-0
 author: ratingtesting (https://github.com/ratingtesting)
 platforms: [windows, linux, macos]
@@ -194,6 +194,7 @@ methodology catches. See `references/qa-testing.md` for full protocol.
 | QA Isolation Protocol: before→during→after run, three-layer protection, git add pitfalls, tier classification | `references/qa-isolation-protocol.md` |
 | Snapshot verify-additions — detects foreign writes by comparing against git HEAD (verify alone only catches shrinkage) | `scripts/snapshot_skill.py` |
 | L4 auto-bootstrap — copies PROGRESS/autoresearch-lessons/phoenix-log templates into project root on first load | `scripts/bootstrap_l4.py` (optional; the `cp` loop in ⚡ Auto-bootstrap is preferred) |
+| Gate 8c machine proof — RED-BATTERY: same spec tests must be GREEN on correct impl and RED on buggy impl (exit 0=discriminating, 1=tautological, 2=inconclusive) | `scripts/red_battery.py <tests.py> <correct_impl.py> <buggy_impl.py>` |
 | jscpd node-CLI vs Rust-port `cpd 5.x` flags + the silent "0 files analyzed" min-tokens trap | `references/jscpd-rust-port-gotchas.md` |
 | Third-party skill audit tools (SkillSpector etc.) | `references/external-skill-audit-tools.md` |
 | Per-stack commands (test/lint/build/quality) | `references/bindings/<your-stack>.md` |
