@@ -84,7 +84,13 @@ def extract_skill(zf: zipfile.ZipFile, target: Path, include_internal: bool):
 
 
 def run_checks(skill_dir: Path):
-    """Run post-install verification checks."""
+    """Run post-install verification checks.
+
+    SECURITY: this EXECUTES code from the freshly imported skill. Never call it
+    implicitly — it must stay behind the explicit --run-checks flag, because a .zip is
+    untrusted input and its manifest is self-attested (an attacker who edits a script
+    also recomputes its SHA256, so integrity verification does not establish trust).
+    """
     import subprocess
     results = []
     for label, cmd_template in POST_INSTALL_CHECKS:
@@ -92,6 +98,7 @@ def run_checks(skill_dir: Path):
         try:
             r = subprocess.run(
                 cmd, shell=True, capture_output=True, text=True, timeout=30,
+                encoding="utf-8", errors="replace",
                 cwd=str(skill_dir))
             output = (r.stdout + r.stderr).strip()
             ok = r.returncode == 0
@@ -103,7 +110,8 @@ def run_checks(skill_dir: Path):
     return results
 
 
-def import_skill(zip_path: Path, force: bool = False, include_internal: bool = True):
+def import_skill(zip_path: Path, force: bool = False, include_internal: bool = True,
+                 run_post_checks: bool = False):
     if not zip_path.exists():
         print(f"[ERROR] {zip_path} not found"); return 1
 
@@ -151,21 +159,28 @@ def import_skill(zip_path: Path, force: bool = False, include_internal: bool = T
             ct_dest.write_bytes(zf.read("_CONTEXT-TRANSFER-PROMPT.md"))
             print(f"  Context-transfer prompt → {ct_dest}")
 
-    # 6. Post-install checks
-    print(f"\n--- Post-install checks ---")
-    checks = run_checks(INSTALL_TO)
+    # 6. Post-install checks — OPT-IN ONLY.
+    # These execute code from the archive you just unpacked. A .zip is untrusted input,
+    # and step 2 proves only self-consistency (the manifest ships inside the same file),
+    # never provenance. So running them is a separate, explicit decision.
     all_ok = True
-    for label, ok, output in checks:
-        status = "OK" if ok else "FAIL"
-        print(f"  [{status}] {label}: {output}")
-        if not ok:
-            all_ok = False
+    if run_post_checks:
+        print(f"\n--- Post-install checks (executing code from the imported skill) ---")
+        for label, ok, output in run_checks(INSTALL_TO):
+            print(f"  [{'OK' if ok else 'FAIL'}] {label}: {output}")
+            all_ok = all_ok and ok
+    else:
+        print(f"\n--- Post-install checks: SKIPPED ---")
+        print(f"  These run shell commands from the imported skill, so they are opt-in.")
+        print(f"  Inspect {INSTALL_TO}, then re-run with --run-checks if you trust it.")
 
     # 7. Summary
     print(f"\n=== IMPORT {'SUCCESS' if all_ok else 'PARTIAL'} ===")
     print(f"  Skill: {INSTALL_TO}")
     print(f"  Files: {count}")
-    if all_ok:
+    if not run_post_checks:
+        print(f"  Status: installed, unverified (checks skipped — see --run-checks)")
+    elif all_ok:
         print(f"  Status: ready to use. Load with skill_view(name='keelwright')")
     else:
         print(f"  Status: installed but some checks failed — review above")
@@ -177,8 +192,12 @@ def main():
     parser.add_argument("zipfile", help="Path to the exported .zip")
     parser.add_argument("--force", action="store_true", help="Overwrite existing skill")
     parser.add_argument("--no-internal", action="store_true", help="Skip internal/ files")
+    parser.add_argument("--run-checks", action="store_true",
+                        help="Run post-install checks. WARNING: executes shell commands "
+                             "from the imported skill — only for archives you trust.")
     args = parser.parse_args()
-    return import_skill(Path(args.zipfile), args.force, not args.no_internal)
+    return import_skill(Path(args.zipfile), args.force, not args.no_internal,
+                        args.run_checks)
 
 
 if __name__ == "__main__":
