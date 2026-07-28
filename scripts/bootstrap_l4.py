@@ -35,12 +35,28 @@ FILES = {
 }
 
 
+def _normalize_path(p: str) -> str:
+    """Convert an MSYS/Cygwin-style path (/c/Users/...) to a Windows path
+    (C:\\Users\\...) when running under Windows Python, which does not
+    understand the former. On non-Windows or already-native paths, return
+    the input unchanged."""
+    import re
+    if os.name == "nt" and re.match(r"^/[a-zA-Z]/(?:\S+)?$", p):
+        # /c/foo/bar -> C:/foo/bar
+        drive = p[1].upper() + ":"
+        rest = p[3:]
+        return drive + "/" + rest
+    return p
+
+
 def main() -> int:
     if len(sys.argv) < 2:
         # No project root given — default to current working directory.
         project_root = os.getcwd()
     else:
-        project_root = sys.argv[1]
+        project_root = _normalize_path(sys.argv[1])
+
+    project_root = os.path.abspath(project_root)
 
     if not os.path.isdir(project_root):
         print(f"[keelwright bootstrap] ERROR: project root not found: {project_root}")
