@@ -8,6 +8,13 @@ internal/
 __pycache__/
 *.pyc
 
+# Throwaway ad-hoc verification scripts — these belong in the OS temp dir, never in the
+# published skill. One (hermes-verify-sqlfix.py) was committed by accident, shipped in
+# every release, and turned out to be markdown saved as .py that could not even compile.
+hermes-verify-*
+ad_hoc_verify_*.py
+!scripts/ad_hoc_verify_template.py
+
 # Versioned local backups (tamper recovery) — kitchen, not shipped to the public repo
 backups/
 
