@@ -10,7 +10,7 @@ description: >
   circuit-breaker limits and Phoenix restart. Plain-language reports for non-developers.
   Proven by adversarial A/B testing: Keelwright Score (KDS) up to 83/100 on strong models
   (SWE-bench 78%). Load before any loop/agent coding session, autonomous run, or commit.
-version: 1.4.6
+version: 1.4.7
 license: MIT-0
 author: ratingtesting (https://github.com/ratingtesting)
 platforms: [windows, linux, macos]
@@ -30,8 +30,8 @@ so you don't pay for them on every call.
 ## ⚡ Auto-bootstrap (runs on first load — no human action needed)
 
 Keelwright is built for vibe-coders who do NOT read skill files. So it sets up its own
-infrastructure silently. **On the first load in a project, the agent MUST execute this
-copy step (do not just "remember" — run it):**
+infrastructure. **On the first load in a project, the agent MUST execute this copy step
+(do not just "remember" — run it):**
 
 ```bash
 # PROJECT_ROOT = the repo / open project directory
@@ -45,13 +45,35 @@ done
 (Optional: if Python is available, `python "$SKILL_DIR/scripts/bootstrap_l4.py" "$PROJECT_ROOT"`
 does the same. Prefer the `cp` loop above — it needs only a shell.)
 
-These three files power Layer 4 (Phoenix + Autoresearch — cross-session learning). They are
-created automatically so the human never has to know they exist. If they are already present,
-the loop skips them (never overwrites). The agent then maintains them every iteration
-(append to PROGRESS.md, promote lessons to autoresearch-lessons.md, log rollbacks to
-phoenix-log.md).
+These three files power Layer 4 (Phoenix + Autoresearch — cross-session learning). If they
+are already present the loop skips them (never overwrites). The agent then maintains them
+every iteration: append to PROGRESS.md, promote lessons to autoresearch-lessons.md, log
+rollbacks to phoenix-log.md.
 
 **This means L4 is NEVER inert for a vibe-coder** — the skill wakes it up on load.
+
+### Announce it — one line, then get out of the way
+
+Creating files in someone's project without a word is a trust violation, and it also wastes
+the skill's best first impression. **After the copy step, the agent MUST report what it
+created and why, in plain language, then continue.** Not a wall of text — one line plus a
+short benefit note:
+
+> 📁 Created 3 tracking files in your project root: `PROGRESS.md`, `autoresearch-lessons.md`,
+> `phoenix-log.md`.
+> They give me memory across chats: what we already tried, which fixes stuck, and what broke
+> before — so a fresh session doesn't repeat old mistakes. Safe to commit; delete them any
+> time (I'll recreate them, losing that history).
+
+Rules for the announcement:
+- Only on the load where files were actually created. If all three already existed, say
+  nothing — repeating it every session is noise.
+- Name the benefit, not the mechanism. "Memory across chats" lands; "L4 cross-session
+  counters" does not.
+- State that deletion is allowed and what it costs. A user who cannot opt out does not
+  trust the tool.
+- One short block, then proceed with the actual task. Never make the human confirm — this
+  is a notification, not a gate.
 
 **Who this is for:** anyone driving an AI agent (or a swarm) who cannot review the logic
 line by line. Because of that, every safeguard here is **machine-enforced and automatic**,
@@ -488,7 +510,7 @@ Three mechanisms, one layer:
   oscillation, drift, amplification, feedback starvation).
 - **Phoenix + Autoresearch (cross-run, L4):** lessons from repeated failures → `phoenix-log.md` /
   `autoresearch-lessons.md`. **Auto-created on first load** (see ⚡ Auto-bootstrap above) —
-  the agent copies the templates into the project root silently, so L4 is awake from session 1.
+  the agent copies the templates into the project root and announces them in one line, so L4 is awake from session 1.
   No human setup required.
 - **Weekly self-improvement cron:** once a week, search past sessions → promote patterns seen
   3+ times into memory / a skill patch. Silent pass if nothing new.

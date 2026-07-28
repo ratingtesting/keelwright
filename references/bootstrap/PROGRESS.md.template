@@ -1,7 +1,12 @@
 # PROGRESS.md — keelwright loop log
 
-> Auto-created by keelwright on first load. Do NOT delete — Phoenix/Autoresearch
-> read this file to learn across sessions. The human never needs to touch it.
+> **What this is:** your AI's memory across chats. Each iteration it records what was tried,
+> what worked, and what broke — so a brand-new session picks up where the last one stopped
+> instead of re-making old mistakes.
+>
+> **You never have to write in it.** keelwright created it and maintains it. Safe to commit
+> (a useful history of how the project got here). Deleting it is allowed — it will be
+> recreated empty, and the accumulated history is lost.
 
 ## STATUS
 - Project: <auto-filled by agent>

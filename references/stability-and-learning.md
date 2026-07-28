@@ -2,7 +2,8 @@
 
 Three self-learning mechanisms, one layer. Stability works within a session; Phoenix and
 Autoresearch are cross-run (auto-created on first skill load — see ⚡ Auto-bootstrap in SKILL.md;
-the agent copies the loop-log templates into the project root silently, so they are always
+the agent copies the loop-log templates into the project root and reports the three files it
+created in one line (see ⚡ Auto-bootstrap), so they are always
 present from session 1); the cron runs weekly.
 
 ## Layer 3: Stability Check (5 failure modes)
