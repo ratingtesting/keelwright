@@ -3,10 +3,8 @@
 This skill combines several community loop-coding patterns into one engine, plus references to
 external CLI tools. It contains **instructions only — no third-party source code**. Referencing a
 tool by name and giving its command line is not redistribution, so those tools' licenses do not
-attach to this skill. This skill is published under **CC BY 4.0** (see `LICENSE`) — free to use,
-modify, and redistribute, including commercially, **provided attribution is kept**:
-`keelwright by ratingtesting (https://github.com/ratingtesting)`. Omitting the credit is a license
-violation.
+This skill is published under **MIT-0** (see `LICENSE`) — free to use,
+modify, and redistribute, including commercially, without attribution.
 
 ## Content sources (adapted patterns)
 

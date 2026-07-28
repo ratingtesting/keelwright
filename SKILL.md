@@ -90,10 +90,8 @@ product, just say what happened and what's next.
 execution-loop, match-loop, autoresearch-loop, coding-framework — all MIT-0) plus references
 to MIT/Apache-licensed CLI tools (jscpd, lizard, scc, Gitleaks, Semgrep, SkillSpector). This
 skill contains only instructions, not the tools' source code. Full credits and the license
-table are in `references/provenance.md`. This skill is licensed **CC BY 4.0** (see `LICENSE`):
-free to use, modify, and redistribute — including commercially — **provided you keep
-attribution**: `keelwright by ratingtesting (https://github.com/ratingtesting)`. Using it
-without that credit is a license violation.
+This skill is licensed **MIT-0** (see `LICENSE`):
+free to use, modify, and redistribute — including commercially — without attribution.
 
 ---
 
