@@ -135,8 +135,8 @@ Key points:
 Write a temp verifier (OS temp path, `hermes-verify-` prefix), run it, clean up:
 
 ```python
-import subprocess, sys, pathlib
-HERE = pathlib.Path(r"C:\Users\Unicorn\vibe-qa\p4\treatment")
+import subprocess, sys, pathlib, time
+HERE = pathlib.Path(sys.argv[1])  # the run dir under test — pass it in, never hard-code
 m = HERE / ".loop_stopped"; m.unlink(missing_ok=True)
 t0 = time.time()
 p = subprocess.run([sys.executable, "loop.py"], cwd=HERE, capture_output=True, text=True, timeout=60)
