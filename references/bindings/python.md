@@ -98,18 +98,20 @@ pre-commit install
 
 This hooks Gitleaks, Ruff, MyPy, jscpd, Lizard, and syntax check into every commit — exactly the gates the keelwright requires.
 
-## Semgrep false-positive workaround (Python logging rules)
+## Semgrep note (Python logging rules)
 
-Rule `python.lang.security.audit.logging.logger-credential-leak.python-logger-credential-disclosure` triggers on format-string parameter names containing `auth_code`, `secret`, `password`, `token`, `key`, etc. — even when the logged value is masked/truncated.
+Rule `python.lang.security.audit.logging.logger-credential-leak.python-logger-credential-disclosure`
+triggers on format-string parameter names containing `auth_code`, `secret`, `password`, `token`,
+`key`, etc. — even when the logged value is masked/truncated.
 
-**Workaround:** use a benign parameter name in the log call (e.g., `ac` instead of `auth_code`) while still masking the actual value:
+**Do NOT log secrets — not even truncated.** The correct fix is to remove the value from the
+log call entirely, not to rename the parameter to evade the rule. Renaming `auth_code` → `ac`
+while still printing `auth_code[:8] + "..."` is rule evasion and leaks the first 8 chars of a
+secret. If you must record that an auth step happened, log a constant with no value:
 
 ```python
-# Triggers false positive:
-logger.info("auth_code=%s", auth_code)  # parameter name "auth_code" matches
-
-# Avoids false positive, still logs masked value:
-logger.info("ac=%s", auth_code[:8] + "...")  # parameter name "ac" is benign
+# Correct: no secret material leaves the process
+logger.info("auth step completed (token not logged)")
 ```
 
-This avoids the rule match without weakening auditability.
+This satisfies the rule without weakening auditability and without leaking anything.
