@@ -57,7 +57,7 @@ commit blocker (R1/R2).
 > (non-MSYS) paths via `$(cygpath -w …)` to avoid interpreter contamination. Details in
 > `external-skill-audit-tools.md`.
 
-**Semgrep false-positive note (Python):** The rule `python.lang.security.audit.logging.logger-credential-leak.python-logger-credential-disclosure` triggers on format-string parameter names containing `auth_code`, `secret`, `password`, `token`, `key`, etc. — even when the logged value is masked/truncated. Workaround: use a benign parameter name in the log call (e.g., `ac` instead of `auth_code`) while still masking the actual value. This avoids the rule match without weakening auditability.
+**Semgrep note (Python):** The rule `python.lang.security.audit.logging.logger-credential-leak.python-logger-credential-disclosure` triggers on format-string parameter names containing `auth_code`, `secret`, `password`, `token`, `key`, etc. — even when the value is masked. **Do NOT log secrets at all** (not even truncated); remove the value from the call. Renaming the parameter to evade the rule while still printing `value[:8] + "..."` leaks the first 8 chars and is rule evasion. Log a constant instead: `logger.info("auth step completed (token not logged)")`.
 
 ## Gate 2 — Independent LOGIC review (R1, R3, R6)
 
