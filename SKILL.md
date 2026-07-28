@@ -10,7 +10,7 @@ description: >
   circuit-breaker limits and Phoenix restart. Plain-language reports for non-developers.
   Proven by adversarial A/B testing: Keelwright Score (KDS) up to 83/100 on strong models
   (SWE-bench 78%). Load before any loop/agent coding session, autonomous run, or commit.
-version: 1.4.9
+version: 1.5.0
 license: MIT-0
 author: ratingtesting (https://github.com/ratingtesting)
 platforms: [windows, linux, macos]
@@ -532,9 +532,12 @@ Three distinct attack surfaces, don't conflate them:
 - **Third-party skills/MCP (R11):** SkillSpector audit BEFORE installing any external skill.
   ~26% of community skills carry vulnerabilities. Reject on CRITICAL/HIGH. → `external-skill-audit-tools.md`.
 
-Also machine-checked: R9 model-version pinning (reproducible runs), R10 swarm memory-poisoning
+Also machine-checked: R10 swarm memory-poisoning
 (durable memory written only after verification), and R12 unattended/overnight preflight
 (isolate + forbidden zones + verify + cap before any hands-off run). → `security-gates.md`.
+**R9 (model-version drift) is a DISCIPLINE, not an enforced gate** — keelwright records the
+model in the STATUS block but cannot detect a provider silently swapping it mid-run. Treat
+reproducibility as your responsibility, not the skill's guarantee.
 Long-horizon code erosion is caught by the hard anti-erosion gate → `writing-code.md`. On
 Windows/MSYS, generate temp verify scripts with a stable path and clean them up individually
 (avoid recursive-delete approval prompts).

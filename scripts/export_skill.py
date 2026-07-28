@@ -48,7 +48,7 @@ def add_to_zip(zf: zipfile.ZipFile, base: Path, pattern: str = "*",
     return added
 
 
-def export(out_path: Path, include_internal: bool):
+def export(out_path: Path, include_internal: bool, include_runs: bool = False):
     skip = SKIP_ALL if include_internal else SKIP_PUBLIC
     total = 0
 
@@ -69,12 +69,18 @@ def export(out_path: Path, include_internal: bool):
             print(f"\n--- QA results ---")
             total += add_to_zip(zf, qa.parent, skip_dirs=skip)
 
-        # 3. External QA run dirs (kw-qa/) — only if NOT already inside the skill's qa-results/
-        #    This avoids duplicate entries when qa-results/ is already part of the skill tree.
+        # 3. External QA run dirs (kw-qa/) — OPT-IN via --include-runs.
+        #    These live OUTSIDE the skill tree and hold raw run history: local absolute paths,
+        #    prompts, model outputs, machine names. Bundling them by default meant a zip handed
+        #    to someone else silently carried the author's environment. Now you ask for them.
         qa_inside_skill = (SKILL / "qa-results").exists()
         kwqa = SKILL.parent.parent / "kw-qa"  # ~/kw-qa/
-        if kwqa.exists() and kwqa != SKILL and not qa_inside_skill:
-            print(f"\n--- External QA runs (kw-qa/) ---")
+        if not include_runs:
+            print(f"\n--- External QA runs (kw-qa/): SKIPPED ---")
+            print(f"  They can contain local paths and raw prompts. Use --include-runs to add them.")
+        elif kwqa.exists() and kwqa != SKILL and not qa_inside_skill:
+            print(f"\n--- External QA runs (kw-qa/) — INCLUDED at your request ---")
+            print(f"  WARNING: raw run data may embed local paths/prompts. Review before sharing.")
             for run in sorted(kwqa.iterdir()):
                 if not run.is_dir():
                     continue
@@ -85,8 +91,9 @@ def export(out_path: Path, include_internal: bool):
         elif qa_inside_skill:
             print(f"\n--- QA runs already inside skill/qa-results/ (skipping external scan) ---")
 
-        # 4. Context transfer prompt
-        ct = kwqa / "CONTEXT-TRANSFER-PROMPT.md" if kwqa.exists() else None
+        # 4. Context transfer prompt — also gated: it comes from kw-qa/ and can carry
+        #    session-specific context the recipient should not silently inherit.
+        ct = kwqa / "CONTEXT-TRANSFER-PROMPT.md" if (include_runs and kwqa.exists()) else None
         if ct and ct.exists():
             zf.write(ct, "_CONTEXT-TRANSFER-PROMPT.md")
             total += 1
@@ -113,6 +120,10 @@ def main():
     parser = argparse.ArgumentParser(description="Export keelwright skill to portable .zip")
     parser.add_argument("-o", "--output", help="Output .zip path")
     parser.add_argument("--all", action="store_true", help="Include internal/ and backups/")
+    parser.add_argument("--include-runs", action="store_true",
+                        help="Also bundle external ~/kw-qa/ run dirs and the context-transfer "
+                             "prompt. WARNING: raw run data can embed local absolute paths, "
+                             "prompts and model output — review before sharing the zip.")
     args = parser.parse_args()
 
     if args.output:
@@ -121,7 +132,7 @@ def main():
         ts = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
         out = Path(os.path.expanduser("~/kw-qa")) / f"keelwright-export-{ts}.zip"
 
-    return export(out, args.all)
+    return export(out, args.all, args.include_runs)
 
 
 if __name__ == "__main__":
