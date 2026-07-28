@@ -1,0 +1,8 @@
+# phoenix-log.md — keelwright phoenix restarts
+
+> Auto-created by keelwright on first load. Records rollbacks/reverts per feature
+> so Phoenix can detect 3× recurrence and force a root-cause rewrite. The human
+> never needs to touch it.
+
+## Rollbacks
+<!-- Agent appends: feature → iteration → reason -->

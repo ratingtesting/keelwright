@@ -1,8 +1,9 @@
 # Stability + Phoenix + Autoresearch + self-improvement cron
 
 Three self-learning mechanisms, one layer. Stability works within a session; Phoenix and
-Autoresearch are cross-run (they only live if you keep the loop log — see phases.md); the cron
-runs weekly.
+Autoresearch are cross-run (auto-created on first skill load — see ⚡ Auto-bootstrap in SKILL.md;
+the agent copies the loop-log templates into the project root silently, so they are always
+present from session 1); the cron runs weekly.
 
 ## Layer 3: Stability Check (5 failure modes)
 
@@ -140,9 +141,13 @@ A layer on top that turns repeated errors into durable knowledge.
 
 Phoenix does NOT replace the scanner. It fires AFTER the scanner detects recurrence.
 
-### ⚠️ L4 is inert without persistent files
+### ⚠️ L4 auto-wakes on first load (no human setup)
 Phoenix/Autoresearch fire on cross-session counters. A fresh chat doesn't remember the iteration
-number. Triggers only fire if the counters live in files (see phases.md, loop log):
+number — but keelwright's ⚡ Auto-bootstrap (SKILL.md) copies `PROGRESS.md`,
+`autoresearch-lessons.md`, and `phoenix-log.md` into the project root on the FIRST skill load.
+So the counters always exist from session 1. The human never creates them. If a file is missing
+(e.g. deleted), the agent recreates it from `references/bootstrap/*.template` before the next
+iteration. Triggers:
 
 | L4 trigger | How it's counted | Action |
 |---|---|---|

@@ -10,7 +10,7 @@ description: >
   circuit-breaker limits and Phoenix restart. Plain-language reports for non-developers.
   Proven by adversarial A/B testing: Keelwright Score (KDS) up to 83/100 on strong models
   (SWE-bench 78%). Load before any loop/agent coding session, autonomous run, or commit.
-version: 1.3.0
+version: 1.4.0
 license: CC-BY-4.0
 author: ratingtesting (https://github.com/ratingtesting)
 platforms: [windows, linux, macos]
@@ -26,6 +26,23 @@ One skill that combines the four things a non-programmer needs to ship AI-genera
 safely and autonomously: an autonomous loop, machine-enforced safety gates, an autonomy
 dial, and self-learning. Thin orchestrator — heavy parts load on demand from `references/`,
 so you don't pay for them on every call.
+
+## ⚡ Auto-bootstrap (runs on first load — no human action needed)
+
+Keelwright is built for vibe-coders who do NOT read skill files. So it sets up its own
+infrastructure silently. **On the first load in a project, the agent MUST:**
+
+1. Detect the project root (the directory of the repo / open project).
+2. If `PROGRESS.md` is missing there → copy `references/bootstrap/PROGRESS.md.template` → `PROGRESS.md`.
+3. If `autoresearch-lessons.md` is missing → copy `references/bootstrap/autoresearch-lessons.md.template`.
+4. If `phoenix-log.md` is missing → copy `references/bootstrap/phoenix-log.md.template`.
+
+These three files power Layer 4 (Phoenix + Autoresearch — cross-session learning). They are
+created automatically so the human never has to know they exist. If they are already present,
+do nothing. The agent then maintains them every iteration (append to PROGRESS.md, promote
+lessons to autoresearch-lessons.md, log rollbacks to phoenix-log.md).
+
+**This means L4 is NEVER inert for a vibe-coder** — the skill wakes it up on load.
 
 **Who this is for:** anyone driving an AI agent (or a swarm) who cannot review the logic
 line by line. Because of that, every safeguard here is **machine-enforced and automatic**,
@@ -460,8 +477,10 @@ in its `context`. Templates and the full hat list — `references/phases.md`.
 Three mechanisms, one layer:
 - **Stability (L3, within session):** every 3 iterations scan 5 failure modes (dead retry,
   oscillation, drift, amplification, feedback starvation).
-- **Phoenix + Autoresearch (cross-run):** lessons from repeated failures → `phoenix-log.md` /
-  `autoresearch-lessons.md`. **Only live if you keep the loop log** (files in the project root).
+- **Phoenix + Autoresearch (cross-run, L4):** lessons from repeated failures → `phoenix-log.md` /
+  `autoresearch-lessons.md`. **Auto-created on first load** (see ⚡ Auto-bootstrap above) —
+  the agent copies the templates into the project root silently, so L4 is awake from session 1.
+  No human setup required.
 - **Weekly self-improvement cron:** once a week, search past sessions → promote patterns seen
   3+ times into memory / a skill patch. Silent pass if nothing new.
 
@@ -539,8 +558,10 @@ otherwise.
 
 - **Subagents don't inherit skills** — always pass skill paths in `context` (see phases.md).
 - **Discrimination runs require real treatment loading.** In adversarial A/B QA of this skill, every treatment subagent MUST load `keelwright` and the exact reference files (`writing-code.md`, `security-gates.md`, `match-loop.md`, etc.) in `context` before implementing. A treatment task sent without these paths is invalid: it does not measure the skill, only the base model.
-- **L4 is inert without the loop log** — Phoenix/Autoresearch fire on cross-session counters;
-  without `PROGRESS.md`/`autoresearch-lessons.md`/`phoenix-log.md` in the project root they sleep.
+- **L4 is awake by default** — Phoenix/Autoresearch fire on cross-session counters stored in
+  `PROGRESS.md`/`autoresearch-lessons.md`/`phoenix-log.md` in the project root. These files are
+  **auto-created on first skill load** (see ⚡ Auto-bootstrap), so the human never sets them up
+  manually. If they are missing, the agent recreates them — L4 never sleeps for a vibe-coder.
 - **Harness contamination invalidates A/B verdicts.** When seeding arm dirs, copy shared inputs
   with the EXACT source dir name and verify with `ls` (never `2>/dev/null` — a failed `cp` then
   runs arms with missing inputs and cross-contaminates artifacts). If an arm was dispatched
