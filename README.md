@@ -228,7 +228,7 @@ This is documented in [`qa-results/README.md`](qa-results/README.md).
 
 ## License
 
-[CC BY 4.0](LICENSE) — free for commercial use with attribution.
+[MIT-0](LICENSE) — free for commercial use without attribution.
 
 Structural patterns adapted from community loop-coding work (Ralph loop, execution-loop,
 match-loop, autoresearch-loop — all MIT-0). All content written from scratch.
