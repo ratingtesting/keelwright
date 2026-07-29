@@ -19,21 +19,78 @@ def sha(p: Path):
 
 
 def arm_dir(run_dir: Path, test_id: str, arm: str) -> Path | None:
-    """Resolve an arm's working dir across layouts + case:
-    `TEST-arm/` (hyphen) or `TEST/arm/` (nested), matching test_id case-insensitively."""
+    """Resolve an arm's working dir across layouts, case, and re-dispatch suffixes.
+
+    Layouts tried in order:
+      1. `TEST-arm/` (hyphen) or `TEST/arm/` (nested) — if populated, return
+      2. Case-insensitive sibling scan — if populated, return
+      3. Re-dispatch: `TEST-vN-arm/` — picks latest populated dir
+      4. Falls back to any match (even empty) to allow gate 2 to flag it
+    """
+    import re as _re
+
+    SEED = {"TASK.md", "spec.md", "data.csv", "seed.py", "seed_db.py",
+            ".git", "__pycache__", ".pytest_cache", ".gitignore"}
+    SKIP = {"starter", "sample"}
+
+    def _populated(d: Path) -> bool:
+        """True if d has files beyond seed/starter/sample."""
+        return any(
+            f for f in d.iterdir()
+            if f.name not in SEED
+            and not any(f.name.startswith(s) for s in SKIP))
+
+    def _match_base(child: Path) -> bool:
+        """True if child matches test_id base (case-insensitive)."""
+        return (child.name.lower() == f"{tl}-{arm}"
+                or (child.name.lower() == tl and (child / arm).is_dir()))
+
+    tl = test_id.lower()
+
+    # Phase 1: exact candidates (hydrated)
     cands = [run_dir / f"{test_id}-{arm}", run_dir / test_id / arm]
     for c in cands:
-        if c.is_dir():
+        if c.is_dir() and _populated(c):
             return c
-    # case-insensitive fallback: scan siblings
-    tl = test_id.lower()
+
+    # Phase 2: case-insensitive siblings (hydrated)
     for child in run_dir.iterdir():
         if not child.is_dir():
             continue
-        if child.name.lower() == f"{tl}-{arm}":
-            return child
-        if child.name.lower() == tl and (child / arm).is_dir():
-            return child / arm
+        base = (child / arm) if child.name.lower() == tl else child
+        if base != child and not base.is_dir():
+            continue
+        if _match_base(child) and base.is_dir() and _populated(base):
+            return base
+
+    # Phase 3: re-dispatch TEST-vN-arm/ (pick latest populated)
+    pattern = _re.compile(
+        rf"^{_re.escape(tl)}-v(\d+)-{_re.escape(arm)}$", _re.IGNORECASE)
+    v_dispatches = []
+    for child in run_dir.iterdir():
+        if not child.is_dir():
+            continue
+        m = pattern.match(child.name)
+        if m:
+            v_dispatches.append((int(m.group(1)), _populated(child), child))
+    if v_dispatches:
+        populated = [c for c in v_dispatches if c[1]]
+        pool = populated if populated else v_dispatches
+        pool.sort(key=lambda c: c[0], reverse=True)
+        return pool[0][2]
+
+    # Phase 4: fall back to any base match (even empty) for gate 2 to flag
+    for c in cands:
+        if c.is_dir():
+            return c
+    for child in run_dir.iterdir():
+        if not child.is_dir():
+            continue
+        if _match_base(child):
+            base = (child / arm) if child.name.lower() == tl else child
+            if base.is_dir():
+                return base
+
     return None
 
 

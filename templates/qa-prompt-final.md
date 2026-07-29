@@ -127,7 +127,7 @@ loop-audit-checklist.md, bindings/.
 Файлы в ~/AppData/Local/hermes/skills/keelwright/.
 
 ━━━ БАТАРЕЯ — ВСЕ 7 СЕКТОРОВ ━━━
-Бери постановки тестов 1.1–7.4 из `qa-master-prompt.md` (секторы 1–7 в том же каталоге templates/).
+Бери постановки тестов 1.1–7.4 из `qa-trap-catalog.md` (references/).
 Пройди КАЖДЫЙ доступный тест; технически невозможные → CANNOT-RUN. Приманочные (там скилл
 дискриминирует на medium/weak): 2.1 reuse-ladder, 2.5 anti-erosion, 3.2 R8 slopsquat, 4.2 тавтология,
 5.1 circuit-breaker, 7.1 reward-hacking. По каждому: control-арм, treatment-арм, факт на диске, вердикт.
