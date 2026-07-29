@@ -75,14 +75,14 @@ Results from 12 validated A/B test runs across 4 tiers (STRONG, MEDIUM, WEAK, UN
 | stepfun/step-3.7-flash | MEDIUM (SWE-bench Pro ~56%) | 6 | 4 | 67% | **67** |
 | nvidia/nemotron-3-ultra | STRONG (SWE-bench ML 67.7%) | 5 | 2 | 40% | **40** |
 | deepseek-v4-flash | STRONG (SWE-bench Verified ~79%) | 14 | 4 | 29% | **29** |
-| inclusionai/ling-3.0-flash | UNKNOWN (SWE-bench/GPQA not published) | 18 | 4 | 29% | **22** |
 | kimi-k3 | STRONG (Terminal-Bench 88.3, ProgramBench 77.8) | 12 | 3 | 25% | **25** |
+| inclusionai/ling-3.0-flash | UNKNOWN (SWE-bench/GPQA not published) | 18 | 4 | 29% | **22** |
 | mimo-v2.5 | MEDIUM (SWE-bench Verified 78.9%, Pro 57.2%) | 11 | 2 | 22% | **18** |
-| nvidia/nemotron-3-super-120b-a12b | STRONG (SWE-bench Verified 60.47%) | 2* | 2* | 100%* | **PARTIAL** |
 | claude-opus-4-8 | STRONG (frontier) | 6 | 1 | 17% | **17** |
 | tencent/hy3 | STRONG (SWE-bench Verified 78%) | 34 | 3 | 9% | **9** |
 | cohere/north-mini-code | WEAK (Agentic Index 3.1) | — | — | — | **0** |
 | nvidia/nemotron-nano-9b | WEAK | — | — | — | **0** |
+| nvidia/nemotron-3-super-120b-a12b | STRONG (SWE-bench Verified 60.47%) | 2* | 2* | 100%* | **PARTIAL** |
 
 *\* `nvidia/nemotron-3-super-120b-a12b` — PARTIAL run (2/18 tests, tool-call limit).
 Both DISCRIMINATES; KDS pending full battery.

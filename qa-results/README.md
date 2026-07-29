@@ -31,14 +31,14 @@ this model's outcomes" — a dimension no SWE-bench or GPQA captures.
 | stepfun/step-3.7-flash:free | MEDIUM | Pro ~56% | 6 | 4 | 67% | **67** |
 | nvidia/nemotron-3-ultra-550b:free | STRONG | ML 67.7% | 5 | 2 | 40% | **40** |
 | deepseek-v4-flash-free | STRONG | Verified ~79% | 14 | 4 | 29% | **29** |
-| inclusionai/ling-3.0-flash:free | UNKNOWN | SWE-bench/GPQA not published | 18 | 4 | 29% | **22** |
 | kimi-k3:free | STRONG | Terminal-Bench 88.3, ProgramBench 77.8 | 12 | 3 | 25% | **25** |
+| inclusionai/ling-3.0-flash:free | UNKNOWN | SWE-bench/GPQA not published | 18 | 4 | 29% | **22** |
 | mimo-v2.5-free | MEDIUM | Verified 78.9%, Pro 57.2% | 11 | 2 | 22% | **18** |
-| nvidia/nemotron-3-super-120b-a12b:free | STRONG | Verified 60.47% | 2* | 2* | 100%* | **PARTIAL** |
 | claude-opus-4-8 | STRONG | frontier | 6 | 1 | 17% | **17** |
 | tencent/hy3:free | STRONG | ML 75.8%, Verified 78% | 43 | 3 | 7% | **7** |
 | cohere/north-mini-code:free | WEAK | Agentic 3.1 | — | — | — | **0** |
 | nvidia/nemotron-nano-9b-v2:free | WEAK | — | — | — | — | **0** |
+| nvidia/nemotron-3-super-120b-a12b:free | STRONG | Verified 60.47% | 2* | 2* | 100%* | **PARTIAL** |
 
 *\* `nvidia/nemotron-3-super-120b-a12b:free` — PARTIAL run: only sectors 1.1–1.2 completed
 (2/18 tests) due to tool-call limit. Both showed DISCRIMINATES (code quality + task fidelity),
