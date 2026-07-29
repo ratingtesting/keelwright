@@ -35,6 +35,7 @@ this model's outcomes" — a dimension no SWE-bench or GPQA captures.
 | inclusionai/ling-3.0-flash:free | UNKNOWN | SWE-bench/GPQA not published | 18 | 4 | 29% | **22** |
 | mimo-v2.5-free | MEDIUM | Verified 78.9%, Pro 57.2% | 11 | 2 | 22% | **18** |
 | claude-opus-4-8 | STRONG | frontier | 6 | 1 | 17% | **17** |
+| claude-opus-5 | STRONG | Verified 96.0% | 15 | 2 | 18% | **13** |
 | tencent/hy3:free | STRONG | ML 75.8%, Verified 78% | 43 | 3 | 7% | **7** |
 | cohere/north-mini-code:free | WEAK | Agentic 3.1 | — | — | — | **0** |
 | nvidia/nemotron-nano-9b-v2:free | WEAK | — | — | — | — | **0** |

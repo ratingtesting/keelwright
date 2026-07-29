@@ -79,6 +79,7 @@ Results from 12 validated A/B test runs across 4 tiers (STRONG, MEDIUM, WEAK, UN
 | inclusionai/ling-3.0-flash | UNKNOWN (SWE-bench/GPQA not published) | 18 | 4 | 29% | **22** |
 | mimo-v2.5 | MEDIUM (SWE-bench Verified 78.9%, Pro 57.2%) | 11 | 2 | 22% | **18** |
 | claude-opus-4-8 | STRONG (frontier) | 6 | 1 | 17% | **17** |
+| claude-opus-5 | STRONG (SWE-bench Verified 96.0%) | 15 | 2 | 18% | **13** |
 | tencent/hy3 | STRONG (SWE-bench Verified 78%) | 34 | 3 | 9% | **9** |
 | cohere/north-mini-code | WEAK (Agentic Index 3.1) | — | — | — | **0** |
 | nvidia/nemotron-nano-9b | WEAK | — | — | — | **0** |
