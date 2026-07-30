@@ -166,7 +166,13 @@ you don't need keelwright — you are the gate.
 ## Quick start
 
 ```
-Load the keelwright skill before any coding session.
+keelwright load /path/to/repo/SKILL.md
+```
+
+Or install via the [skills CLI](https://skills.sh) by Vercel to track usage and appear on the leaderboard:
+
+```
+npx skills add ratingtesting/keelwright
 ```
 
 That's it. The skill is a single file (`SKILL.md`) that your AI agent loads as context.
