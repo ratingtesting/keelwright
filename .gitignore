@@ -20,6 +20,9 @@ backups/
 
 # ─── NEVER PUBLISH: internal working artifacts ───
 # Publishing registry (links, tokens, internal commands)
+PUBLISHING_REGISTRY.md
+
+# Setup guide (internal, not for public)
 
 # Article drafts (human-language rewrites, platform-specific copies)
 habr-article-draft.md
