@@ -83,7 +83,12 @@ def extract_skill(zf: zipfile.ZipFile, target: Path, include_internal: bool):
             continue
         # Extract
         data = zf.read(info.filename)
-        dest = target / arcname
+        dest = (target / arcname).resolve()
+        # ZIP-SLIP GUARD: reject any entry that escapes the install target.
+        target_resolved = target.resolve()
+        if dest != target_resolved and target_resolved not in dest.parents:
+            print(f"  [BLOCK] {arcname} escapes install dir — skipped (zip-slip)")
+            continue
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_bytes(data)
         count += 1
@@ -132,12 +137,10 @@ def import_skill(zip_path: Path, force: bool = False, include_internal: bool = T
     with zipfile.ZipFile(zip_path) as zf:
         # 1. Read manifest
         if "_MANIFEST.json" not in zf.namelist():
-            print("[WARN] No _MANIFEST.json — cannot verify integrity before install")
-            manifest = {}
-        else:
-            manifest = json.loads(zf.read("_MANIFEST.json"))
-            print(f"Manifest: {manifest.get('files', '?')} files, "
-                  f"exported {manifest.get('exported', '?')}")
+            print("[FAIL] No _MANIFEST.json — integrity cannot be verified. "
+                  "Refusing to install unverified archive.")
+            return 1
+        manifest = json.loads(zf.read("_MANIFEST.json"))
 
         # 2. Verify integrity
         print("\n--- Integrity check ---")
