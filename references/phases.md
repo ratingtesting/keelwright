@@ -213,7 +213,7 @@ fire, keep 3 files in the active project root.
 | `autoresearch-lessons.md` | keep/PIVOT/finish | start of each run | lessons → don't repeat mistakes |
 | `phoenix-log.md` | on failure mode repeat ≥2 | Stability scan (L3) | root cause of recurring failures |
 
-**Do not commit these without an explicit request — add them to `.gitignore`.**
+**Do not commit these by default — add them to `.gitignore` unless the user explicitly asks to keep them tracked.**
 
 ### Protocol (REQUIRED every Phase-3 iteration)
 ```

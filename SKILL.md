@@ -10,7 +10,7 @@ description: >
   circuit-breaker limits and Phoenix restart. Plain-language reports for non-developers.
   Proven by adversarial A/B testing: Keelwright Score (KDS) up to 83/100 on strong models
   (SWE-bench 78%). Load before any loop/agent coding session, autonomous run, or commit.
-version: 1.5.5
+version: 1.5.6-beta
 license: MIT-0
 author: ratingtesting (https://github.com/ratingtesting)
 platforms: [windows, linux, macos]
@@ -62,8 +62,9 @@ short benefit note:
 > 📁 Created 3 tracking files in your project root: `PROGRESS.md`, `autoresearch-lessons.md`,
 > `phoenix-log.md`.
 > They give me memory across chats: what we already tried, which fixes stuck, and what broke
-> before — so a fresh session doesn't repeat old mistakes. Safe to commit; delete them any
-> time (I'll recreate them, losing that history).
+> before — so a fresh session doesn't repeat old mistakes. By default these are local scratch memory:
+> add them to `.gitignore` and do not push them to the repo. Delete them anytime; I'll recreate
+> empty and the history is lost.
 
 Rules for the announcement:
 - Only on the load where files were actually created. If all three already existed, say

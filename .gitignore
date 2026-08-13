@@ -44,3 +44,8 @@ vcru_*.html
 
 # Scraped JS bundles (site debugging)
 vcru_editor.js
+
+# Keelwright L4 bootstrap logs — local scratch memory, do not commit by default
+PROGRESS.md
+autoresearch-lessons.md
+phoenix-log.md
