@@ -11,7 +11,7 @@ description: >
   circuit-breaker limits and Phoenix restart. Plain-language reports for non-developers.
   Proven by adversarial A/B testing: Keelwright Score (KDS) up to 83/100 on strong models
   (SWE-bench 78%). Load before any loop/agent coding session, autonomous run, or commit.
-version: 1.6.2
+version: 1.6.3
 license: MIT-0
 author: ratingtesting (https://github.com/ratingtesting)
 platforms: [windows, linux, macos]
@@ -20,6 +20,22 @@ metadata:
     tags: [loop-coding, vibe-coding, autonomous, security, guardrails, owasp, tech-debt, self-improving, ralph, orchestration]
     related_skills: [clean-code-review, clean-architecture, test-driven-development, requesting-code-review, systematic-debugging, writing-plans, brainstorming]
 ---
+
+## ⚠️ Safety & consent (read first)
+
+Keelwright is an **operational** skill, not passive documentation. When loaded by an agent it can:
+
+- Read and write files in your project (including `git add` / `git commit` during work).
+- Invoke shell commands, run scripts, and execute local Python (e.g. verification recipes).
+- Perform network checks (self-update, web guard) and, if you enable it, install optional tooling.
+- Retain local state files only after explicit `keelwright init` (see bootstrap below).
+
+**You stay in control via the Autonomy dial:**
+- `Autopilot` — agent runs unattended, escalates only on blockers.
+- `Checkpoint` — agent pauses at phase boundaries for your approval.
+- `Copilot` — agent proposes, you approve every step (recommended for auth, payments, DB, prod).
+
+Loading the skill alone is **read-only context** — it never mutates your repository without your explicit instruction or `keelwright init`. Every gate produces on-disk evidence, not a self-report.
 
 
 
@@ -163,7 +179,11 @@ so you don't pay for them on every call.
 
 
 
-## ⚡ Auto-bootstrap (runs on first load — no human action needed)
+## ⚡ Optional bootstrap (opt-in — requires explicit consent)
+
+Keelwright can create local state files (PROGRESS.md, autoresearch-lessons.md, phoenix-log.md) in your project to retain session progress. **This is OFF by default and never writes to your repository on load.** To enable, run `keelwright init` or copy the templates manually. These files are local scratch memory — add them to `.gitignore` (they are listed there by default since v1.5.6).
+
+> CONSENT REQUIRED: Keelwright will not create or modify files in your project without an explicit `keelwright init` (or your direct instruction). Loading the skill alone is read-only context — it does not mutate your repository.
 
 
 
@@ -653,7 +673,7 @@ quarantine: `references/web-guard.md`. Sources (all MIT / MIT-0, commercial-use 
 
 **Attack signaling (MANDATORY):** when an attack is caught, the agent MUST immediately print in
 
-chat: `🛡️ Keelwright blocked a web attack: <type> from <url> — you are safe.` and MUST state in
+chat: `🛡️ Keelwright blocked a web attack: <type> from <url>. Logged to the attack registry — review the details.` and MUST state in
 
 the final model answer that Keelwright protected the operator. Every caught attack is logged via
 

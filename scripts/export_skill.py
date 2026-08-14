@@ -100,9 +100,11 @@ def export(out_path: Path, include_internal: bool, include_runs: bool = False):
 
         # 5. Manifest (sha256 of every file — tamper detection on import)
         import json as _json
+        # NOTE: do NOT embed the absolute local skill_path — it leaks the exporter's
+        # home directory / username when the ZIP is shared. Use a relative marker only.
         zf.writestr("_MANIFEST.json", _json.dumps({
             "exported": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-            "skill_path": str(SKILL),
+            "skill_name": SKILL.name if hasattr(SKILL, "name") else str(SKILL).split("/")[-1],
             "files": len(MANIFEST_ENTRIES),
             "total_bytes": sum(e["size"] for e in MANIFEST_ENTRIES),
             "entries": MANIFEST_ENTRIES,

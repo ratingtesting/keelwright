@@ -44,6 +44,10 @@ browser automation surface is available; if the host has none, do NOT fake a vis
   agent-browser snapshot      # accessibility tree with @refs (best for AI)
   agent-browser screenshot --screenshot-dir ./shots
   ```
+  > ⚠️ **Consent & supply-chain warning:** `npm install -g agent-browser` is a **global** install
+  > that modifies your system and downloads a browser binary from the network. Review it before
+  > running; prefer a local/`npx` install in an isolated environment if your platform policy
+  > forbids global changes. Only do this if the operator explicitly wants visual QA enabled.
   Repo: `https://github.com/vercel-labs/agent-browser` (also ships a `.claude-plugin`, so it can
   be added as a skill/plugin where that's supported). Verify install with `agent-browser --version`
   before relying on it.

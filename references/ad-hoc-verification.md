@@ -1,5 +1,10 @@
 # Ad-hoc verification when no test framework exists
 
+> ⚠️ **Scope & safety note:** the recipes below write a Python file to a temp directory,
+> execute it locally, and delete it afterward. This is intentional local code execution for
+> verification only — never run untrusted code this way, and always review the script before
+> running. Treat temp scripts as ephemeral evidence, not as project artifacts.
+
 When the project has no test suite for the changed code, the verification gate
 (Step 8 of Phase 3) cannot run "test must fail on OLD behavior → pass on NEW."
 Instead of skipping verification, write a focused throwaway script. This file covers

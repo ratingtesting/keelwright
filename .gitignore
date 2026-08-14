@@ -49,3 +49,10 @@ vcru_editor.js
 PROGRESS.md
 autoresearch-lessons.md
 phoenix-log.md
+
+# Local QA run artifacts (not part of the published skill)
+qa-results/*.results.jsonl
+qa-results/*-REPORT.md
+qa-results/*.summary.md
+qa-results/kw*.results.jsonl
+qa-results/kw*.summary.md
