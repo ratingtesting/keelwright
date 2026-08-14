@@ -59,10 +59,11 @@ No jargon. No "the function validates a string argument against a non-null const
 Before any web trip, keelwright verifies prompt-injection protection is ACTIVE, not just
 enabled. A full-layer `defense_health.py` check covers the ML classifier (injection-guard),
 attack-log writability, security-guidance config, and agent-defense. Caught attacks are logged
-to an append-only registry and signaled in chat. If a layer is down, it WARNS with a concrete
-fix and keeps a dependency-free heuristic backstop (`web_heuristic_guard.py`) on — never silent,
-never a hard block, never a false "you're safe." Benefit reporting stays silent by default
-(no per-gate spam) but emits one cumulative session summary so you feel the value without noise.
+to an append-only registry (kept 30 days, query params stripped) and signaled in chat.
+If a layer is down, it WARNS with a concrete fix and keeps a dependency-free heuristic
+backstop (`web_heuristic_guard.py`) on — never silent, never a hard block, never a false
+"you're safe." Benefit reporting stays silent by default (no per-gate spam) but emits one
+cumulative session summary so you feel the value without noise.
 
 ---
 
@@ -216,11 +217,12 @@ keelwright/
 │   ├── validate_run.py         — integrity gate for QA results
 │   ├── workspace_guard.py      — read-only skill-tree isolation
 │   ├── snapshot_skill.py       — verify no foreign writes
-│   ├── check_update.py          — self-update check vs latest GitHub release (24h cache)
+│   ├── check_update.py          — self-update check vs latest GitHub release (24h cache, weekly mode)
 │   ├── web_heuristic_guard.py    — dependency-free injection/cloaking backstop
 │   ├── defense_health.py         — full-layer web-defense health check
-│   ├── attack_registry.py        — append-only JSONL log of caught web attacks
-│   └── verify_web_guard.py       — verify injection-guard ML layer is ACTIVE
+│   ├── attack_registry.py        — append-only JSONL log of caught web attacks (30-day retention, URL redaction)
+│   ├── verify_web_guard.py       — verify injection-guard ML layer is ACTIVE
+│   └── viral_ask.py              — optional viral prompt after demonstrated value (opt-in, max once/30 days)
 └── qa-results/
     ├── README.md               — KDS scoreboard + methodology
     └── *.results.jsonl         — sanitized machine-verified run data
@@ -248,6 +250,8 @@ This is documented in [`qa-results/README.md`](qa-results/README.md).
 ---
 
 ## What's new (version history)
+
+**v1.6.5** — Security audit fixes (SkillSpector v1.6.4): honest bootstrap behavior (no false "opt-in"), weekly update check with user prompt, attack registry retention (30 days) + URL redaction, viral ask opt-in (max once/30 days), removed false "you are safe" claims, agent-browser as optional suggestion, permissions metadata in frontmatter.
 
 **v1.6.4** — ClawHub re-publish of v1.6.3 security audit fixes (version slot reused).
 

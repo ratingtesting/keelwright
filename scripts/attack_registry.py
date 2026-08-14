@@ -13,6 +13,9 @@ DESIGN RULES (do not weaken):
 - Source: github.com/gweber/hermes-injection-guard (MIT) + scastile/hermes-agent-defense (MIT)
   + web-agent-security-gate (MIT-0, ratingtesting) — all commercial-use-without-attribution
   white list. Technique adapted in operator's own words; no verbatim copy.
+- Retention: entries older than 30 days are purged on --cleanup (non-blocking).
+- Redaction: query parameters stripped from source_url before logging (no secrets in logs).
+- Opt-in: logging only happens if KEELWRIGHT_ATTACK_REGISTRY=1 or explicit --add call.
 
 USAGE:
   python attack_registry.py --add --channel web_extract --source-url https://x --attack-type \
@@ -20,24 +23,47 @@ USAGE:
     blocked --outcome blocked-success --model-provider nous/tencent-hy3 --notes "..."
   python attack_registry.py --tail 20
   python attack_registry.py --stats
+  python attack_registry.py --cleanup          # remove entries older than 30 days
+  python attack_registry.py --cleanup --force  # force cleanup even if not opted in
 """
 import argparse
 import datetime
 import json
 import os
+import re
 import sys
+from urllib.parse import urlparse, urlunparse
 
 DEFAULT_PATH = os.path.join(
     os.path.expanduser("~"), ".hermes", "keelwright", "attack_registry.jsonl"
 )
 
 REQUIRED_ADD = ["channel", "attack_type", "severity", "detected_by", "action_taken", "outcome"]
+RETENTION_DAYS = 30
+
+# Opt-in check: logging only if env var set or explicit --force-add
+def is_opted_in() -> bool:
+    return os.environ.get("KEELWRIGHT_ATTACK_REGISTRY", "0") == "1"
+
+
+def redact_url(url: str) -> str:
+    """Strip query parameters and fragment from URL to avoid logging secrets."""
+    if not url:
+        return ""
+    try:
+        parsed = urlparse(url)
+        # Keep only scheme, netloc, path
+        clean = urlunparse((parsed.scheme, parsed.netloc, parsed.path, "", "", ""))
+        return clean
+    except Exception:
+        return url
 
 
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--path", default=DEFAULT_PATH)
     ap.add_argument("--add", action="store_true", help="append a new attack record")
+    ap.add_argument("--force-add", action="store_true", help="append even if not opted in")
     ap.add_argument("--channel")
     ap.add_argument("--source-url", default="")
     ap.add_argument("--attack-type")
@@ -49,13 +75,58 @@ def main() -> int:
     ap.add_argument("--notes", default="")
     ap.add_argument("--tail", type=int, default=0, help="print last N records")
     ap.add_argument("--stats", action="store_true", help="print count by attack_type")
+    ap.add_argument("--cleanup", action="store_true", help="remove entries older than 30 days")
+    ap.add_argument("--force", action="store_true", help="force cleanup even if not opted in")
     args = ap.parse_args()
 
-    if args.add:
+    # Cleanup mode
+    if args.cleanup:
+        if not args.force and not is_opted_in():
+            print("Registry not opted in (set KEELWRIGHT_ATTACK_REGISTRY=1). Use --force to override.", file=sys.stderr)
+            return 0
+        try:
+            if not os.path.exists(args.path):
+                print("no registry yet")
+                return 0
+            cutoff = datetime.datetime.now() - datetime.timedelta(days=RETENTION_DAYS)
+            kept = 0
+            removed = 0
+            with open(args.path, encoding="utf-8") as f:
+                lines = [l for l in f if l.strip()]
+            with open(args.path, "w", encoding="utf-8") as f:
+                for line in lines:
+                    try:
+                        r = json.loads(line)
+                        ts_str = r.get("timestamp", "")
+                        if ts_str:
+                            ts = datetime.datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+                            if ts >= cutoff:
+                                f.write(line)
+                                kept += 1
+                            else:
+                                removed += 1
+                        else:
+                            f.write(line)  # keep malformed entries
+                            kept += 1
+                    except Exception:
+                        f.write(line)  # keep unparseable entries
+                        kept += 1
+            print(f"Cleanup: kept {kept}, removed {removed} (older than {RETENTION_DAYS} days)")
+            return 0
+        except Exception as e:
+            print(f"Cleanup error: {e}", file=sys.stderr)
+            return 0
+
+    # Add mode
+    if args.add or args.force_add:
+        if not args.force_add and not is_opted_in():
+            print("Registry not opted in (set KEELWRIGHT_ATTACK_REGISTRY=1). Use --force-add to override.", file=sys.stderr)
+            return 0
+
         rec = {
             "timestamp": datetime.datetime.now().isoformat(timespec="seconds"),
             "channel": args.channel,
-            "source_url": args.source_url,
+            "source_url": redact_url(args.source_url),
             "attack_type": args.attack_type,
             "severity": args.severity,
             "detected_by": args.detected_by,
@@ -75,6 +146,7 @@ def main() -> int:
               f"[{rec['severity']}] -> {rec['outcome']}")
         return 0
 
+    # Stats mode
     if args.stats:
         counts = {}
         try:
@@ -96,7 +168,7 @@ def main() -> int:
             print(f"{v:>4}  {k}")
         return 0
 
-    # default: --tail or full read
+    # Default: --tail or full read
     try:
         with open(args.path, encoding="utf-8") as f:
             lines = [l for l in f if l.strip()]

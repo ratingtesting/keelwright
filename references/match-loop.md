@@ -33,26 +33,27 @@ browser automation surface is available; if the host has none, do NOT fake a vis
 
 - **If your runtime already exposes browser tools** (navigate / screenshot / snapshot / console),
   use them — the recipes below assume that.
-- **If the machine has no browser tooling, install a free one.** The stack-agnostic, permissively
-  licensed option is `agent-browser` (Vercel, **Apache-2.0**) — a native CLI that drives Chrome
-  for AI agents:
+- **If the machine has no browser tooling and you want visual QA**, you can install a free one.
+  The stack-agnostic, permissively licensed option is `agent-browser` (Vercel, **Apache-2.0**) —
+  a native CLI that drives Chrome for AI agents:
   ```bash
-  npm install -g agent-browser
+  npm i -g agent-browser
   agent-browser install       # downloads Chrome for Testing (first run only)
   # then, e.g.:
   agent-browser open <url>
   agent-browser snapshot      # accessibility tree with @refs (best for AI)
   agent-browser screenshot --screenshot-dir ./shots
   ```
-  > ⚠️ **Consent & supply-chain warning:** `npm install -g agent-browser` is a **global** install
-  > that modifies your system and downloads a browser binary from the network. Review it before
-  > running; prefer a local/`npx` install in an isolated environment if your platform policy
-  > forbids global changes. Only do this if the operator explicitly wants visual QA enabled.
-  Repo: `https://github.com/vercel-labs/agent-browser` (also ships a `.claude-plugin`, so it can
-  be added as a skill/plugin where that's supported). Verify install with `agent-browser --version`
-  before relying on it.
-- **If neither is possible** (no browser tools, install blocked by no network/permissions): the
-  visual test is **CANNOT-RUN** with that reason recorded — same tool-absence honesty as the
+  > ⚠️ **Consent & supply-chain note:** `npm i -g agent-browser` is a **global** install
+  > that modifies your system and downloads a browser binary from the network.
+  > Review it before running; prefer a local/`npx` install in an isolated environment
+  > if your platform policy forbids global changes. Only do this if you explicitly want
+  > visual QA enabled. Not required — use only if convenient.
+  > Repo: `https://github.com/vercel-labs/agent-browser` (also ships a `.claude-plugin`,
+  > so it can be added as a skill/plugin where that's supported). Verify install with
+  > `agent-browser --version` before relying on it.
+- **If neither is possible** (no browser tools, install blocked by no network/permissions):
+  the visual test is **CANNOT-RUN** with that reason recorded — same tool-absence honesty as the
   structural gate. A gate that cannot run has NOT passed; never emit a green/PASS visual verdict
   from an environment that could not actually render the page.
 
@@ -137,12 +138,12 @@ Then parse the returned string. This is the only form that reliably returned dat
 ## Ad-hoc verification script recipe (proven in-session)
 
 When a quick regression check is useful and no canonical test runner exists:
-1. Write a small Python script to `C:\Users\<user>\AppData\Local\Temp\hermes-verify-<topic>.py`.
+1. Write a small Python script to `C:\\Users\\<user>\\AppData\\Local\\Temp\\hermes-verify-<topic>.py`.
 2. Load the target file and run regex/structural assertions against it.
 3. Print `ALL_PASS: True/False` and `sys.exit(...)`.
 4. Run it via terminal, then clean it up with `rm`.
 
-**Pitfall — HTML attribute regex:** if a requirement involves attributes like `tabindex`, `aria-describedby`, or `role`, regex must allow quoted and unquoted attribute values. Use `(["\']?\d+["\']?)` instead of `(\d+)`, and strip quotes before comparing. A too-strict pattern silently fails and blocks convergence.
+**Pitfall — HTML attribute regex:** if a requirement involves attributes like `tabindex`, `aria-describedby`, or `role`, regex must allow quoted and unquoted attribute values. Use `(["']?\d+["']?)` instead of `(\d+)`, and strip quotes before comparing. A too-strict pattern silently fails and blocks convergence.
 
 **Browser console expression fallback:** for live DOM checks, return a plain concatenated string, not an object. JSON/object returns serialize as `null` in this environment. Build the data as string segments and parse the result.
 
