@@ -17,7 +17,9 @@ AI coding session.
 
 - Security gates R1-R12 are **never** disabled, even on Autopilot
 - Never delete or weaken tests (reward-hacking guard)
-- Stage files by explicit path: `git add file1 file2` — never `git add -A`
+- Stage files by explicit path: `git add file1 file2` — never `git add -A` when working in a
+  project the agent is modifying (bootstrap/qa artifacts must not be committed by accident).
+  The skill's own repo maintenance may use `git add -A` deliberately.
 - Plain language for all user-facing messages (no jargon)
 - Verify on disk, never trust self-reports
 

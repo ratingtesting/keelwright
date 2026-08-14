@@ -36,7 +36,10 @@ AI coding session. It is designed for non-programmers who use AI to write code.
 - Do not weaken or delete tests to make builds pass
 - Do not bypass security gates even on Autopilot
 - Do not invent scope without acceptance criteria
-- Do not use `git add -A` (stage files by explicit path only)
+- Do not use `git add -A` when staging a project the agent is working in (stage by explicit path
+  only, so bootstrap/qa artifacts are never committed by accident). NOTE: this rule is for
+  agents USING the skill on a project — the skill's own repo maintenance may use `git add -A`
+  deliberately.
 - Do not trust self-reports from QA runs (verify on disk)
 
 ## File structure
@@ -48,7 +51,8 @@ references/           — detailed patterns (load on demand)
   circuit-breaker.md  — loop limits
   phases.md           — build loop phases
   writing-code.md     — coding discipline
-qa-results/           — verified A/B test data
-scripts/              — validate_run.py, workspace_guard.py
+qa-results/           — QA methodology README only (raw A/B run artifacts are gitignored local scratch)
+scripts/              — validate_run.py, workspace_guard.py, check_update.py, web_heuristic_guard.py,
+                       defense_health.py, attack_registry.py, verify_web_guard.py, export_skill.py, import_skill.py
 templates/            — QA prompts
 ```
