@@ -4,6 +4,20 @@
 
 ---
 
+## What's new
+
+**v1.6.1 — Defense health + soft alert.** Full-layer web-defense check (`scripts/defense_health.py`): injection-guard (ML), attack log writability, security-guidance config, agent-defense. If a critical layer is down, keelwright WARNS with a concrete fix recommendation and keeps the heuristic backstop on — it does NOT hard-block and does NOT claim you're safe. No more "компрометирована" wording; plain: "защита не работает в полной мере — нельзя рассчитывать, что последствий не будет".
+
+**v1.6.0 — Heuristic fallback + benefit reporting.** `web_heuristic_guard.py` flags common injection/cloaking markers with zero ML deps, so Web Guard never silently collapses to no-op. Benefit reporting stays silent by default (no per-gate spam) but emits one cumulative session summary so you feel the value without the noise.
+
+**v1.5.9 — Web Guard default-on + attack registry.** Before any web trip, keelwright verifies prompt-injection protection is ACTIVE (not just enabled). Every caught attack is logged to an append-only registry (`attack_registry.py`) and signaled in chat: "🛡️ Keelwright blocked a web attack: <type> from <url> — you are safe. Details in the registry."
+
+**v1.5.6 — L4 bootstrap files default to .gitignore.** `PROGRESS.md`, `autoresearch-lessons.md`, `phoenix-log.md` are local scratch memory, never pushed.
+
+**v1.5.7 — Self-update check.** `check_update.py` compares your version to the latest GitHub release (24h cache, never blocking) so a safety skill never silently runs stale.
+
+---
+
 ## The problem
 
 You use AI to write code. You're not a developer — you're a founder, a builder, a product person.
