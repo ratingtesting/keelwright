@@ -249,6 +249,10 @@ This is documented in [`qa-results/README.md`](qa-results/README.md).
 
 ## What's new (version history)
 
+**v1.6.4** — ClawHub re-publish of v1.6.3 security audit fixes (version slot reused).
+
+**v1.6.3** — Security audit fixes (NVIDIA SkillSpector): opt-in bootstrap (no silent repo writes), dropped false "you are safe", no absolute path leak in export manifest, added Safety & consent section, tooling warnings (agent-browser global install, hermes-verify temp scripts), qa-results gitignored.
+
 **v1.6.2** — Integrity fix: collapsed bloated frontmatter, added required `slug` for askill publish.
 
 **v1.6.1** — Defense health + soft alert. Full-layer web-defense check; if a critical layer is down, keelwright WARNS with a fix recommendation (no hard-block, no false "safe").
