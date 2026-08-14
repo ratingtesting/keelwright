@@ -4,20 +4,6 @@
 
 ---
 
-## What's new
-
-**v1.6.1 — Defense health + soft alert.** Full-layer web-defense check (`scripts/defense_health.py`): injection-guard (ML), attack log writability, security-guidance config, agent-defense. If a critical layer is down, keelwright WARNS with a concrete fix recommendation and keeps the heuristic backstop on — it does NOT hard-block and does NOT claim you're safe. No more "компрометирована" wording; plain: "защита не работает в полной мере — нельзя рассчитывать, что последствий не будет".
-
-**v1.6.0 — Heuristic fallback + benefit reporting.** `web_heuristic_guard.py` flags common injection/cloaking markers with zero ML deps, so Web Guard never silently collapses to no-op. Benefit reporting stays silent by default (no per-gate spam) but emits one cumulative session summary so you feel the value without the noise.
-
-**v1.5.9 — Web Guard default-on + attack registry.** Before any web trip, keelwright verifies prompt-injection protection is ACTIVE (not just enabled). Every caught attack is logged to an append-only registry (`attack_registry.py`) and signaled in chat: "🛡️ Keelwright blocked a web attack: <type> from <url> — you are safe. Details in the registry."
-
-**v1.5.6 — L4 bootstrap files default to .gitignore.** `PROGRESS.md`, `autoresearch-lessons.md`, `phoenix-log.md` are local scratch memory, never pushed.
-
-**v1.5.7 — Self-update check.** `check_update.py` compares your version to the latest GitHub release (24h cache, never blocking) so a safety skill never silently runs stale.
-
----
-
 ## The problem
 
 You use AI to write code. You're not a developer — you're a founder, a builder, a product person.
@@ -68,6 +54,15 @@ Phoenix protocol restarts a stuck session with a clean context.
 Every gate outcome, every blocker, every decision point is explained in plain English —
 what happened, why it matters to your product, what to do next.
 No jargon. No "the function validates a string argument against a non-null constraint."
+
+**5. Web Guard (default-on protection)**
+Before any web trip, keelwright verifies prompt-injection protection is ACTIVE, not just
+enabled. A full-layer `defense_health.py` check covers the ML classifier (injection-guard),
+attack-log writability, security-guidance config, and agent-defense. Caught attacks are logged
+to an append-only registry and signaled in chat. If a layer is down, it WARNS with a concrete
+fix and keeps a dependency-free heuristic backstop (`web_heuristic_guard.py`) on — never silent,
+never a hard block, never a false "you're safe." Benefit reporting stays silent by default
+(no per-gate spam) but emits one cumulative session summary so you feel the value without noise.
 
 ---
 
@@ -220,7 +215,12 @@ keelwright/
 ├── scripts/
 │   ├── validate_run.py         — integrity gate for QA results
 │   ├── workspace_guard.py      — read-only skill-tree isolation
-│   └── snapshot_skill.py       — verify no foreign writes
+│   ├── snapshot_skill.py       — verify no foreign writes
+│   ├── check_update.py          — self-update check vs latest GitHub release (24h cache)
+│   ├── web_heuristic_guard.py    — dependency-free injection/cloaking backstop
+│   ├── defense_health.py         — full-layer web-defense health check
+│   ├── attack_registry.py        — append-only JSONL log of caught web attacks
+│   └── verify_web_guard.py       — verify injection-guard ML layer is ACTIVE
 └── qa-results/
     ├── README.md               — KDS scoreboard + methodology
     └── *.results.jsonl         — sanitized machine-verified run data
@@ -244,6 +244,22 @@ A `DISCRIMINATES` means the skill added something the model wouldn't have done a
 
 Weak models (KDS 0) fabricated results instead of running tests. The gate caught all of them.
 This is documented in [`qa-results/README.md`](qa-results/README.md).
+
+---
+
+## What's new (version history)
+
+**v1.6.2** — Integrity fix: collapsed bloated frontmatter, added required `slug` for askill publish.
+
+**v1.6.1** — Defense health + soft alert. Full-layer web-defense check; if a critical layer is down, keelwright WARNS with a fix recommendation (no hard-block, no false "safe").
+
+**v1.6.0** — Heuristic fallback (never no-op) + benefit reporting (silent by default, one session summary).
+
+**v1.5.9** — Web Guard default-on + attack registry + mandatory chat signaling.
+
+**v1.5.7** — Self-update check (never runs stale).
+
+**v1.5.6** — L4 bootstrap files default to .gitignore.
 
 ---
 
