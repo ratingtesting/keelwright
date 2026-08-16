@@ -56,3 +56,7 @@ qa-results/*-REPORT.md
 qa-results/*.summary.md
 qa-results/kw*.results.jsonl
 qa-results/kw*.summary.md
+
+# Local artifacts from npx skills add (not part of the skill distribution)
+.agents/
+skills-lock.json

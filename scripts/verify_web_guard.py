@@ -6,11 +6,13 @@ via the operator's web-agent-security-gate skill (MIT-0, ratingtesting). Techniq
 the operator's own words; no verbatim copy. All sources are in the commercial-use-without-
 attribution white list (MIT-0 / MIT / Apache-2.0 / ISC / Unlicense / 0BSD).
 
-Run with the REAL Hermes venv python, e.g. on Windows:
+Run with the agent's Python — the same interpreter that runs the agent / the
+injection-guard plugin. On Windows that is typically the agent's venv, e.g.:
   C:/Users/<user>/AppData/Local/hermes/hermes-agent/venv/Scripts/python verify_web_guard.py
+(use your agent runtime's python path; the script only needs stdlib + the plugin importable).
 
 WHY: `injection-guard` is a NO-OP when transformers/torch/sentencepiece are absent from the
-venv, yet still reports "enabled" in config. Declared != working. This script proves the
+agent's Python environment, yet still reports "enabled" in config. Declared != working. This script proves the
 classifier loads and the hook fires on a test injection but passes safe content.
 
 Exits non-zero on any failure so it can gate a web-facing dispatch decision.

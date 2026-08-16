@@ -53,7 +53,7 @@ dup_pct = d["statistics"]["total"]["percentage"]
 
 ## Semgrep on Windows — workaround for PYTHONPATH collision
 
-Hermes venv's `pydantic_core` shadows Semgrep's bundled one. Always run with `PYTHONPATH=` prefix:
+agent venv's `pydantic_core` shadows Semgrep's bundled one. Always run with `PYTHONPATH=` prefix:
 
 ```bash
 PYTHONPATH= semgrep scan --config=auto --error ./src

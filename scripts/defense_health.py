@@ -6,7 +6,7 @@ engine must know the state of EVERY layer, not just one. This script checks all 
 reports pass | fail | unverified per layer, plus a concrete fix recommendation on failure.
 
 Layers checked:
-  A. injection-guard (ML)   — via scripts/verify_web_guard.py in the Hermes venv
+  A. injection-guard (ML)   — via scripts/verify_web_guard.py in the agent's Python environment
   B. caught_attacks.jsonl   — the log file exists AND is writable (attacks must be recorded)
   C. security-guidance       — listed in config.yaml plugins.enabled (best-effort, if readable)
   D. agent-defense           — skill present (optional; unverified if not installed)
@@ -19,7 +19,7 @@ Sources (commercial-use white list, adapted in operator's own words; no verbatim
 - injection-guard: gweber/hermes-injection-guard (MIT)
 - agent-defense: scastile/hermes-agent-defense (MIT)
 - web-agent-security-gate: ratingtesting (MIT-0)
-- setup facts: lazy-unicorn/SETUP_GUIDE.md B5-B6 (regex recovery command)
+- recovery: corrupted `regex` in the agent's Python environment is the usual fix (see FIX_REGEX below; self-contained)
 
 USAGE:
   python defense_health.py            # human summary + JSON
@@ -44,9 +44,17 @@ CAUGHT = os.path.join(HERMES_HOME, "injection-guard", "caught_attacks.jsonl")
 CONFIG = os.path.join(HERMES_HOME, "config.yaml")
 AGENT_DEFENSE = os.path.join(HERMES_HOME, "skills", "agent-defense", "SKILL.md")
 
-# Fix recommendation pulled from lazy-unicorn/SETUP_GUIDE.md (regex recovery).
-FIX_REGEX = ("<hermes-venv>/Scripts/python -m pip install --force-reinstall --no-deps regex "
-             "&& re-run scripts/verify_web_guard.py (expect PASS: injection-guard is ACTIVE)")
+# Fix recommendation: corrupted `regex` package in the agent's Python venv is the usual
+# cause of the injection-guard ML layer silently becoming a no-op (circular import on `_regex`).
+# Runtime-agnostic — works for Hermes, OpenClaw, or any agent that runs this skill in a venv.
+FIX_REGEX = (
+    "The ML layer (injection-guard / DeBERTa) is down. Most often the `regex` package in your "
+    "agent's Python environment is corrupted (e.g. after a pip upgrade). Fix: in that environment "
+    "run `python -m pip install --force-reinstall --no-deps regex`, then re-run "
+    "`python scripts/verify_web_guard.py` (expect PASS: injection-guard is ACTIVE). "
+    "If torch/transformers/sentencepiece are missing from the environment, install them — without "
+    "them the ML layer is a silent no-op. The verify script prints the exact venv/python to use."
+)
 
 
 def find_venv_python():
@@ -59,7 +67,7 @@ def find_venv_python():
 def check_injection_guard():
     vpy = find_venv_python()
     if not vpy:
-        return "unverified", "Hermes venv python not found; run scripts/verify_web_guard.py manually"
+        return "unverified", "agent Python environment not found; run scripts/verify_web_guard.py manually"
     if not os.path.isfile(VERIFY):
         return "unverified", "verify_web_guard.py not beside this script"
     r = subprocess.run([vpy, VERIFY], capture_output=True, text=True)

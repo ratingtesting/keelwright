@@ -47,7 +47,7 @@ gitleaks detect --redact -v                    # whole repo/history
 PYTHONPATH= semgrep scan --config=auto --error ./src
 ```
 
-When Semgrep crashes with `ModuleNotFoundError` on Windows, the Hermes venv's `pydantic_core` shadows Semgrep's bundled one. Fix: run with `PYTHONPATH=` prefix to clear the venv from the import chain, or install Semgrep via `uv tool install semgrep` (isolated from the agent venv).
+When Semgrep crashes with `ModuleNotFoundError` on Windows, the agent venv's `pydantic_core` shadows Semgrep's bundled one. Fix: run with `PYTHONPATH=` prefix to clear the venv from the import chain, or install Semgrep via `uv tool install semgrep` (isolated from the agent venv).
 
 A language-specific grep layer (framework-specific anti-patterns your SAST doesn't know) goes in
 your binding file — see `bindings/flutter-example.md`. Gitleaks CRITICAL / Semgrep ERROR =
