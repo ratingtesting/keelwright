@@ -251,6 +251,14 @@ This is documented in [`qa-results/README.md`](qa-results/README.md).
 
 ## What's new (version history)
 
+**v1.6.7** — Runtime-agnostic Web Guard. Removed all references to private `SETUP_GUIDE.md` and
+Hermes-specific paths/commands (`Hermes venv`, `hermes gateway restart`, `profile isolation`).
+Fix instructions now runtime-neutral ("the agent's Python environment") — works on Hermes,
+OpenClaw, Cursor, Kilo, Codex, Cline. Added explicit "Runtime-agnostic mandate" to SKILL.md,
+AGENTS.md, CLAUDE.md, web-guard.md so co-authoring agents keep it universal.
+
+**v1.6.6** — ClawHub version slot bump (v1.6.5 slot reserved); identical content to v1.6.5.
+
 **v1.6.5** — Security audit fixes (SkillSpector v1.6.4): honest bootstrap behavior (no false "opt-in"), weekly update check with user prompt, attack registry retention (30 days) + URL redaction, viral ask opt-in (max once/30 days), removed false "you are safe" claims, agent-browser as optional suggestion, permissions metadata in frontmatter.
 
 **v1.6.4** — ClawHub re-publish of v1.6.3 security audit fixes (version slot reused).
