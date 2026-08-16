@@ -1,5 +1,11 @@
 # Web Guard — default-on protection for any agent running this skill
 
+> **Runtime-agnostic:** this skill ships on ClawHub / askill.sh / skills.sh and runs on Hermes,
+> OpenClaw, Cursor, Kilo, Codex, Cline and others. All instructions below use runtime-neutral
+> terms ("the agent's Python environment", "your agent runtime"). There is NO dependency on any
+> single vendor's venv path, gateway command, or private setup file. Fix steps must work on any
+> venv-based agent.
+
 Keelwright is a safety engine. A safety engine must protect its own operator when the
 operator's agent goes online. This file adapts three MIT / MIT-0 licensed community defenses
 into one machine-enforced rule set. The agent MUST apply this on every load — web trips are

@@ -27,6 +27,26 @@ permissions:
   network: true
 ---
 
+## 🌐 Runtime-agnostic mandate (read before any edit)
+
+Keelwright is published on **ClawHub, askill.sh, and skills.sh** and is used by operators on
+**Hermes, OpenClaw, Cursor, Kilo, Codex, Cline** and other agents — NOT only Hermes.
+
+**When editing this skill, you MUST keep it runtime-agnostic:**
+
+- ❌ NEVER reference the operator's private files (e.g. `lazy-unicorn/SETUP_GUIDE.md`, any
+  repo outside `ratingtesting/keelwright`). Those files do not exist in the user's environment.
+- ❌ NEVER hardcode `Hermes venv`, `<hermes-venv>`, `hermes gateway restart`, or any
+  single-runtime path/command as if it were universal.
+- ✅ Write fix instructions in runtime-neutral terms: "the agent's Python environment",
+  "your agent runtime", "the interpreter that runs the agent". The recovery steps must work
+  for Hermes, OpenClaw, or any venv-based agent.
+- ✅ If a fix needs a specific runtime, say "on <runtime> do X; on others, do Y" — never assume.
+- ✅ Every file the skill references (templates, scripts, references) MUST live inside this repo.
+  No external file dependencies.
+
+Violating this makes the skill broken for the majority of users. Self-contained + universal = mandatory.
+
 ## ⚠️ Safety & consent (read first)
 
 Keelwright is an **operational** skill, not passive documentation. When loaded by an agent it can:

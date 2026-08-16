@@ -22,6 +22,13 @@ AI coding session.
   The skill's own repo maintenance may use `git add -A` deliberately.
 - Plain language for all user-facing messages (no jargon)
 - Verify on disk, never trust self-reports
+- **Keep the skill runtime-agnostic.** Keelwright is published on ClawHub, askill.sh, and
+  skills.sh and is used on Hermes, OpenClaw, Cursor, Kilo, Codex, Cline, and more — not only
+  Hermes. NEVER reference the operator's private files (e.g. `lazy-unicorn/SETUP_GUIDE.md` or
+  any repo outside `ratingtesting/keelwright`). NEVER hardcode `Hermes venv`, `<hermes-venv>`,
+  or `hermes gateway restart` as if universal. Write fix instructions in runtime-neutral terms
+  ("the agent's Python environment", "your agent runtime") so they work for any venv-based agent.
+  Every file the skill references MUST live inside this repo. Universal + self-contained = mandatory.
 
 ## Architecture (5 layers)
 
