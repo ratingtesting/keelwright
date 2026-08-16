@@ -11,7 +11,7 @@ description: >
   circuit-breaker limits and Phoenix restart. Plain-language reports for non-developers.
   Proven by adversarial A/B testing: Keelwright Score (KDS) up to 83/100 on strong models
   (SWE-bench 78%). Load before any loop/agent coding session, autonomous run, or commit.
-version: 1.6.7
+version: 1.6.8
 license: MIT-0
 author: ratingtesting (https://github.com/ratingtesting)
 platforms: [windows, linux, macos]
@@ -702,7 +702,8 @@ Keelwright protects its own operator online. Before ANY web tool call (`web_sear
 prompt-injection protection is ACTIVE (not just enabled) by running `scripts/verify_web_guard.py` and `scripts/defense_health.py` (full-layer health check; if a CRITICAL layer fails, warn + recommend fix, do NOT hard-block)
 with the agent's Python environment. Full rules, enabling the guard on any runtime, contamination window, and memory
 
-quarantine: `references/web-guard.md`. Sources (all MIT / MIT-0, commercial-use white list):
+quarantine: `references/web-guard.md`. If a layer is down, the operator fix guide is
+`references/remediation.md` (plain-language steps, no coding needed). Sources (all MIT / MIT-0, commercial-use white list):
 
 `injection-guard` (gweber, MIT), `agent-defense` (scastile, MIT), `web-agent-security-gate`
 

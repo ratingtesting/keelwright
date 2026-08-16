@@ -210,6 +210,8 @@ keelwright/
 │   ├── reward-hacking-bait.md  — test-deletion trap + variants
 │   ├── loop-audit-checklist.md — 7-principle checklist for existing loops
 │   ├── qa-trap-catalog.md      — discriminating test catalog
+│   ├── web-guard.md            — default-on web prompt-injection protection guards
+│   ├── remediation.md          — operator fix guide (what to do when web defense is degraded)
 │   └── ...                     — 20+ more references
 ├── templates/
 │   └── qa-prompt-final.md      — autonomous QA prompt (runs unattended)
@@ -250,6 +252,10 @@ This is documented in [`qa-results/README.md`](qa-results/README.md).
 ---
 
 ## What's new (version history)
+
+**v1.6.8** — Added operator remediation guide (`references/remediation.md`): plain-language steps
+for any non-coder to fix a "web defense degraded" warning (corrupted `regex`, missing torch/
+transformers, disabled plugin). Linked from SKILL.md Web Guard section + README file tree.
 
 **v1.6.7** — Runtime-agnostic Web Guard. Removed all references to private `SETUP_GUIDE.md` and
 Hermes-specific paths/commands (`Hermes venv`, `hermes gateway restart`, `profile isolation`).
