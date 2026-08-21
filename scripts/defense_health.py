@@ -18,7 +18,7 @@ The heuristic fallback (web_heuristic_guard.py) stays on regardless.
 Sources (commercial-use white list, adapted in operator's own words; no verbatim copy):
 - injection-guard: gweber/hermes-injection-guard (MIT)
 - agent-defense: scastile/hermes-agent-defense (MIT)
-- web-agent-security-gate: ratingtesting (MIT-0)
+- web-agent-security-gate: ClawHub / OpenClaw community, MIT-0
 - recovery: corrupted `regex` in the agent's Python environment is the usual fix (see FIX_REGEX below; self-contained)
 
 USAGE:
@@ -31,15 +31,21 @@ import os
 import subprocess
 import sys
 
-HOME = os.path.expanduser("~")
-HERMES_HOME = os.path.join(HOME, ".hermes")
+# Runtime-agnostic: the agent's Python interpreter IS the venv we need. We run
+# verify_web_guard.py with the same interpreter that is running this script, so there is
+# no hardcoded vendor path or home dir to guess (works on Hermes, OpenClaw, Cursor, Codex,
+# Cline, Kilo, and any venv-based agent on Windows / Linux / macOS).
+# Fallback candidates keep the previous behavior for callers that invoke this script with a
+# system python while the agent venv lives elsewhere.
+import sys as _sys
 VENV_CANDIDATES = [
-    os.path.join(HERMES_HOME, "hermes-agent", "venv", "Scripts", "python"),
-    os.path.join(HERMES_HOME, "hermes-agent", "venv", "bin", "python"),
-    r"C:/Users/Unicorn/AppData/Local/hermes/hermes-agent/venv/Scripts/python",
+    _sys.executable,
+    os.path.join(os.path.expanduser("~"), ".hermes", "hermes-agent", "venv", "Scripts", "python.exe"),
+    os.path.join(os.path.expanduser("~"), ".hermes", "hermes-agent", "venv", "bin", "python"),
 ]
 HERE = os.path.dirname(os.path.abspath(__file__))
 VERIFY = os.path.join(HERE, "verify_web_guard.py")
+HERMES_HOME = os.path.join(os.path.expanduser("~"), ".hermes")
 CAUGHT = os.path.join(HERMES_HOME, "injection-guard", "caught_attacks.jsonl")
 CONFIG = os.path.join(HERMES_HOME, "config.yaml")
 AGENT_DEFENSE = os.path.join(HERMES_HOME, "skills", "agent-defense", "SKILL.md")

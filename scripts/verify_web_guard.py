@@ -2,7 +2,7 @@
 """verify_web_guard.py — confirm injection-guard is ACTIVE, not just enabled.
 
 ADAPTED from github.com/gweber/hermes-injection-guard (MIT) scripts/verify_protection.py,
-via the operator's web-agent-security-gate skill (MIT-0, ratingtesting). Technique reused in
+via the operator's web-agent-security-gate skill (MIT-0, ClawHub / OpenClaw community). Technique reused in
 the operator's own words; no verbatim copy. All sources are in the commercial-use-without-
 attribution white list (MIT-0 / MIT / Apache-2.0 / ISC / Unlicense / 0BSD).
 

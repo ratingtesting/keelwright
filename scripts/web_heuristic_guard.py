@@ -13,7 +13,7 @@ collapses. When it fires, it logs to the attack registry like any other detectio
 Rules (commercial-use white list sources, adapted in operator's own words; no verbatim copy):
 - injection-guard internals: gweber/hermes-injection-guard (MIT)
 - agent-defense layering: scastile/hermes-agent-defense (MIT)
-- web-agent-security-gate: ratingtesting (MIT-0)
+- web-agent-security-gate: ClawHub / OpenClaw community, MIT-0
 
 USAGE:
   python web_heuristic_guard.py --text "web page content here"

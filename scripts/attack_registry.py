@@ -11,7 +11,7 @@ DESIGN RULES (do not weaken):
 - Always exits 0 on read; --add exits non-zero only if required fields missing (so a broken
   call surfaces, but normal logging never aborts the agent's run).
 - Source: github.com/gweber/hermes-injection-guard (MIT) + scastile/hermes-agent-defense (MIT)
-  + web-agent-security-gate (MIT-0, ratingtesting) — all commercial-use-without-attribution
+  + web-agent-security-gate (MIT-0, ClawHub / OpenClaw community) — all commercial-use-without-attribution
   white list. Technique adapted in operator's own words; no verbatim copy.
 - Retention: entries older than 30 days are purged on --cleanup (non-blocking).
 - Redaction: query parameters stripped from source_url before logging (no secrets in logs).

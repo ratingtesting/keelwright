@@ -11,7 +11,7 @@ description: >
   circuit-breaker limits and Phoenix restart. Plain-language reports for non-developers.
   Proven by adversarial A/B testing: Keelwright Score (KDS) up to 83/100 on strong models
   (SWE-bench 78%). Load before any loop/agent coding session, autonomous run, or commit.
-version: 1.6.8
+version: 1.6.9
 license: MIT-0
 author: ratingtesting (https://github.com/ratingtesting)
 platforms: [windows, linux, macos]
@@ -698,16 +698,19 @@ to reinstall — the agent does not auto-update mid-session.
 
 Keelwright protects its own operator online. Before ANY web tool call (`web_search`,
 
-`web_extract`, `browser_navigate`, `fetch_url`, `vision_analyze(URL)`) the agent verifies
-prompt-injection protection is ACTIVE (not just enabled) by running `scripts/verify_web_guard.py` and `scripts/defense_health.py` (full-layer health check; if a CRITICAL layer fails, warn + recommend fix, do NOT hard-block)
-with the agent's Python environment. Full rules, enabling the guard on any runtime, contamination window, and memory
+`web_extract`, `browser_navigate`, `fetch_url`, `vision_analyze(URL)`) the agent MUST verify
+prompt-injection protection is ACTIVE (not just enabled) by running `scripts/detect_guard.py`
+with the agent's Python environment — this is the enforcement mechanism, not a suggestion. The probe
+returns `ACTIVE` / `DEGRADED` / `UNPROTECTED`; on the latter two the agent MUST tell the operator
+before any web trip (template in `references/web-guard.md`). Full rules, enabling the guard on any
+runtime, subagent/kanban reach, contamination window, and memory
 
 quarantine: `references/web-guard.md`. If a layer is down, the operator fix guide is
 `references/remediation.md` (plain-language steps, no coding needed). Sources (all MIT / MIT-0, commercial-use white list):
 
-`injection-guard` (gweber, MIT), `agent-defense` (scastile, MIT), `web-agent-security-gate`
+`injection-guard` (community, MIT), `agent-defense` (community, MIT), `web-agent-security-gate`
 
-(ratingtesting, MIT-0). Full recovery steps are in `references/web-guard.md` (no external files needed).
+(ClawHub / OpenClaw community, MIT-0). Full recovery steps are in `references/web-guard.md` (no external files needed).
 
 
 
@@ -11537,16 +11540,23 @@ otherwise.
   test_ids against actual arm dirs on disk.
 
 
+---
 
+## Changelog
 
-
-
-
-
-
-
-
-
-
-
-
+### 1.6.9
+- **Web Guard auto-probe** — new `scripts/detect_guard.py` returns ACTIVE/DEGRADED/UNPROTECTED
+  with a plain-language message; the agent MUST surface DEGRADED/UNPROTECTED to the operator.
+  Replaces the old "agent should run verify" instruction (which no subagent executed) with a
+  real, callable mechanism. No auto-download — model install is an explicit operator-approved step.
+- **Automatic subagent/kanban coverage (Hermes)** — new companion plugin `plugin/keelwright-guard/`
+  injects the Web Guard rule into EVERY agent turn via the `pre_llm_call` hook, including
+  delegate_task subagents and kanban workers (proven to reach them in a live test). On the first
+  turn it prints an honest operator notice (what/why), never enabling silently.
+- **Universal onboarding** — `references/web-guard.md` now documents the runtime-agnostic mandate:
+  Hermes uses the plugin; Cursor/Codex/Cline use project AGENTS.md/rules; OpenClaw uses a hook.
+  No private operator paths, no hardcoded runtime — self-contained.
+- **`defense_health.py` universalized** — dropped Windows/hardcoded `C:/Users/...` paths; venv
+  detection now uses `sys.executable`. Works on any OS/runtime.
+- **Attribution corrected** — `web-agent-security-gate` is a ClawHub/OpenClaw community skill
+  (MIT-0), not ratingtesting. Credit restored.
