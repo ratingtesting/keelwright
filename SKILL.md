@@ -11,7 +11,7 @@ description: >
   circuit-breaker limits and Phoenix restart. Plain-language reports for non-developers.
   Proven by adversarial A/B testing: Keelwright Score (KDS) up to 83/100 on strong models
   (SWE-bench 78%). Load before any loop/agent coding session, autonomous run, or commit.
-version: 1.6.9
+version: 1.7.0
 license: MIT-0
 author: ratingtesting (https://github.com/ratingtesting)
 platforms: [windows, linux, macos]
@@ -11543,6 +11543,28 @@ otherwise.
 ---
 
 ## Changelog
+
+### 1.7.0
+- **keelwright-guard plugin simplified to auto-injection only.** The plugin now
+  registers a single `system_prompt_section` (Web Guard rule) that reaches
+  EVERY session including subagents and kanban workers (proven live). Removed the
+  `pre_llm_call` user-notice path — Hermes injects `pre_llm_call` returns into
+  the MODEL PROMPT, not the user-visible chat, so it could not carry an operator
+  notice. All operator-facing messaging (what/why, ML-classifier offer, desloppify
+  recommendation) now lives in the skill's "On skill load" section: the agent
+  reads keelwright and TELLS the operator in chat.
+- **On skill load — operator notice (visible).** New `references/web-guard.md`
+  section instructs the agent to open with a plain-language Web Guard summary
+  when the skill loads: coverage of subagents/workers, optional ML classifier
+  (~700MB, explicit consent), and desloppify mention at final polish.
+- **desloppify recommendation.** Added to web-guard.md: recommend
+  github.com/peteromallet/desloppify (OSNL license — free internal + OSS, paid
+  tier for closed-source commercial redistribution) for the final code-polish
+  pass. Link only; keelwright does NOT bundle its code (outside the MIT-0/MIT/
+  Apache/ISC/Unlicense/0BSD white list, and keelwright is self-contained).
+
+### 1.6.9
+
 
 ### 1.6.9
 - **Web Guard auto-probe** — new `scripts/detect_guard.py` returns ACTIVE/DEGRADED/UNPROTECTED

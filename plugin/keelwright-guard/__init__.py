@@ -5,23 +5,29 @@ WHY THIS PLUGIN EXISTS
 The keelwright SKILL.md tells the *main* agent to guard its web calls. But a
 skill is NOT inherited by subagents (delegate_task) or kanban workers — they
 get a fresh prompt and never see the skill text. We tested `pre_llm_call`
-injection live: it reaches the main session but NOT subagents (their prompt is
-isolated). The `system_prompt_section` mechanism, however, is rendered once per
-new session — and a spawned subagent is a new session — so it is the correct
-hook to reach children automatically. This plugin uses it.
+injection live: it reaches the main session but the returned context is
+injected into the MODEL PROMPT, not the user-visible chat — so it cannot carry
+a user-facing notice. The `system_prompt_section` mechanism, however, IS
+rendered into the system prompt of every new session — and a spawned subagent
+is a new session — so it is the correct hook to reach children automatically
+and invisibly (the model sees the rule; the operator does not need to).
 
-WHAT IT REGISTERS
------------------
-A bounded system-prompt section (after_memory, <=4000 chars) carrying the Web
-Guard rule. Because it lives in the system prompt, every agent turn — including
-subagent and kanban-worker turns — sees it without any manual `context` passing
-by the parent.
+WHAT THIS PLUGIN DOES
+--------------------
+Registers ONE system-prompt section (after_memory, <=4000 chars) carrying the
+Web Guard rule. Because it lives in the system prompt, every agent turn —
+including subagent and kanban-worker turns — sees it without any manual
+`context` passing by the parent. Proven live: a subagent spawned without any
+manual context found "KEELWRIGHT WEB GUARD" in its prompt.
 
-ON HONESTY
-----------
-The plugin does NOT silently change the operator's setup. On the first turn of
-a session it ALSO returns a `pre_llm_call` notice telling the operator what was
-enabled and why (the rule itself is delivered via the system section, always on).
+USER-FACING NOTICES ARE THE SKILL'S JOB
+----------------------------------------
+The operator-facing explanation (what Web Guard is, that it now covers
+subagents, the ML-classifier offer, the desloppify recommendation) lives in
+the keelwright SKILL.md / references/web-guard.md "On skill load" section. The
+agent reads the skill and tells the operator in chat. This plugin stays
+invisible infrastructure — it only ensures the RULE is present in every
+agent's prompt.
 
 RUNTIME SCOPE
 -------------
@@ -49,34 +55,15 @@ KEELWRIGHT WEB GUARD (auto-applied by keelwright-guard plugin):
   parent to repeat it.
 """
 
-FIRST_TURN_NOTICE = (
-    "🛡️ keelwright-guard is ACTIVE. This companion plugin auto-applies keelwright's "
-    "Web Guard to EVERY agent in this session — including subagents you spawn and "
-    "kanban board workers — via a system-prompt section (proven to reach spawned "
-    "agents). Why: a spawned agent handed a poisoned web result could act on injected "
-    "instructions without you seeing the prompt. It does NOT silently change your "
-    "setup; it only adds the rule to prompts. To verify or install the full ML "
-    "classifier (one-time ~700MB model), ask your agent explicitly."
-)
-
-
-def board_rules(session_info):
-    return WEB_GUARD_SECTION
-
 
 def register(ctx):
-    # System-prompt section: rendered once per new session, including subagents.
+    # System-prompt section: always-on rule for every session (incl. children).
+    def board_rules(session_info):
+        return WEB_GUARD_SECTION
+
     ctx.register_system_prompt_section(
         "keelwright.web-guard",
         board_rules,
         position="after_memory",
         max_chars=4000,
     )
-
-    # Honest operator notice on the first turn of the main session only.
-    def notice(session_id=None, is_first_turn=False, **kwargs):
-        if is_first_turn:
-            return FIRST_TURN_NOTICE
-        return None
-
-    ctx.register_hook("pre_llm_call", notice)
