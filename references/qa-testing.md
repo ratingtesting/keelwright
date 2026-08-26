@@ -302,8 +302,7 @@ Instruct the tester to be ruthless — a negative result is more valuable than "
 When running Python scripts by absolute path on Windows/MSYS, always quote the path or use forward-slash POSIX form. Unquoted backslash paths break because MSYS rewrites `C:\\Users\\...` to `C:\\c\\Users\\...`. Real cases from run `20260721T082708Z`: ad-hoc verify scripts under `%TEMP%\\hermes-verify-...` and `python ...\\scripts\\validate_run.py ...` both failed until switched to POSIX `/c/Users/...` forms. Default invocation patterns:
 
 ```
-python "C:\\Users\\Unicorn\\AppData\\Local\\hermes\\skills\\keelwright\\scripts\\validate_run.py" "<run_dir>" "<results.jsonl>"
-python "/c/Users/Unicorn/AppData/Local/hermes/skills/keelwright/scripts/validate_run.py" "<run_dir>" "<results.jsonl>"
+python "<skill_dir>/scripts/validate_run.py" "<run_dir>" "<results.jsonl>"
 ```
 
 For temp verify scripts, create them with an absolute `%TEMP%\\hermes-verify-<test>.py` path, run them quoted/POSIX, and delete afterward.

@@ -100,7 +100,7 @@ The integrity gate script `scripts/validate_run.py` exists but was not executed 
 ## Artifacts Location
 
 ```
-C:\Users\Unicorn\kw-qa\20260721T143000Z\
+<local_qa_dir>/20260721T143000Z\
 ├── 00-capability-report.md      # Full report
 ├── .run_meta.json               # Run metadata
 ├── results.jsonl                # 13 line-delimited JSON records

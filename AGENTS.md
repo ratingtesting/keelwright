@@ -43,7 +43,7 @@ AI coding session. It is designed for non-programmers who use AI to write code.
 - Do not trust self-reports from QA runs (verify on disk)
 - **Do NOT hardcode any single agent runtime as if universal.** Keelwright ships on ClawHub,
   askill.sh, and skills.sh and is used on Hermes, OpenClaw, Cursor, Kilo, Codex, Cline, and more.
-  NEVER reference the operator's private files (e.g. `lazy-unicorn/SETUP_GUIDE.md` or any repo
+  NEVER reference the operator's private files (e.g. `a private operator repo's setup file` or any repo
   outside `ratingtesting/keelwright`). NEVER write `Hermes venv`, `<hermes-venv>`, or
   `hermes gateway restart` as if every user had them. Write fixes in runtime-neutral terms
   ("the agent's Python environment", "your agent runtime") so they work on any venv-based agent.

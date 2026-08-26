@@ -30,9 +30,8 @@ def find_plugin():
         if os.path.isfile(cand):
             return os.path.dirname(cand)
         cur = os.path.dirname(cur)
-    for fb in (r"C:/Users/Unicorn/AppData/Local/hermes/plugins/injection-guard",):
-        if os.path.isfile(os.path.join(fb, "__init__.py")):
-            return fb
+    # No hardcoded fallback paths: the upward walk above works on any platform
+    # and any operator username. Keeps the skill self-contained + runtime-agnostic.
     return None
 
 

@@ -11,7 +11,7 @@ description: >
   circuit-breaker limits and Phoenix restart. Plain-language reports for non-developers.
   Proven by adversarial A/B testing: Keelwright Score (KDS) up to 83/100 on strong models
   (SWE-bench 78%). Load before any loop/agent coding session, autonomous run, or commit.
-version: 1.7.0
+version: 1.7.1
 license: MIT-0
 author: ratingtesting (https://github.com/ratingtesting)
 platforms: [windows, linux, macos]
@@ -34,7 +34,7 @@ Keelwright is published on **ClawHub, askill.sh, and skills.sh** and is used by 
 
 **When editing this skill, you MUST keep it runtime-agnostic:**
 
-- ❌ NEVER reference the operator's private files (e.g. `lazy-unicorn/SETUP_GUIDE.md`, any
+- ❌ NEVER reference the operator's private files (e.g. `a private operator repo's setup file`, any
   repo outside `ratingtesting/keelwright`). Those files do not exist in the user's environment.
 - ❌ NEVER hardcode `Hermes venv`, `<hermes-venv>`, `hermes gateway restart`, or any
   single-runtime path/command as if it were universal.
@@ -11543,6 +11543,20 @@ otherwise.
 ---
 
 ## Changelog
+
+### 1.7.1
+- **Privacy fix:** removed all references to the operator's private repos/paths.
+  Replaced `lazy-unicorn/SETUP_GUIDE.md` mentions (SKILL.md/CLAUDE.md/AGENTS.md/
+  README.md) with a neutral "private operator repo" example. Removed hardcoded
+  `C:/Users/Unicorn/...` fallback from `verify_web_guard.py` (now walks up the
+  tree from the script location — works on any username/platform). Replaced
+  hardcoded `validate_run.py` path in `references/qa-testing.md` with
+  `<skill_dir>/scripts/...`. Replaced QA artifact path in
+  `references/qa-results-20260721.md` with `<local_qa_dir>/...`. Skill is now
+  fully self-contained + runtime-agnostic (no operator-specific strings remain).
+
+### 1.7.0
+
 
 ### 1.7.0
 - **keelwright-guard plugin simplified to auto-injection only.** The plugin now

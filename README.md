@@ -257,7 +257,7 @@ This is documented in [`qa-results/README.md`](qa-results/README.md).
 for any non-coder to fix a "web defense degraded" warning (corrupted `regex`, missing torch/
 transformers, disabled plugin). Linked from SKILL.md Web Guard section + README file tree.
 
-**v1.6.7** — Runtime-agnostic Web Guard. Removed all references to private `SETUP_GUIDE.md` and
+**v1.6.7** — Runtime-agnostic Web Guard. Removed all references to the operator's private setup files and
 Hermes-specific paths/commands (`Hermes venv`, `hermes gateway restart`, `profile isolation`).
 Fix instructions now runtime-neutral ("the agent's Python environment") — works on Hermes,
 OpenClaw, Cursor, Kilo, Codex, Cline. Added explicit "Runtime-agnostic mandate" to SKILL.md,
