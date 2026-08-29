@@ -253,6 +253,16 @@ This is documented in [`qa-results/README.md`](qa-results/README.md).
 
 ## What's new (version history)
 
+**v1.7.2** — Audit-driven fixes (16-agent review + meta-audit):
+- **License corrected to MIT-0** across `LICENSE`, `llms.txt`, `architecture.html`, `web-guard.md`.
+  The skill is free to use/modify/redistribute commercially **without attribution**.
+- **GATE 4 contamination check fixed** — was a dead substring match on a regex literal;
+  now uses `re.search` so it actually fires on skill contamination.
+- **`import_skill.py` zip-name validation** — rejects malformed/malicious export filenames
+  before running post-install checks (defense-in-depth).
+- **`check_update.py` signature-verification hook** — update fetches now verify a pinned
+  release commit SHA + GPG signature, closing a TOFU supply-chain vector.
+
 **v1.6.8** — Added operator remediation guide (`references/remediation.md`): plain-language steps
 for any non-coder to fix a "web defense degraded" warning (corrupted `regex`, missing torch/
 transformers, disabled plugin). Linked from SKILL.md Web Guard section + README file tree.

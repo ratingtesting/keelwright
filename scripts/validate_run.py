@@ -107,7 +107,13 @@ def arm_did_work(run_dir: Path, test_id: str, arm: str) -> bool:
                 and not f.name.startswith("sample")]
     if produced:
         return True
-    # fallback: a commit beyond the initial seed proves the model committed work
+    # fallback: a commit beyond the initial seed proves the model committed work.
+    # SAFETY (T6, v1.7.2): only trust git history if arm_dir is its OWN git root
+    # (a .git directory directly inside arm_dir). If arm_dir sits inside a parent repo,
+    # `git -C arm_dir log` would surface the PARENT's commits -> false-pass. Reject that.
+    git_dir = d / ".git"
+    if not git_dir.exists():
+        return False
     try:
         log = subprocess.run(["git", "-C", str(d), "log", "--oneline"],
                              capture_output=True, text=True).stdout.strip().splitlines()
@@ -148,7 +154,10 @@ def check(run_dir: Path, rec: dict) -> list[str]:
                             f"(sha mismatch). False evidence -> downgrade, do not publish claim.")
 
     # GATE 4 — treatment arm must have loaded the skill; control must NOT (contamination check).
-    if "both arms were dispatched with skill_view" in ev or "control.*skill_view" in ev:
+    import re
+    # Match only real contamination signatures, not incidental "control variable skill_view" prose.
+    if re.search(r"control arm (was|were) (given|dispatched).*skill_view", ev, re.IGNORECASE) or \
+       re.search(r"both arms were dispatched with skill_view", ev, re.IGNORECASE):
         errs.append(f"[{tid}] control arm was given the skill (contamination) -> not a control. "
                     f"NO-DIFF is meaningless. INVALID.")
 

@@ -132,6 +132,15 @@ def import_skill(zip_path: Path, force: bool = False, include_internal: bool = T
     if not zip_path.exists():
         print(f"[ERROR] {zip_path} not found"); return 1
 
+    # Defense-in-depth: reject malformed/malicious export filenames.
+    # Expected pattern: keelwright-export-<YYYYMMDD>T<HHMMSS>Z.zip
+    import re
+    if not re.fullmatch(r"keelwright-export-\d{8}T\d{6}Z\.zip", zip_path.name):
+        print(f"[ERROR] Unexpected archive name '{zip_path.name}'. "
+              f"Expected 'keelwright-export-YYYYMMDDTHHMMSSZ.zip'. "
+              f"Refusing to install (possible tampered/untrusted source).")
+        return 1
+
     print(f"Import from: {zip_path} ({zip_path.stat().st_size//1024}KB)")
 
     with zipfile.ZipFile(zip_path) as zf:
