@@ -32,6 +32,7 @@ import sys
 
 # Markers ordered by severity. Each is a compiled pattern (case-insensitive).
 # CRITICAL: direct instruction-override attempts.
+# CRITICAL: direct instruction-override attempts + code/exec injection.
 CRITICAL = [
     r"ignore\s+(all\s+)?previous\s+instructions",
     r"disregard\s+(your\s+)?(prior\s+)?(system\s+)?(instructions|prompt)",
@@ -42,6 +43,25 @@ CRITICAL = [
     r"run\s+the\s+(following\s+)?(command|script|tool)",
     r"exfiltrate",
     r"send\s+(all\s+)?(data|keys?|tokens?|secrets?)\s+to",
+    # injection: XSS / script injection / template injection
+    r"<script",
+    r"<\s*scr",  # catches <scr1pt> style obfuscation too
+    r"onerror\s*=",
+    r"javascript\s*:",
+    r"\{\{.*\}\}",  # template-injection ({{7*7}})
+    # SQL / command injection fragments (loose: catches missing-space mutations)
+    r"(drop|delete|truncate|insert|update)\s*(table|from|into)?",
+    r"(union\s+select|;\s*select\s+|\bselect\s+\*\s+from)",
+    r"`\s*;?\s*(rm|curl|wget|bash|sh|nc)\s",
+    r">>>\s*(drop|delete|select|insert)",  # markdown code-fence SQL
+    # F31 (v1.9.0) canonical cases: secret + doom-loop
+    r"password\s*=\s*['\"][^'\"]{4,}",  # hardcoded credential
+    r"api[_-]?key\s*=\s*['\"][^'\"]{8,}",
+    r"while\s+True\s*:",  # unbounded loop (doom-loop risk)
+    r"for\s+\w+\s+in\s+range\(\s*\d{4,}",  # absurdly large range, no stop
+    # jailbreak personas
+    r"pretend\s+you\s+are\s+(dan|an\s+unrestricted|without\s+rules)",
+    r"developer\s+mode\s+(unlocked|enabled|on)",
 ]
 # HIGH: cloaking / tool-abuse framing.
 HIGH = [
@@ -52,6 +72,8 @@ HIGH = [
     r"override\s+(the\s+)?(safety|policy|rule)",
     r"continue\s+this\s+(video|task)\s+from",
     r"base64\s+decode\s+and\s+execute",
+    r"no\s+(restrictions|limits|filters)",
+    r"ignore\s+(all\s+)?(safety|ethical|moral)\s+(guidelines|rules)",
 ]
 # MEDIUM: suspicious but ambiguous phrasing.
 MEDIUM = [

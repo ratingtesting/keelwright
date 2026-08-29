@@ -181,6 +181,10 @@ Install keelwright into your agent runtime (Hermes: drop the folder into your sk
 Cursor/Codex/Cline/OpenClaw: see `references/bindings/<runtime>.md`). Then load it by name
 (`keelwright`) before any loop/agent coding session.
 
+**30-second try:** load the skill, then paste any task from [`examples/`](examples/) into your
+agent. At session end you'll get: `Keelwright this session: <N> gates passed, <M> traps avoided,
+<K> attacks blocked.` No agent? Run `python scripts/validate_run.py --self-test`.
+
 Or install via the [skills CLI](https://skills.sh) by Vercel to track usage and appear on the leaderboard:
 
 ```
