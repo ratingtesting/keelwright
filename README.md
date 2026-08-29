@@ -2,6 +2,8 @@
 
 **An engine for vibe-coders and loop-coders who ship AI-generated code they can't read line by line.**
 
+[![security](https://github.com/ratingtesting/keelwright/actions/workflows/security.yml/badge.svg)](https://github.com/ratingtesting/keelwright/actions/workflows/security.yml)
+
 ---
 
 ## The problem
