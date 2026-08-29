@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 ratingtesting — MIT-0 (see LICENSE). Free to use/modify/redistribute, no attribution required.
 """defense_health.py — full-layer web-defense health check for keelwright.
 
 WHY: verify_web_guard.py only checks the ML layer (injection-guard / DeBERTa). A safety

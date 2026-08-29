@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 ratingtesting — MIT-0 (see LICENSE). Free to use/modify/redistribute, no attribution required.
 """export_skill.py — bundle the entire keelwright skill into a portable .zip
 
 Packages the public skill (excludes internal/ and backups/ unless --all) plus QA results
@@ -14,6 +15,7 @@ from pathlib import Path
 
 SKILL = Path(os.environ.get("KEELWRIGHT",
     os.path.expanduser("~/AppData/Local/hermes/skills/keelwright")))
+
 SKIP_PUBLIC = {"internal", "backups", ".git", "__pycache__", ".pytest_cache"}
 SKIP_ALL = {".git", "__pycache__", ".pytest_cache"}
 MANIFEST_ENTRIES = []

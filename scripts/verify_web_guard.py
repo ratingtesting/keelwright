@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 ratingtesting — MIT-0 (see LICENSE). Free to use/modify/redistribute, no attribution required.
 """verify_web_guard.py — confirm injection-guard is ACTIVE, not just enabled.
 
 ADAPTED from github.com/gweber/hermes-injection-guard (MIT) scripts/verify_protection.py,
@@ -7,8 +8,9 @@ the operator's own words; no verbatim copy. All sources are in the commercial-us
 attribution white list (MIT-0 / MIT / Apache-2.0 / ISC / Unlicense / 0BSD).
 
 Run with the agent's Python — the same interpreter that runs the agent / the
-injection-guard plugin. On Windows that is typically the agent's venv, e.g.:
-  C:/Users/<user>/AppData/Local/hermes/hermes-agent/venv/Scripts/python verify_web_guard.py
+injection-guard plugin. On any runtime this is "the python that runs your agent", e.g.:
+  <your-agent-runtime>/venv/Scripts/python verify_web_guard.py   (Windows)
+  <your-agent-runtime>/bin/python verify_web_guard.py           (Linux/macOS)
 (use your agent runtime's python path; the script only needs stdlib + the plugin importable).
 
 WHY: `injection-guard` is a NO-OP when transformers/torch/sentencepiece are absent from the

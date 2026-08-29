@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 ratingtesting — MIT-0 (see LICENSE). Free to use/modify/redistribute, no attribution required.
 """Validate the YAML frontmatter of a SKILL.md file.
 
 Exists so the post-install check can run as a plain argument vector instead of

@@ -6,5 +6,5 @@ description: >
   workers — so prompt-injection protection is not silently absent from spawned
   agents. Runtime: Hermes. Other runtimes use the skill's documented mechanism
   (project AGENTS.md / rules / hooks).
-author: keelwright authors (MIT-0)
+author: ratingtesting (MIT-0)
 license: MIT-0

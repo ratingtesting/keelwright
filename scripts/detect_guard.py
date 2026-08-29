@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 ratingtesting — MIT-0 (see LICENSE). Free to use/modify/redistribute, no attribution required.
 """detect_guard.py — runtime-agnostic web-defense probe for keelwright.
 
 WHY THIS EXISTS
@@ -69,8 +70,34 @@ def _have_modules(interp: str, mods) -> bool:
         return False
 
 
-def _heuristic_present() -> bool:
-    return os.path.isfile(os.path.join(HERE, "web_heuristic_guard.py"))
+def _classifier_verified(interp: str) -> bool:
+    """T11 (v1.8.0): ACTIVE requires proof the classifier actually works, not just imports.
+
+    We look for a verification marker written by verify_web_guard.py (operator-approved
+    smoke test). If absent, the agent must run verify_web_guard.py before claiming ACTIVE.
+    This avoids the false-ACTIVE trap where deps import but the model is broken/MITM'd.
+    """
+    marker = os.path.join(HERE, ".web_guard_verified")
+    try:
+        if os.path.exists(marker):
+            return True
+    except Exception:
+        pass
+    # Fallback: if verify_web_guard.py exists, run it non-interactively (it exits 0 on pass).
+    vwg = os.path.join(HERE, "verify_web_guard.py")
+    if os.path.isfile(vwg):
+        try:
+            r = subprocess.run([interp, vwg], capture_output=True, text=True, timeout=60)
+            if r.returncode == 0:
+                try:
+                    with open(marker, "w", encoding="utf-8") as f:
+                        f.write("")
+                except Exception:
+                    pass
+                return True
+        except Exception:
+            return False
+    return False
 
 
 def main() -> int:
@@ -78,14 +105,25 @@ def main() -> int:
 
     ml_ready = _have_modules(interp, ("transformers", "torch", "sentencepiece"))
     if ml_ready:
-        # Deeper confirmation is an explicit, operator-approved step (may download
-        # a model). We only report readiness here; the agent asks before running it.
+        # T11 (v1.8.0): deps present is NOT the same as "verified working".
+        # The classifier can be broken (corrupted regex pkg, MITM model, revoked source)
+        # even when deps import. ACTIVE requires a passing verify_web_guard.py smoke
+        # test (operator-approved, may download ~700MB model). Without it we report
+        # DEGRADED so the operator is never falsely told they are fully protected.
+        verified = _classifier_verified(interp)
+        if verified:
+            print(
+                "ACTIVE: web prompt-injection protection is verified working "
+                "(classifier deps present AND verify_web_guard.py passed)."
+            )
+            return 0
         print(
-            "ACTIVE (classifier deps present): web prompt-injection protection can run. "
-            "For a full working-check, the agent should run `verify_web_guard.py` "
-            "(may download a ~700MB classifier model — only after the operator approves)."
+            "DEGRADED: ML classifier deps are present, but the classifier has NOT been "
+            "verified by verify_web_guard.py. It may be broken, revoked, or MITM-substituted — "
+            "do NOT report ACTIVE. Run `verify_web_guard.py` (operator-approved, may download "
+            "a ~700MB model) to confirm protection before unattended web trips."
         )
-        return 0
+        return 1
 
     if _heuristic_present():
         print(

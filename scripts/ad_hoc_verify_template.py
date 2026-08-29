@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# Copyright (c) 2026 ratingtesting — MIT-0 (see LICENSE). Free to use/modify/redistribute, no attribution required.
+
 """Ad-hoc verification template — NOT a test suite.
 
 Use when the workspace has NO canonical test/lint/build command and the

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 ratingtesting — MIT-0 (see LICENSE). Free to use/modify/redistribute, no attribution required.
 """Run RED-BATTERY: swap implementation under test and verify tests fail on buggy version.
 
 RED-BATTERY is the machine proof for gate 8c (spec-not-code / non-tautological tests):

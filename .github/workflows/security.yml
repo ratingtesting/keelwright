@@ -1,0 +1,41 @@
+name: security
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  supply-chain:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install audit tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install pip-audit
+      - name: pip-audit (transitive deps of any pip-installed tooling)
+        run: |
+          # keelwright is stdlib-only at runtime; this scans any tooling the repo pins.
+          pip-audit --require-hashes || true
+      - name: OSV-Scanner
+        uses: actions/osv-scanner-action@v1
+        with:
+          scan-args: |-
+            --recursive
+            ./
+        continue-on-error: true
+
+  license-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify MIT-0 license consistency
+        run: |
+          grep -q "MIT No Attribution" LICENSE || (echo "LICENSE must be MIT-0" && exit 1)
+          test -f NOTICE-MIT || (echo "NOTICE-MIT missing" && exit 1)
+          echo "license check OK"

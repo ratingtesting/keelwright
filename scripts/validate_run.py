@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 ratingtesting — MIT-0 (see LICENSE). Free to use/modify/redistribute, no attribution required.
 """Post-run integrity gate for a keelwright QA run.
 
 Mechanically rejects the fabrication patterns seen in run 20260720T200131Z_vibe BEFORE any
@@ -111,6 +112,8 @@ def arm_did_work(run_dir: Path, test_id: str, arm: str) -> bool:
     # SAFETY (T6, v1.7.2): only trust git history if arm_dir is its OWN git root
     # (a .git directory directly inside arm_dir). If arm_dir sits inside a parent repo,
     # `git -C arm_dir log` would surface the PARENT's commits -> false-pass. Reject that.
+    # T36 (v1.8.0): arm_dir layout is A/B/<test_id>/<arm>; the seed is TASK.md/spec.
+    # A non-seed commit inside arm_dir's own .git is the only accepted fallback proof.
     git_dir = d / ".git"
     if not git_dir.exists():
         return False

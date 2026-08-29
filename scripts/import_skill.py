@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 ratingtesting — MIT-0 (see LICENSE). Free to use/modify/redistribute, no attribution required.
 """import_skill.py — install keelwright from a portable .zip on a new machine
 
 Unpacks the exported .zip, verifies file integrity against _MANIFEST.json, installs

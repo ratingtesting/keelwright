@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 ratingtesting — MIT-0 (see LICENSE). Free to use/modify/redistribute, no attribution required.
 """workspace_guard.py — INFRASTRUCTURE-level isolation for keelwright agents.
 
 Prompt-level isolation ("write only inside your dir") is IGNORED by weak models — observed
 2026-07-21 on step-3.7/nemotron: arms wrote outside their arm-dir, cited other runs, mixed
-results. This guard makes isolation MECHANICAL, not advisory. Use it for QA arms AND for swarm
+results. This guard makes isolation a TRIPWIRE, not advisory. Use it for QA arms AND for swarm
 agents (N agents working in parallel must never touch each other's files or blend code).
 
 MODEL

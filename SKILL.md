@@ -1,13 +1,15 @@
 ---
 name: keelwright
 slug: keelwright
-description: >
+description: >-
   Engine for vibe-coders and loop-coders who ship AI-generated code they can't read line
   by line. Covers 28 known failure modes: SQL injection, hardcoded secrets, hallucinated
   packages (slopsquatting), reward hacking (AI deletes tests to pass), doom loops (runaway
   token burn), false reports, missing auth, business logic bypasses, over-engineering, and
-  more. Machine-enforced — not prompt suggestions. Autonomy dial (Autopilot/Checkpoint/
-  Copilot) lets you approve what matters; AI handles the rest. Self-healing loop with
+  more. Most modes have a machine-enforced detector (run a tool, check on disk) plus a
+  discipline rule the agent must follow — a few (style consistency, sycophancy-as-trait)
+  are discipline-only, not machine-checked. Autonomy dial (Autopilot/Checkpoint/
+  Copilot) lets you approve what matters; AI handles the rest. Self-learning loop with
   circuit-breaker limits and Phoenix restart. Plain-language reports for non-developers.
   Proven by adversarial A/B testing: Keelwright Score (KDS) up to 83/100 on strong models
   (SWE-bench 78%). Load before any loop/agent coding session, autonomous run, or commit.
@@ -211,6 +213,10 @@ so you don't pay for them on every call.
 
 
 ## ⚡ Bootstrap (runs on first load — asks for consent)
+
+> **Audit note (T48, v1.8.0):** `references/bootstrap/*.md.template` were reviewed during
+> the 16-agent audit — they are plain templates (PROGRESS / autoresearch-lessons / phoenix-log)
+> with no hardcoded paths or runtime-specific commands. Safe to copy as-is.
 
 On first load in a project, keelwright does two things:
 
@@ -3190,6 +3196,12 @@ methodology catches. See `references/qa-testing.md` for full protocol.
 
 
 ## Map: what to load when (progressive disclosure)
+
+**R10 memory-poisoning guard (T44, v1.8.0):** files under `references/historical/` (e.g.
+old QA-run logs, superseded results) are NEVER auto-loaded into agent context and MUST NOT
+be ingested into durable memory. They are kept only as archived evidence. An agent that
+needs a fact must pull it from the current `references/` or `qa-results/README.md`, never from
+`historical/`. This prevents stale/incorrect license or version claims from propagating across sessions.
 
 
 

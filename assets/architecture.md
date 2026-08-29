@@ -138,7 +138,7 @@ this is what makes keelwright a lifecycle engine, not just a code writer.
 ```
   🔒 BATTLE-TESTED QA ⭐⭐⭐  A/B (control vs skill), fact-checked on disk, not self-report —
                              published WITH an honest adversarial report (found+fixed defects).
-  💸 ZERO INSTALL · ZERO COST · FULL TRANSPARENCY ⭐  (plain markdown, orchestrates free tools)
+  💸 ZERO COST · FULL TRANSPARENCY ⭐  (plain markdown, orchestrates free tools — no install of keelwright itself required; you bring your own free CLI tools)
   🗣 PLAIN-LANGUAGE THROUGHOUT ⭐  built for people who read logic, not syntax.
 ```
 

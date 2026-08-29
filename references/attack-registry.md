@@ -6,7 +6,8 @@ pollution — it is the evidence trail that turns "I think I'm safe" into "here 
 
 ## Location
 
-Default: `~/.hermes/keelwright/attack_registry.jsonl` (one line per event, append-only).
+Default: `~/.keelwright/keelwright/attack_registry.jsonl` (one line per event, append-only).
+Override with `--path` or `KEELWRIGHT_ATTACK_REGISTRY_PATH`.
 Override with `--path`. The file is local scratch memory — add to `.gitignore` if inside a repo.
 
 ## Retention & Redaction

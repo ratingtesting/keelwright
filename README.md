@@ -175,9 +175,9 @@ you don't need keelwright — you are the gate.
 
 ## Quick start
 
-```
-keelwright load /path/to/repo/SKILL.md
-```
+Install keelwright into your agent runtime (Hermes: drop the folder into your skills dir;
+Cursor/Codex/Cline/OpenClaw: see `references/bindings/<runtime>.md`). Then load it by name
+(`keelwright`) before any loop/agent coding session.
 
 Or install via the [skills CLI](https://skills.sh) by Vercel to track usage and appear on the leaderboard:
 

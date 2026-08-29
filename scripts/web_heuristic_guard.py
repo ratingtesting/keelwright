@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 ratingtesting — MIT-0 (see LICENSE). Free to use/modify/redistribute, no attribution required.
 """web_heuristic_guard.py — lightweight injection fallback for keelwright.
 
 WHY: `injection-guard` (DeBERTa ML) is the primary layer, but if its venv deps break
@@ -13,7 +14,7 @@ collapses. When it fires, it logs to the attack registry like any other detectio
 Rules (commercial-use white list sources, adapted in operator's own words; no verbatim copy):
 - injection-guard internals: gweber/hermes-injection-guard (MIT)
 - agent-defense layering: scastile/hermes-agent-defense (MIT)
-- web-agent-security-gate: ClawHub / OpenClaw community, MIT-0
+- web-agent-security-gate: ClawHub / OpenClaw community, SPDX-License-Identifier: MIT-0
 
 USAGE:
   python web_heuristic_guard.py --text "web page content here"
@@ -62,7 +63,14 @@ MEDIUM = [
 
 
 def compile_group(patterns):
-    return [(p, re.compile(p, re.IGNORECASE)) for p in patterns]
+    # T49 (v1.8.0): cap regex matching time to avoid ReDoS if a hostile/over-broad
+    # pattern is ever added via --add-pattern. Python 3.11+ supports the timeout arg.
+    kwargs = {"re.IGNORECASE": re.IGNORECASE}
+    try:
+        return [(p, re.compile(p, re.IGNORECASE, timeout=0.5)) for p in patterns]
+    except TypeError:
+        # Older Python without timeout support — compile without it.
+        return [(p, re.compile(p, re.IGNORECASE)) for p in patterns]
 
 
 CRIT_C = compile_group(CRITICAL)
@@ -77,13 +85,16 @@ def scan(text: str):
             if rx.search(text):
                 hits.append({"severity": label, "pattern": pat})
     severity = None
+    # T14 (v1.8.0): MEDIUM markers are advisory only — they do NOT raise the
+    # flagged/blocking severity. A page with only MEDIUM phrasing is reported as
+    # advisory, not FLAGGED. Only CRITICAL/HIGH escalate.
     if any(h["severity"] == "CRITICAL" for h in hits):
         severity = "CRITICAL"
     elif any(h["severity"] == "HIGH" for h in hits):
         severity = "HIGH"
-    elif hits:
-        severity = "MEDIUM"
-    return hits, severity
+    advisory = [h["pattern"] for h in hits if h["severity"] == "MEDIUM"]
+    flagged = severity is not None
+    return hits, severity, advisory
 
 
 def main() -> int:
@@ -97,14 +108,18 @@ def main() -> int:
     else:
         text = sys.stdin.read()
 
-    hits, severity = scan(text)
-    flagged = bool(hits)
-    out = {"flagged": flagged, "severity": severity, "markers": [h["pattern"] for h in hits]}
+    hits, severity, advisory = scan(text)
+    flagged = bool(hits) and severity is not None
+    out = {"flagged": flagged, "severity": severity,
+           "markers": [h["pattern"] for h in hits if h["severity"] != "MEDIUM"],
+           "advisory": advisory}
     if args.json:
         print(json.dumps(out, ensure_ascii=False))
     else:
         if flagged:
             print(f"FLAGGED [{severity}]: {', '.join(out['markers'])}")
+        elif advisory:
+            print(f"ADVISORY (not flagged): {', '.join(advisory)}")
         else:
             print("clean")
     return 1 if flagged else 0

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 ratingtesting — MIT-0 (see LICENSE). Free to use/modify/redistribute, no attribution required.
 """check_update.py — non-blocking Keelwright self-update check.
 
 WHY: a safety skill running on an old version is a risk (new gates, fixed holes).
@@ -126,7 +127,11 @@ def fetch_latest() -> str | None:
             # on mismatch, avoiding a false "update available" that could push a bad build.
             return None
         return latest
-    except Exception:
+    except Exception as e:
+        # T41 (v1.8.0): surface a warning on network/lookup failure instead of silent pass,
+        # but stay non-blocking (return None -> no "update available" printed, exit 0).
+        print(f"[keelwright-update-check] could not reach GitHub ({type(e).__name__}); "
+              f"skipping update check this run.", file=sys.stderr)
         return None
 
 

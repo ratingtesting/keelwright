@@ -1,4 +1,4 @@
-# Security gates R1-R11 — machine-enforced safety for non-programmers
+# Security gates R1-R12 — machine-enforced safety for non-programmers
 
 From research into vibe/loop-coding risks: ~45% of AI-generated code fails OWASP Top-10
 (Veracode), ~40% is insecure on security tasks (Stanford), a large share of vibe apps ship ≥1
@@ -283,7 +283,27 @@ Phase 3 iteration:
   run starts. R5/R7/R9/R10 = warnings in the report.
 - Don't duplicate `requesting-code-review` — call it, adding the logic checks from here.
 
-## Pitfalls
+## Workspace isolation how-to (R12 / T31, v1.8.0)
+
+Before any unattended or parallel run, seal every workspace so agents cannot blend code:
+
+```bash
+# Seal one workspace per owner (call before the agent runs):
+python scripts/workspace_guard.py seal <workspace_dir> <owner_id> [run_id]
+
+# Make the skill tree read-only so QA models can't write into it:
+python scripts/workspace_guard.py isolate-skill-tree <skill_dir>
+# ... run the agent/swarm ...
+python scripts/workspace_guard.py restore-skill-tree <skill_dir>
+
+# Audit a whole run for cross-arm contamination:
+python scripts/workspace_guard.py audit <run_dir>
+```
+
+Exit 0 = clean; exit 1 = isolation violated (do NOT trust results / do NOT merge code).
+The seal is a TRIPWIRE: any write outside the sealed dir, or into another owner's dir,
+is a violation. Forbidden zones (operator-private repos, other projects) must never be
+passed to the agent as a working path.
 
 - **Don't rely on "looks right"** — that's exactly R6, the Stanford trap. Always run the machine check.
 - **Checklist by scale** — full for auth/payments/data, light for UI trivia. Don't stall on trivial work.

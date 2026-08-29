@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 ratingtesting — MIT-0 (see LICENSE). Free to use/modify/redistribute, no attribution required.
 """snapshot_skill.py — versioned backups + tamper detection for the keelwright skill.
 
 WHY: a weak model editing the skill in another session truncated SKILL.md from ~500 lines to 86
