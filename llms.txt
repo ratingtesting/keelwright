@@ -52,8 +52,8 @@ KDS measures how much the skill changes a model's behavior:
 
 ## License
 
-CC BY 4.0 — free for commercial use with attribution.
-Required: "keelwright by ratingtesting — https://github.com/ratingtesting"
+MIT-0 (MIT No Attribution) — free for commercial use WITHOUT attribution.
+See `LICENSE` for the full text.
 
 ## Links
 

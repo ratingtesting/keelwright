@@ -31,8 +31,42 @@ CACHE_FILE = os.path.join(os.path.expanduser("~"), ".cache", "keelwright_update_
 WEEKLY_CACHE_FILE = os.path.join(os.path.expanduser("~"), ".cache", "keelwright_update_check_weekly.json")
 REPO = "ratingtesting/keelwright"
 API_URL = f"https://api.github.com/repos/{REPO}/releases/latest"
+# Security (T43, v1.7.2): pin the expected release tag object SHA. A TOFU/GitHub-compromise
+# that swaps the "latest" release must not silently downgrade or inject code. The agent
+# verifies the returned tag points at this pinned SHA before trusting the version string.
+# Update PINNED_RELEASE_SHA when you cut a new release AND have verified its provenance.
+TAG_REF_URL = f"https://api.github.com/repos/{REPO}/git/refs/tags"
+PINNED_RELEASE_SHA = {
+    "1.7.2": "REPLACE_WITH_REAL_TAG_SHA_AT_RELEASE_TIME",
+}
 CACHE_TTL_HOURS = 24
 WEEKLY_TTL_DAYS = 7
+
+
+def verify_release_signature(tag_name: str, tag_sha: str | None) -> bool:
+    """Return True only if the release tag is pinned AND matches the expected SHA.
+
+    A missing/expected SHA (e.g. not yet pinned) returns False so the caller WARNs
+    (does NOT hard-fail the agent's run) rather than trusting an unverified update.
+    """
+    clean = (tag_name or "").lstrip("v")
+    expected = PINNED_RELEASE_SHA.get(clean)
+    if not expected or not tag_sha:
+        return False
+    return expected == tag_sha
+
+
+def fetch_tag_sha(tag_name: str) -> str | None:
+    """Resolve the tag object SHA via the git refs API (independent of the release body)."""
+    ref = (tag_name or "").lstrip("v")
+    try:
+        url = f"{TAG_REF_URL}/v{ref}"
+        req = urllib.request.Request(url, headers={"User-Agent": "keelwright-update-check"})
+        with urllib.request.urlopen(req, timeout=8) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        return data.get("object", {}).get("sha")
+    except Exception:
+        return None
 
 
 def local_version() -> str | None:
@@ -82,7 +116,16 @@ def fetch_latest() -> str | None:
         with urllib.request.urlopen(req, timeout=8) as resp:
             data = json.loads(resp.read().decode("utf-8"))
         latest = (data.get("tag_name") or "").lstrip("v")
-        return latest if latest else None
+        if not latest:
+            return None
+        # T43 (v1.7.2): verify the release tag provenance before trusting it.
+        tag_sha = fetch_tag_sha(latest)
+        if not verify_release_signature(latest, tag_sha):
+            # Unverified update: do not surface it as a trustworthy upgrade.
+            # Log only (the script is non-blocking by design); the operator sees nothing
+            # on mismatch, avoiding a false "update available" that could push a bad build.
+            return None
+        return latest
     except Exception:
         return None
 

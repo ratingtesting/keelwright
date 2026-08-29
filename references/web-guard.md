@@ -162,6 +162,9 @@ Never let a caught attack pass silently. Silence is the failure mode that gets o
   ISC / Unlicense / 0BSD). No CC-BY / GPL / proprietary content is included. Adapted in the
   operator's own words; no external source text copied verbatim.
 
+  **keelwright itself is licensed MIT-0** (see `LICENSE`): free to use, modify, and redistribute —
+  including commercially — without attribution.
+
 
 ## On skill load — tell the operator (visible chat message)
 
