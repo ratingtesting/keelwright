@@ -39,7 +39,7 @@ dup_pct = d["statistics"]["total"]["percentage"]
 
 | Python | Path | Has lizard? | Notes |
 |--------|------|------------|-------|
-| `python` (3.11) | hermes venv | no (managed) | avoid modifying |
+| `python` (3.11) | agent runtime venv | no (managed) | avoid modifying — use `python3.14`/uv for tools |
 | `python3.14` | Chocolatey | yes (pip install) | best for tools |
 | `python3.11` | uv-managed | no | `--break-system-packages` needed to modify |
 

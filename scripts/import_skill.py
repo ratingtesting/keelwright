@@ -12,18 +12,18 @@ Stdlib only. Usage:
 import zipfile, hashlib, os, sys, time, argparse, json
 from pathlib import Path
 
-HERMES_SKILLS = Path(os.environ.get(
-    "HERMES_SKILLS",
-    os.path.expanduser("~/AppData/Local/hermes/skills")))
+KEELWRIGHT_SKILLS = Path(os.environ.get(
+    "KEELWRIGHT_SKILLS",
+    os.path.expanduser("~/.keelwright/skills")))
 
 SKILL_NAME = "keelwright"
-INSTALL_TO = HERMES_SKILLS / SKILL_NAME
+INSTALL_TO = KEELWRIGHT_SKILLS / SKILL_NAME
 
 # Post-install checks as ARGUMENT VECTORS, never shell strings.
 # {skill} is substituted as a single argv element, so a path containing spaces,
 # quotes, &, ; or | is passed verbatim to the process instead of being parsed by a
 # shell. Building these as strings + shell=True was a command-injection vector: the
-# install path is attacker-influenceable via HERMES_SKILLS.
+# install path is attacker-influenceable via KEELWRIGHT_SKILLS.
 # Each entry: (label, [argv...]) — {skill} placeholders are replaced per element.
 POST_INSTALL_CHECKS = [
     ("SKILL.md YAML", ["{python}", "{skill}/scripts/_check_yaml.py", "{skill}/SKILL.md"]),
@@ -51,18 +51,25 @@ def verify_manifest(zf: zipfile.ZipFile, manifest_data: dict) -> list:
     return errors
 
 
-def find_hermes_skills_dir() -> Path:
-    """Auto-detect the Hermes skills directory across platforms."""
+def find_skills_dir() -> Path:
+    """Auto-detect the agent's skills directory across runtimes (Hermes, OpenClaw, Cursor, Codex, Cline...)."""
     candidates = [
+        Path(os.environ.get("KEELWRIGHT_SKILLS", "")) if os.environ.get("KEELWRIGHT_SKILLS") else None,
+        Path(os.path.expanduser("~/.keelwright/skills")),
         Path(os.path.expanduser("~/AppData/Local/hermes/skills")),
         Path(os.path.expanduser("~/.local/share/hermes/skills")),
         Path(os.path.expanduser("~/.hermes/skills")),
+        Path(os.path.expanduser("~/.openclaw/skills")),
+        Path(os.path.expanduser("~/.cursor/skills")),
+        Path(os.path.expanduser("~/.config/codex/skills")),
+        Path(os.path.expanduser("~/.config/cline/skills")),
     ]
+    candidates = [c for c in candidates if c]
     for c in candidates:
         if c.exists():
             return c
-    # Create the Windows one by default
-    return candidates[0]
+    # Default neutral path (runtime-agnostic)
+    return Path(os.path.expanduser("~/.keelwright/skills"))
 
 
 def extract_skill(zf: zipfile.ZipFile, target: Path, include_internal: bool):
@@ -163,11 +170,11 @@ def import_skill(zip_path: Path, force: bool = False, include_internal: bool = T
         print(f"  All {len(manifest.get('entries', []))} files verified OK")
 
         # 3. Check target
-        env_override = os.environ.get("HERMES_SKILLS")
+        env_override = os.environ.get("KEELWRIGHT_SKILLS")
         if env_override:
             INSTALL_TO = Path(env_override) / SKILL_NAME
         else:
-            INSTALL_TO = find_hermes_skills_dir() / SKILL_NAME
+            INSTALL_TO = find_skills_dir() / SKILL_NAME
         if INSTALL_TO.exists() and not force:
             print(f"\n[STOP] {INSTALL_TO} already exists. Use --force to overwrite.")
             return 1

@@ -14,7 +14,7 @@ import zipfile, os, time, argparse, hashlib
 from pathlib import Path
 
 SKILL = Path(os.environ.get("KEELWRIGHT",
-    os.path.expanduser("~/AppData/Local/hermes/skills/keelwright")))
+    os.path.expanduser("~/.keelwright/skills/keelwright")))
 
 SKIP_PUBLIC = {"internal", "backups", ".git", "__pycache__", ".pytest_cache"}
 SKIP_ALL = {".git", "__pycache__", ".pytest_cache"}
