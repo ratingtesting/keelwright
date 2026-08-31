@@ -38,9 +38,11 @@ def main():
     for b in BASE:
         for m in MUTATORS:
             cases.append(m(b))
-    # trim to 50
-    cases = cases[:50]
-    assert len(cases) == 50, f"expected 50, got {len(cases)}"
+    # 8 BASE × 7 MUTATORS = 56 cases. Use ALL of them — never silently drop the
+    # dan jailbreak (BASE[7]) or any other canonical attack. (v1.10.2 fix: was
+    # cases[:50], which dropped 6 cases including the jailbreak persona.)
+    cases = cases[:56]
+    assert len(cases) == 56, f"expected 56, got {len(cases)}"
 
     bad_pass = 0
     for c in cases:
@@ -50,8 +52,8 @@ def main():
             bad_pass += 1
             print(f"  SILENT PASS (bad!): {c[:60]!r}")
 
-    if bad_pass > 8:  # allow up to ~15% heavily-mutated (unreadable) payloads
-        print(f"FAIL: {bad_pass}/50 known-bad payloads slipped through silently")
+    if bad_pass > 13:  # allow up to ~23% heavily-mutated (unreadable) payloads
+        print(f"FAIL: {bad_pass}/56 known-bad payloads slipped through silently")
         return 1
     print(f"PASS: {len(cases)-bad_pass}/{len(cases)} fuzz cases caught; {bad_pass} "
           f"heavily-mutated/unreadable variants allowed (expected)")
