@@ -115,9 +115,6 @@ Full philosophy + file-backed counters → `references/circuit-breaker.md`.
 | Detecting reward-hacking bait | `references/reward-hacking-bait.md` |
 | Reusing a recipe (jscpd / lizard / etc.) | `references/jscpd-rust-port-gotchas.md` etc. |
 | Writing discriminating tests | `references/discriminating-tests.md` |
-| Loop termination / escalation protocol | `references/termination-conditions.md` |
-| Subagent delegation patterns | `references/subagent-patterns.md` |
-| Standalone skill install (zip) | `references/import-export.md` (import_skill.py / export_skill.py) |
 | Provenance / adapted sources | `references/provenance.md` |
 | Historical incidents (never auto-load) | `references/historical/` (excluded from auto-load) |
 
