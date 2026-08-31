@@ -39,3 +39,14 @@ jobs:
           grep -q "MIT No Attribution" LICENSE || (echo "LICENSE must be MIT-0" && exit 1)
           test -f NOTICE-MIT || (echo "NOTICE-MIT missing" && exit 1)
           echo "license check OK"
+
+  build-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Verify skill index is up to date
+        run: |
+          python scripts/build_skill.py --check

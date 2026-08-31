@@ -38,8 +38,8 @@ def reassemble_skill(index_text: str, refs_dir: Path) -> str:
     out.append("> **Note for agents:** When loaded in a live coding session, read these modules\n")
     out.append("> on demand via `references/<name>.md`. They are inlined here for web display.\n\n")
 
-    # Walk all .md in references/ sorted
-    ref_files = sorted(refs_dir.glob("*.md"))
+    # Walk all .md in references/ sorted (recursive to include bindings/, bootstrap/, etc.)
+    ref_files = sorted(refs_dir.rglob("*.md"))
     for rf in ref_files:
         rel_name = rf.relative_to(ROOT)
         out.append(f"\n--- {rel_name} ---\n\n")
