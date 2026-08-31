@@ -27,6 +27,7 @@ showing a result.
 | R9 | Model version drift | pin model+version in the run contract | warning |
 | R10 | Multi-agent cascade + memory poisoning | isolate agent output; write durable memory only after verify | warning |
 | R11 | Malicious third-party skill | SkillSpector audit BEFORE install | YES |
+| R12 | Scope creep / CONFLICT-resolution | explicit CONFLICT-resolution process (T53) + termination conditions | YES |
 
 ## Gate 1 — Security scan (R1, R2)
 

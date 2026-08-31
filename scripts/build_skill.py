@@ -58,12 +58,27 @@ def main():
     p = argparse.ArgumentParser(description="Assemble layered skill for publication.")
     p.add_argument("--output", "-o", default="SKILL.full.md", help="Output file path")
     p.add_argument("--check", action="store_true", help="Check if output is up-to-date")
-    p.add_argument("--inplace", action="store_true", help="Overwrite SKILL.md directly")
+    p.add_argument("--inplace", action="store_true", help="Overwrite SKILL.md directly (for publication workflows)")
     args = p.parse_args()
 
     if not INDEX_PATH.exists():
         print(f"Error: {INDEX_PATH} not found", file=sys.stderr)
         return 1
+
+    # Symlink guard: refuse to operate if SKILL.md is a symlink (MIN-3c)
+    if INDEX_PATH.is_symlink():
+        print(f"Error: {INDEX_PATH} is a symlink — refusing to operate. Resolve it first.", file=sys.stderr)
+        return 1
+
+    # Inplace warning (MIN-3c)
+    if args.inplace:
+        print("WARNING: --inplace will OVERWRITE the layered index (SKILL.md) with the full assembled doc.")
+        print("This is for publication artifacts ONLY. Normal development keeps SKILL.md as the index.")
+        print("Type 'YES' to confirm: ", end="", flush=True)
+        confirm = sys.stdin.readline().strip()
+        if confirm != "YES":
+            print("Aborted.")
+            return 1
 
     index_text = INDEX_PATH.read_text(encoding="utf-8")
     assembled = reassemble_skill(index_text, REFS_DIR)

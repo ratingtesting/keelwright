@@ -107,13 +107,19 @@ Full philosophy + file-backed counters → `references/circuit-breaker.md`.
 | Naming a known failure mode | `references/risk-glossary.md` (28 modes) |
 | Web trip (search / fetch / browser) | `references/web-guard.md` |
 | Attack caught / logging | `references/attack-registry.md` |
-|| Loop ran too long / failed twice | `references/circuit-breaker.md` + `references/stability-and-learning.md` ||
-|| Merge/rebase conflict in skill source | `references/conflict-resolution.md` (T53) ||
-|| Setting up A/B adversarial QA | `references/qa-testing.md` + `references/qa-trap-catalog.md` ||
+| Loop ran too long / failed twice | `references/circuit-breaker.md` + `references/stability-and-learning.md` |
+| Merge/rebase conflict in skill source | `references/conflict-resolution.md` (T53) |
+| Setting up A/B adversarial QA | `references/qa-testing.md` + `references/qa-trap-catalog.md` |
 | Per-runtime setup (Cursor/Codex/Cline/OpenClaw) | `references/bindings/<runtime>.md` |
 | Built-in rule audit for an external skill | `references/external-skill-audit-tools.md` |
 | Detecting reward-hacking bait | `references/reward-hacking-bait.md` |
 | Reusing a recipe (jscpd / lizard / etc.) | `references/jscpd-rust-port-gotchas.md` etc. |
+| Writing discriminating tests | `references/discriminating-tests.md` |
+| Loop termination / escalation protocol | `references/termination-conditions.md` |
+| Subagent delegation patterns | `references/subagent-patterns.md` |
+| Standalone skill install (zip) | `references/import-export.md` (import_skill.py / export_skill.py) |
+| Provenance / adapted sources | `references/provenance.md` |
+| Historical incidents (never auto-load) | `references/historical/` (excluded from auto-load) |
 
 **Hermes desktop on-demand:** `skill_view(name='keelwright', file_path='references/<name>.md')`.
 **Other runtimes:** include the matching reference in your rules / `AGENTS.md` only when needed.
@@ -223,6 +229,7 @@ No agent? `python scripts/runtime_integration_tester.py --skill-dir .` exercises
 - LICENSE/llms.txt/architecture → MIT-0; GATE 4 fix; import_skill zip validation;
 - check_update pinned-SHA verify.
 
-For the full changelog and migration notes, see `references/changelog.md` (when it exists).
+For the full per-version changelog and migration notes, see the Git history
+(`git log --oneline`) or `RELEASE-*.md` files at the repo root.
 
 

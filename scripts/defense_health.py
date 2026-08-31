@@ -36,17 +36,16 @@ import sys
 # verify_web_guard.py with the same interpreter that is running this script, so there is
 # no hardcoded vendor path or home dir to guess (works on Hermes, OpenClaw, Cursor, Codex,
 # Cline, Kilo, and any venv-based agent on Windows / Linux / macOS).
-# Fallback candidates keep the previous behavior for callers that invoke this script with a
-# system python while the agent venv lives elsewhere.
+# Optional opt-in override for callers that know a specific agent Python:
+#   KEELWRIGHT_AGENT_PYTHON=/path/to/python
 import sys as _sys
-VENV_CANDIDATES = [
-    _sys.executable,
-    os.path.join(os.path.expanduser("~"), ".hermes", "hermes-agent", "venv", "Scripts", "python.exe"),
-    os.path.join(os.path.expanduser("~"), ".hermes", "hermes-agent", "venv", "bin", "python"),
-]
+VENV_CANDIDATES = [_sys.executable]
+if os.environ.get("KEELWRIGHT_AGENT_PYTHON"):
+    VENV_CANDIDATES.insert(0, os.environ["KEELWRIGHT_AGENT_PYTHON"])
 HERE = os.path.dirname(os.path.abspath(__file__))
 VERIFY = os.path.join(HERE, "verify_web_guard.py")
-HERMES_HOME = os.path.join(os.path.expanduser("~"), ".hermes")
+# Home dir for keelwright-managed artifacts (attack log, config). Override with KEELWRIGHT_HOME.
+HERMES_HOME = os.environ.get("KEELWRIGHT_HOME", os.path.join(os.path.expanduser("~"), ".hermes"))
 CAUGHT = os.path.join(HERMES_HOME, "injection-guard", "caught_attacks.jsonl")
 CONFIG = os.path.join(HERMES_HOME, "config.yaml")
 AGENT_DEFENSE = os.path.join(HERMES_HOME, "skills", "agent-defense", "SKILL.md")
