@@ -29,7 +29,7 @@ AI coding session. It is designed for non-programmers who use AI to write code.
    understands. No jargon in user-facing messages.
 
 5. **Risk glossary**: 28 named failure modes mapped to enforcement mechanisms.
-   See SKILL.md §Risk glossary for the full table.
+   See `references/risk-glossary.md` for the full table (loaded on demand, not in SKILL.md).
 
 ## Do NOT
 

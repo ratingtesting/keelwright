@@ -6,6 +6,23 @@
 
 ---
 
+## Architecture (v1.10.0+)
+
+**Layered skill.** `SKILL.md` is a thin **index** (~3K tokens) that the agent loads once.
+Heavy detail lives in `references/*.md` and loads on demand:
+
+- **Hermes desktop:** `skill_view(name='keelwright', file_path='references/<name>.md')`
+- **Cursor / Codex / Cline / OpenClaw:** include the matching `references/<name>.md`
+  in your `AGENTS.md` / rules when the situation matches the Map table in SKILL.md.
+- **Public registries (skills.sh / ClawHub / askill.sh):** display the **assembled**
+  full document — built by `python scripts/build_skill.py` from index + references.
+
+Why this shape: keeps agent context lightweight (saves ~14K tokens per session start vs a
+monolithic SKILL.md) without sacrificing discoverability for visitors of public registries.
+See [`docs/ADR-001-layered-skill.md`](docs/ADR-001-layered-skill.md) for the full decision.
+
+---
+
 ## The problem
 
 You use AI to write code. You're not a developer — you're a founder, a builder, a product person.
