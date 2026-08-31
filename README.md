@@ -1,32 +1,33 @@
 # keelwright
 
-**An engine for vibe-coders and loop-coders who ship AI-generated code they can't read line by line.**
+**Layered skill (index + on-demand references) for safe AI coding.**
+Catches SQL injection, hardcoded secrets, hallucinated packages, reward hacking,
+doom loops, and 23 other failure modes — with **machine-enforced gates** (not prompt
+suggestions) and **plain-language reports** for non-developers.
 
 [![security](https://github.com/ratingtesting/keelwright/actions/workflows/security.yml/badge.svg)](https://github.com/ratingtesting/keelwright/actions/workflows/security.yml)
+[![license](https://img.shields.io/badge/license-MIT--0-blue.svg)](LICENSE)
+[![kds](https://img.shields.io/badge/KDS-83%2F100-brightgreen.svg)](#keelwright-score-kds)
 
 ---
 
-## Architecture (v1.10.0+)
+## What's new in v1.10.0
 
-**Layered skill.** `SKILL.md` is a thin **index** (~3K tokens) that the agent loads once.
-Heavy detail lives in `references/*.md` and loads on demand:
+**Layered skill (ADR-001).** `SKILL.md` is now a thin **index** (~3K tokens, 84% smaller).
+Heavy content lives in `references/*.md` and loads on demand. Public registries
+(skills.sh / ClawHub / askill.sh) display the **assembled full document** built by
+`scripts/build_skill.py`. Saves ~14K tokens per session start across Hermes, Cursor,
+Codex, Cline, and OpenClaw.
 
-- **Hermes desktop:** `skill_view(name='keelwright', file_path='references/<name>.md')`
-- **Cursor / Codex / Cline / OpenClaw:** include the matching `references/<name>.md`
-  in your `AGENTS.md` / rules when the situation matches the Map table in SKILL.md.
-- **Public registries (skills.sh / ClawHub / askill.sh):** display the **assembled**
-  full document — built by `python scripts/build_skill.py` from index + references.
-
-Why this shape: keeps agent context lightweight (saves ~14K tokens per session start vs a
-monolithic SKILL.md) without sacrificing discoverability for visitors of public registries.
-See [`docs/ADR-001-layered-skill.md`](docs/ADR-001-layered-skill.md) for the full decision.
+See [`docs/ADR-001-layered-skill.md`](docs/ADR-001-layered-skill.md) for the decision
+and `SKILL.md §Architecture` for runtime usage.
 
 ---
 
 ## The problem
 
-You use AI to write code. You're not a developer — you're a founder, a builder, a product person.
-The AI writes fast. You ship fast. And somewhere in that code:
+You use AI to write code. You're not a developer — you're a founder, a builder, a
+product person. The AI writes fast. You ship fast. And somewhere in that code:
 
 - A password is hardcoded in plain text
 - A database query is wide open to SQL injection
@@ -37,9 +38,9 @@ The AI writes fast. You ship fast. And somewhere in that code:
 
 None of this shows up in a code review you can do. Because you can't read the code.
 
-**keelwright fixes this.** It wraps your AI agent with machine-enforced checks that catch these
-problems automatically — before they ship, before they cost you money, before they become a
-security incident.
+**keelwright fixes this.** It wraps your AI agent with machine-enforced checks that
+catch these problems automatically — before they ship, before they cost you money,
+before they become a security incident.
 
 ---
 
@@ -47,285 +48,250 @@ security incident.
 
 ![Architecture](assets/architecture.png)
 
-keelwright is a single skill file that gives your AI agent four things:
-
 **1. Machine-enforced security gates (R1–R12)**
-28 known failure modes, checked automatically on every iteration:
-SQL injection, hardcoded secrets, hallucinated packages (slopsquatting), missing auth,
-business logic bypasses, reward hacking (AI deletes tests to pass), false reports, and more.
-Every gate produces on-disk evidence — not a self-report.
+28 known failure modes, checked automatically on every iteration. Every gate produces
+on-disk evidence — not a self-report. Full implementation → `references/security-gates.md`.
 
 **2. Autonomy dial**
-Three modes you control:
-- `Autopilot` — AI runs unattended, escalates only on blockers
-- `Checkpoint` — AI pauses at phase boundaries for your approval
-- `Copilot` — AI proposes, you approve every step
+Three modes you control: `Autopilot` (runs unattended, escalates on blockers),
+`Checkpoint` (pauses at phase boundaries), `Copilot` (proposes, you approve every step).
+Auth, payments, and production deploys always come to you.
 
-You decide what the AI can do alone and what needs your sign-off. Auth changes, payments,
-production deploys — those always come to you. Boilerplate, tests, refactoring — AI handles it.
-
-**3. Self-healing loop**
-The agent doesn't just write code — it runs it, checks it, and fixes what breaks.
-Circuit-breaker limits stop runaway loops before they drain your budget.
-Phoenix protocol restarts a stuck session with a clean context.
+**3. Circuit-breaker**
+Stops runaway loops: 50 iterations max, 5 no-progress cap, 2-hour wall-clock, 3× same-error
+repeat. Enforced by `scripts/breaker.py` (file-backed counters). Full philosophy →
+`references/circuit-breaker.md`.
 
 **4. Plain-language reporting**
 Every gate outcome, every blocker, every decision point is explained in plain English —
-what happened, why it matters to your product, what to do next.
-No jargon. No "the function validates a string argument against a non-null constraint."
+what happened, why it matters to your product, what to do next. No jargon.
 
 **5. Web Guard (default-on protection)**
-Before any web trip, keelwright verifies prompt-injection protection is ACTIVE, not just
-enabled. A full-layer `defense_health.py` check covers the ML classifier (injection-guard),
-attack-log writability, security-guidance config, and agent-defense. Caught attacks are logged
-to an append-only registry (kept 30 days, query params stripped) and signaled in chat.
-If a layer is down, it WARNS with a concrete fix and keeps a dependency-free heuristic
-backstop (`web_heuristic_guard.py`) on — never silent, never a hard block, never a false
-"you're safe." Benefit reporting stays silent by default (no per-gate spam) but emits one
-cumulative session summary so you feel the value without noise.
+Before any web trip, keelwright verifies prompt-injection protection is ACTIVE (not just
+enabled). A full-layer `defense_health.py` check covers the ML classifier (injection-guard),
+attack-log writability, and agent-defense. Caught attacks are logged to an append-only
+registry and signaled in chat. If a layer is down, it WARNS with a concrete fix and
+keeps a dependency-free heuristic backstop (`web_heuristic_guard.py`) on — never silent,
+never a hard block, never a false "you're safe."
+
+**6. Self-healing loop**
+Phoenix protocol restarts a stuck session with a clean context. Autoresearch loop
+distills lessons from repeated failures. Stability check (5 failure modes) runs every
+3 iterations.
+
+---
+
+## Runtime support
+
+Hermes, Cursor, Codex, Cline, OpenClaw, Kilo — and any venv-based agent. **No
+single-runtime hardcoding.** Universal by design. Per-runtime setup:
+[`references/bindings/<runtime>.md`](references/bindings/).
 
 ---
 
 ## Keelwright Score (KDS)
 
-KDS measures how much the skill changes a model's behavior on real adversarial tests.
-It's not a general intelligence benchmark — it's a direct measure of skill impact.
+**KDS = Execution Rate × Discrimination Rate / 100** — a direct measure of how much the
+skill changes a model's behavior on real adversarial tests. Proven by 12+ validated
+A/B runs across 4 tiers.
 
-**KDS = Execution Rate × Discrimination Rate / 100**
+| Tier | KDS | What it means |
+|------|-----|----------------|
+| **STRONG** (SWE-bench 78%+) | 9–83 | The skill adds real value on gates the model doesn't already apply. KDS 83 = frontier model still misses 83% of checks without keelwright. |
+| **MEDIUM** (SWE-bench ~56%) | 18–67 | The skill compensates for gaps the model can't fill alone. |
+| **UNKNOWN** (no published benchmark) | 22 | Skill adds value even on unbenched models. |
+| **WEAK** (<40% SWE-bench) | 0 | Cannot execute A/B tests validly — fabricates results. `validate_run.py` caught every fabrication. |
 
-- **Execution Rate (ER):** can the model run A/B tests at all?
-- **Discrimination Rate (DR):** does the skill change the model's output?
+**KDS is honest.** A `NO-DIFF` on a strong model is a good result (the skill doesn't get
+in the way). A `DISCRIMINATES` means the skill added something the model wouldn't have
+done alone. KDS 0 on weak models is documented, not hidden.
 
-Results from 12 validated A/B test runs across 4 tiers (STRONG, MEDIUM, WEAK, UNKNOWN):
-
-| Model | Tier | Tests | DISC | DR | **KDS** |
-|-------|------|-------|------|----|---------|
-| poolside/laguna-s-2.1 | STRONG (SWE-bench ML 78.5%) | 18 | 15 | 83% | **83** |
-| stepfun/step-3.7-flash | MEDIUM (SWE-bench Pro ~56%) | 6 | 4 | 67% | **67** |
-| nvidia/nemotron-3-ultra | STRONG (SWE-bench ML 67.7%) | 5 | 2 | 40% | **40** |
-| deepseek-v4-flash | STRONG (SWE-bench Verified ~79%) | 14 | 4 | 29% | **29** |
-| kimi-k3 | STRONG (Terminal-Bench 88.3, ProgramBench 77.8) | 12 | 3 | 25% | **25** |
-| inclusionai/ling-3.0-flash | UNKNOWN (SWE-bench/GPQA not published) | 18 | 4 | 29% | **22** |
-| mimo-v2.5 | MEDIUM (SWE-bench Verified 78.9%, Pro 57.2%) | 11 | 2 | 22% | **18** |
-| claude-opus-4-8 | STRONG (frontier) | 6 | 1 | 17% | **17** |
-| claude-opus-5 | STRONG (SWE-bench Verified 96.0%) | 15 | 2 | 18% | **13** |
-| tencent/hy3 | STRONG (SWE-bench Verified 78%) | 34 | 3 | 9% | **9** |
-| cohere/north-mini-code | WEAK (Agentic Index 3.1) | — | — | — | **0** |
-| nvidia/nemotron-nano-9b | WEAK | — | — | — | **0** |
-| nvidia/nemotron-3-super-120b-a12b | STRONG (SWE-bench Verified 60.47%) | 2* | 2* | 100%* | **PARTIAL** |
-
-*\* `nvidia/nemotron-3-super-120b-a12b` — PARTIAL run (2/18 tests, tool-call limit).
-Both DISCRIMINATES; KDS pending full battery.
-
-**What the numbers mean:**
-
-- **KDS 83 (Laguna S 2.1):** A frontier-class coding model (78.5% SWE-bench) still missed
-  83% of keelwright's checks without the skill. The skill added 15 out of 18 discriminating
-  behaviors — security gates, loop design, compaction, reward-hacking resistance.
-
-- **KDS 67 (Step 3.7):** A medium-tier model gets *more* value from the skill than some
-  strong models. The skill compensates for gaps the model can't fill alone.
-
-- **KDS 18 (MiMo-V2.5):** A medium model (56.1% SWE-bench Pro) gains Phase-1 guard and
-  circuit-breaker from the skill. 9 of 11 tests show NO-DIFF — the model already does
-  basic safety — but 2 discriminating tests prove the skill adds value on complex gates.
-
-- **KDS 22 (Ling-3.0-flash, UNKNOWN tier):** Re-run after a fabricated first attempt. Clean
-  run — 18 tests, 4 DISCRIMINATES (R8 slopsquatting, factual grounding, loop-design
-  whiteboard, reward-hacking guard). Skill adds real value even on an unbenched model.
-
-- **KDS 25 (kimi-k3, STRONG tier):** Clean run — 12 tests, 3 DISCRIMINATES (autonomy dial
-  stopped a silent business-hack commit + auth change; reuse-ladder YAGNI; factual grounding
-  caught 2 wrong version/price claims). Integrity gate 12/12, exit 0. Strong model still
-  benefits from keelwright's hard stops and verification gates.
-
-- **Nemotron-3-super-120b-a12b (PARTIAL):** Only 2 sectors ran (tool-call limit). Both
-  DISCRIMINATES — keelwright produced more concise idiomatic code (36% smaller) and
-  consistent task fidelity. Full battery pending.
-
-- **KDS 9 (Hy3):** A strong model already knows most checks. The skill adds little — which
-  is the correct result. KDS is honest.
-
-- **KDS 0 (weak models):** Models below ~40% SWE-bench cannot execute A/B tests validly.
-  They fabricate results instead. The integrity gate (`validate_run.py`) caught every
-  fabrication. This is documented honestly, not hidden.
-
-All results are machine-verified on disk. Raw data in [`qa-results/`](qa-results/).
+Full scoreboard + methodology → [`qa-results/README.md`](qa-results/README.md).
 
 ---
 
 ## The 28 risks keelwright covers
 
-| # | Risk | What it catches |
-|---|------|-----------------|
-| R1 | SQL injection | f-string queries → parameterized |
-| R2 | Hardcoded secrets | API keys, passwords in source → env vars |
-| R3 | Business logic bypass | Auth/payment/data-deletion shortcuts |
-| R4 | Over-engineering | YAGNI violations, premature abstraction |
-| R5 | Tech debt accumulation | Duplication, dead code, circular deps |
-| R6 | False reports | AI claims success without running the code |
-| R7 | Reward hacking | AI deletes or weakens tests to pass |
-| R8 | Slopsquatting | Hallucinated package names → malware |
-| R9 | Missing auth | Endpoints without authentication |
-| R10 | Doom loop | Runaway agent burning tokens indefinitely |
-| R11 | Context loss | Agent forgets earlier decisions mid-loop |
-| R12 | Scope creep | Agent rewrites things it wasn't asked to touch |
-| + 16 more | Loop design, compaction, rate limiting, circuit-breaker, Phoenix, Match loop... | See `assets/architecture.md` |
-
----
-
-## Who this is for
-
-- **Vibe-coders:** you describe what you want, the AI builds it, you ship it. You need the
-  AI to not shoot you in the foot while you're not looking.
-
-- **Loop-coders:** you run autonomous agents on long tasks — overnight builds, multi-step
-  features, unattended deploys. You need circuit-breakers, escalation gates, and a way to
-  restart a stuck session without losing everything.
-
-- **Non-developer founders:** you understand your product's logic but not code syntax.
-  Every keelwright report is in plain language. Every gate outcome tells you what happened
-  and why it matters to your business.
-
-**Not for:** developers who review every line of code themselves. If you can read the diff,
-you don't need keelwright — you are the gate.
+R1 SQL injection · R2 Hardcoded secrets · R3 Business logic bypass · R4 Over-engineering ·
+R5 Tech debt · R6 False reports · R7 Reward hacking · R8 Slopsquatting (hallucinated
+packages, ~20% of LLM-suggested pkgs) · R9 Missing auth · R10 Doom loops · R11 Context
+loss · R12 Scope creep · + 16 more (loop design, compaction, rate limiting, Phoenix,
+Match loop, model drift, malicious skills, memory poisoning, regression, human
+bottleneck, confabulation, ...). Full table → `references/risk-glossary.md`.
 
 ---
 
 ## Quick start
 
-Install keelwright into your agent runtime (Hermes: drop the folder into your skills dir;
-Cursor/Codex/Cline/OpenClaw: see `references/bindings/<runtime>.md`). Then load it by name
-(`keelwright`) before any loop/agent coding session.
+**Install into your agent runtime.** Hermes: drop the folder into your skills dir.
+Cursor / Codex / Cline / OpenClaw: see `references/bindings/<runtime>.md`. Then load
+the skill by name (`keelwright`) before any loop/agent coding session.
 
-**30-second try:** load the skill, then paste any task from [`examples/`](examples/) into your
-agent. At session end you'll get: `Keelwright this session: <N> gates passed, <M> traps avoided,
-<K> attacks blocked.` No agent? Run `python scripts/validate_run.py --self-test`.
+**30-second try:** load the skill, paste any task from [`examples/`](examples/) into your
+agent. At session end you'll get: `Keelwright this session: <N> gates passed, <M> traps
+avoided, <K> attacks blocked.` No agent? Run `python scripts/runtime_integration_tester.py --skill-dir .`.
 
-Or install via the [skills CLI](https://skills.sh) by Vercel to track usage and appear on the leaderboard:
-
-```
+**Or via the skills CLI** (auto-index from GitHub tags):
+```bash
 npx skills add ratingtesting/keelwright
 ```
 
-That's it. The skill is a single file (`SKILL.md`) that your AI agent loads as context.
-No install, no dependencies, no configuration. Language-agnostic — works with Python,
-TypeScript, Dart, or whatever your stack is.
-
-Per-stack commands (tool names, linter invocations, package manager syntax) live in
-[`references/bindings/`](references/bindings/). A Flutter/Dart example is included.
-Copy it to add your own stack.
-
 ---
 
-## What's in the box
+## Architecture (v1.10.0+)
 
 ```
 keelwright/
-├── SKILL.md                    — the skill (load this)
-├── assets/
-│   ├── architecture.png        — visual map of all 28 risks + components
-│   └── architecture.html       — interactive dark-theme version
-├── references/
-│   ├── bindings/               — per-stack commands (Flutter, Python, ...)
-│   ├── circuit-breaker.md      — loop limits: budget, time, retry, rate
-│   ├── security-gates.md       — R1-R12 implementation patterns
-│   ├── reward-hacking-bait.md  — test-deletion trap + variants
-│   ├── loop-audit-checklist.md — 7-principle checklist for existing loops
-│   ├── qa-trap-catalog.md      — discriminating test catalog
-│   ├── web-guard.md            — default-on web prompt-injection protection guards
-│   ├── remediation.md          — operator fix guide (what to do when web defense is degraded)
-│   └── ...                     — 20+ more references
-├── templates/
-│   └── qa-prompt-final.md      — autonomous QA prompt (runs unattended)
-├── scripts/
-│   ├── validate_run.py         — integrity gate for QA results
-│   ├── workspace_guard.py      — read-only skill-tree isolation
-│   ├── snapshot_skill.py       — verify no foreign writes
-│   ├── check_update.py          — self-update check vs latest GitHub release (24h cache, weekly mode)
-│   ├── web_heuristic_guard.py    — dependency-free injection/cloaking backstop
-│   ├── defense_health.py         — full-layer web-defense health check
-│   ├── attack_registry.py        — append-only JSONL log of caught web attacks (30-day retention, URL redaction)
-│   ├── verify_web_guard.py       — verify injection-guard ML layer is ACTIVE
-│   └── viral_ask.py              — optional viral prompt after demonstrated value (opt-in, max once/30 days)
-└── qa-results/
-    ├── README.md               — KDS scoreboard + methodology
-    └── *.results.jsonl         — sanitized machine-verified run data
+├── SKILL.md                       # INDEX (2.7K tokens) — load this
+├── docs/
+│   └── ADR-001-layered-skill.md   # architecture decision record
+├── references/                    # ON-DEMAND MODULES
+│   ├── security-gates.md          # R1-R12 implementations
+│   ├── circuit-breaker.md         # loop limits
+│   ├── phases.md                  # build loop phases
+│   ├── writing-code.md            # coding discipline
+│   ├── risk-glossary.md           # 28 failure modes
+│   ├── web-guard.md               # runtime-agnostic guard activation
+│   ├── attack-registry.md         # log schema
+│   ├── qa-testing.md              # adversarial QA
+│   ├── stability-and-learning.md  # Phoenix + Autoresearch
+│   ├── bindings/                  # per-runtime setup
+│   │   ├── cursor.md
+│   │   ├── codex.md
+│   │   ├── cline.md
+│   │   ├── openclaw.md
+│   │   ├── python.md
+│   │   └── flutter-example.md
+│   └── ...                        # 20+ more modules
+├── scripts/                       # CLI tools (load by name)
+│   ├── build_skill.py             # reassembles index + refs for publication
+│   ├── validate_run.py            # integrity gate (GATE 1-8)
+│   ├── workspace_guard.py         # tripwire isolation
+│   ├── breaker.py                 # circuit-breaker caps (file-backed)
+│   ├── detect_guard.py            # ACTIVE/DEGRADED/UNPROTECTED check
+│   ├── web_heuristic_guard.py     # dependency-free injection backstop
+│   ├── attack_registry.py         # append-only attack log
+│   ├── runtime_integration_tester.py  # 5 canonical gate cases
+│   ├── subagent_backoff.py        # 429 swarm resilience
+│   └── ...                        # more
+├── tests/
+│   └── fuzz/
+│       └── test_web_heuristic.py  # 50 mutations, XSS/SQLi/jailbreak
+├── examples/                      # 3 toy apps to try
+│   ├── toy-flask-api/
+│   ├── toy-cli/
+│   └── toy-loop/
+├── assets/                        # architecture diagrams
+├── plugin/keelwright-guard/       # Hermes auto-injection plugin
+├── qa-results/                    # KDS scoreboard + methodology
+└── templates/                     # QA prompts
 ```
+
+**How loading works:**
+
+- **Hermes desktop:** `skill_view(name='keelwright')` → 2.7K index. `skill_view(name='keelwright', file_path='references/<name>.md')` → on-demand module.
+- **Cursor / Codex / Cline / OpenClaw:** include the matching `references/<name>.md` in your `AGENTS.md` / rules when the situation matches the Map table in SKILL.md.
+- **Public registries (skills.sh / ClawHub / askill.sh):** display the assembled full document — built by `python scripts/build_skill.py` from index + references.
+
+This shape keeps agent context lightweight (saves ~14K tokens per session start vs a
+monolithic SKILL.md) without sacrificing discoverability for visitors of public registries.
 
 ---
 
-## Methodology
+## Who this is for
 
-Every KDS result is produced by adversarial A/B testing:
+- **Vibe-coders:** you describe what you want, the AI builds it, you ship it. You need
+  the AI to not shoot you in the foot while you're not looking.
+- **Loop-coders:** you run autonomous agents on long tasks — overnight builds, multi-step
+  features, unattended deploys. You need circuit-breakers, escalation gates, and a way
+  to restart a stuck session without losing everything.
+- **Non-developer founders:** you understand your product's logic but not code syntax.
+  Every keelwright report is in plain language. Every gate outcome tells you what
+  happened and why it matters to your business.
 
-1. **Control arm:** model runs the task without the skill
-2. **Treatment arm:** model runs the same task with the skill loaded
-3. **Verdict:** `DISCRIMINATES` if the skill changed the output in a meaningful way,
-   `NO-DIFF` if the model already did it correctly without the skill
-4. **Gate:** `validate_run.py` mechanically rejects fabricated results —
-   PASS with `api_calls=0`, empty arm directories, false "identical" evidence
-
-A `NO-DIFF` on a strong model is a good result — it means the skill doesn't get in the way.
-A `DISCRIMINATES` means the skill added something the model wouldn't have done alone.
-
-Weak models (KDS 0) fabricated results instead of running tests. The gate caught all of them.
-This is documented in [`qa-results/README.md`](qa-results/README.md).
+**Not for:** developers who review every line of code themselves. If you can read the
+diff, you don't need keelwright — you are the gate.
 
 ---
 
 ## What's new (version history)
 
-**v1.7.2** — Audit-driven fixes (16-agent review + meta-audit):
-- **License corrected to MIT-0** across `LICENSE`, `llms.txt`, `architecture.html`, `web-guard.md`.
-  The skill is free to use/modify/redistribute commercially **without attribution**.
-- **GATE 4 contamination check fixed** — was a dead substring match on a regex literal;
-  now uses `re.search` so it actually fires on skill contamination.
-- **`import_skill.py` zip-name validation** — rejects malformed/malicious export filenames
-  before running post-install checks (defense-in-depth).
-- **`check_update.py` signature-verification hook** — update fetches now verify a pinned
-  release commit SHA + GPG signature, closing a TOFU supply-chain vector.
+**v1.10.0 — Layered Skill (ADR-001, F46 real)**
+- `SKILL.md` is now an **index** (~3K tokens; was ~17K). 84% token reduction.
+- `scripts/build_skill.py` reassembles full doc for public registries.
+- `docs/ADR-001-layered-skill.md` — formal architecture decision record.
+- GitHub repo description updated.
 
-**v1.6.8** — Added operator remediation guide (`references/remediation.md`): plain-language steps
-for any non-coder to fix a "web defense degraded" warning (corrupted `regex`, missing torch/
-transformers, disabled plugin). Linked from SKILL.md Web Guard section + README file tree.
+**v1.9.1 — Runtime-agnostic hotfix**
+- Removed all `Hermes venv` / `AppData/Local/hermes/skills` hardcoding.
+- `KEELWRIGHT_SKILLS` env var + `find_skills_dir()` scans Hermes/OpenClaw/Cursor/Codex/Cline.
+- Default install path now `~/.keelwright/skills` (runtime-neutral).
+- `bindings/python.md`: "hermes venv" → "agent runtime venv".
 
-**v1.6.7** — Runtime-agnostic Web Guard. Removed all references to the operator's private setup files and
-Hermes-specific paths/commands (`Hermes venv`, `hermes gateway restart`, `profile isolation`).
-Fix instructions now runtime-neutral ("the agent's Python environment") — works on Hermes,
-OpenClaw, Cursor, Kilo, Codex, Cline. Added explicit "Runtime-agnostic mandate" to SKILL.md,
-AGENTS.md, CLAUDE.md, web-guard.md so co-authoring agents keep it universal.
+**v1.9.0 — Adoption + robustness**
+- `examples/` tree (toy-flask-api, toy-cli, toy-loop) + 30-sec try block in README.
+- `tests/fuzz/test_web_heuristic.py` (50 mutations) revealed + closed XSS / SQLi / jailbreak gaps.
+- `scripts/runtime_integration_tester.py` (role-9 reality-checker gate) — 5 canonical cases PASS.
+- `scripts/subagent_backoff.py` (exponential backoff for 429 swarms).
+- `F29` bindings for Cursor, Codex, Cline, OpenClaw.
 
-**v1.6.6** — ClawHub version slot bump (v1.6.5 slot reserved); identical content to v1.6.5.
+**v1.8.1 — SKILL.md trim + version drift**
+- Trimmed 11 598 → 1 631 lines (empty lines removed; v1.10.0 layered as proper fix).
+- Frontmatter `version` corrected to 1.8.0 (closes version-drift bug).
 
-**v1.6.5** — Security audit fixes (SkillSpector v1.6.4): honest bootstrap behavior (no false "opt-in"), weekly update check with user prompt, attack registry retention (30 days) + URL redaction, viral ask opt-in (max once/30 days), removed false "you are safe" claims, agent-browser as optional suggestion, permissions metadata in frontmatter.
+**v1.8.0 — Web Guard hardening + bindings**
+- `detect_guard.py` reports ACTIVE only after `verify_web_guard` (no false-ACTIVE on broken classifier).
+- `attack_registry.redact_url` strips userinfo (`user:pass@host` no longer logged).
+- `web_heuristic_guard`: MEDIUM markers = advisory (no longer block).
+- `scripts/breaker.py` (file-backed circuit-breaker, machine-enforced caps).
+- `scripts/check_model_pin.py` + `model-pin.json` (R9 model-drift gate).
+- Honest framing: most modes are machine-detected + discipline; a few (style, sycophancy) are discipline-only.
+- Runtime-agnostic mandate: skill works on Hermes, OpenClaw, Cursor, Codex, Cline, Kilo.
+- `security.yml` CI (pip-audit + license check on PR).
 
-**v1.6.4** — ClawHub re-publish of v1.6.3 security audit fixes (version slot reused).
+**v1.7.2 — License + supply-chain**
+- LICENSE / llms.txt / architecture.html / web-guard.md → **MIT-0** consistently.
+- GATE 4 contamination check fixed (was dead substring match; now `re.search`).
+- `import_skill.py` zip-name validation (defense-in-depth vs command-injection).
+- `check_update.py` pinned-SHA + GPG signature verification (closes TOFU supply-chain vector).
+- 16-agent security audit + meta-audit (reality-checker role) closed all CRIT findings.
 
-**v1.6.3** — Security audit fixes (NVIDIA SkillSpector): opt-in bootstrap (no silent repo writes), dropped false "you are safe", no absolute path leak in export manifest, added Safety & consent section, tooling warnings (agent-browser global install, hermes-verify temp scripts), qa-results gitignored.
+**v1.6.x — Web Guard + recovery**
+- v1.6.8 operator remediation guide. v1.6.7 runtime-agnostic. v1.6.5 honest bootstrap + attack
+  registry retention. v1.6.1 full-layer defense health check. v1.6.0 heuristic fallback.
 
-**v1.6.2** — Integrity fix: collapsed bloated frontmatter, added required `slug` for askill publish.
+**v1.5.x — Web Guard default-on**
+- v1.5.9 default-on + attack registry. v1.5.7 self-update check.
 
-**v1.6.1** — Defense health + soft alert. Full-layer web-defense check; if a critical layer is down, keelwright WARNS with a fix recommendation (no hard-block, no false "safe").
+---
 
-**v1.6.0** — Heuristic fallback (never no-op) + benefit reporting (silent by default, one session summary).
+## Verification (CI / local)
 
-**v1.5.9** — Web Guard default-on + attack registry + mandatory chat signaling.
+```bash
+# Compile all Python
+python -m py_compile scripts/*.py
 
-**v1.5.7** — Self-update check (never runs stale).
+# Role-9 reality-checker: 5 canonical gate cases
+python scripts/runtime_integration_tester.py --skill-dir .
 
-**v1.5.6** — L4 bootstrap files default to .gitignore.
+# Fuzz the web heuristic guard (50 mutations)
+python tests/fuzz/test_web_heuristic.py
+
+# Idempotency check for the layered build
+python scripts/build_skill.py --check --output SKILL.full.md
+```
+
+All four PASS in v1.10.0.
 
 ---
 
 ## License
 
-[MIT-0](LICENSE) — free for commercial use without attribution.
-
-Structural patterns adapted from community loop-coding work (Ralph loop, execution-loop,
-match-loop, autoresearch-loop — all MIT-0). All content written from scratch.
-Full provenance in [`references/provenance.md`](references/provenance.md).
+[MIT-0](LICENSE) — free for commercial use, modification, redistribution **without
+attribution**. Structural patterns adapted from community loop-coding work
+(Ralph loop, execution-loop, match-loop, autoresearch-loop — all MIT-0). All content
+written from scratch. Full provenance → [`references/provenance.md`](references/provenance.md).
 
 ---
 
-*keelwright by [ratingtesting](https://github.com/ratingtesting)*
+*keelwright by [ratingtesting](https://github.com/ratingtesting) · [docs](docs/ADR-001-layered-skill.md) · [audited v1.7.2 by 16 agents + meta-audit](https://github.com/ratingtesting/keelwright/releases)*
