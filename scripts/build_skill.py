@@ -39,7 +39,13 @@ def reassemble_skill(index_text: str, refs_dir: Path) -> str:
     out.append("> on demand via `references/<name>.md`. They are inlined here for web display.\n\n")
 
     # Walk all .md in references/ sorted (recursive to include bindings/, bootstrap/, etc.)
+    # Exclude directories that must never be auto-inlined.
+    EXCLUDE_DIRS = {"historical", "internal"}
     ref_files = sorted(refs_dir.rglob("*.md"))
+    ref_files = [
+        rf for rf in ref_files
+        if not any(part in EXCLUDE_DIRS for part in rf.relative_to(ROOT).parts)
+    ]
     for rf in ref_files:
         rel_name = rf.relative_to(ROOT)
         out.append(f"\n--- {rel_name} ---\n\n")

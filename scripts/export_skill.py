@@ -34,7 +34,10 @@ def add_to_zip(zf: zipfile.ZipFile, base: Path, pattern: str = "*",
     for f in sorted(base.rglob(pattern)):
         if not f.is_file():
             continue
-        if any(p in skip_dirs for p in f.relative_to(base).parts):
+        if info.is_symlink():
+            continue
+        rel_parts = f.relative_to(base).parts
+        if any(part in skip_dirs for part in rel_parts):
             continue
         size = f.stat().st_size
         if size > max_bytes:

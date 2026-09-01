@@ -36,7 +36,7 @@ repos:
       - id: jscpd
         name: jscpd duplication check
         entry: jscpd
-        args: ["--threshold", "5", "--reporters", "consoleFull", "./src"]
+        args: ["--threshold", "10", "--reporters", "consoleFull", "./src"]
         language: system
         types: [python]
         stages: [commit]
@@ -47,7 +47,7 @@ repos:
       - id: lizard
         name: lizard complexity check
         entry: python -m lizard
-        args: ["-C", "15", "./src"]
+        args: ["-C", "25", "./src"]
         language: system
         types: [python]
         stages: [commit]

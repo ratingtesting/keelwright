@@ -200,6 +200,26 @@ def check(run_dir: Path, rec: dict) -> list[str]:
                         f"'{run_name}') -> cross-run contamination. INVALID.")
             break
 
+    # GATE 7 — review-request record integrity: every R3-class commit must have a review report.
+    # This is a lightweight presence check: the record should reference a review artifact
+    # (report path or inline review block). Absence means the commit bypassed review.
+    review_ref = str(rec.get("review_report", "") or rec.get("review", "") or "").strip()
+    if review_ref == "" and rec.get("requires_review", False):
+        errs.append(f"[{tid}] requires_review=true but no review_report/review field present. "
+                    f"Review request not recorded. INVALID.")
+
+    # GATE 8 — verification checklist: for code changes, the review must attest that
+    # the reported diff matches disk, tests moved red->green, and discriminating tests exist.
+    # We do not re-run tests here; we check that the review RECORD contains these attestations.
+    if review_ref:
+        review_text = review_ref.lower()
+        if "diff" not in review_text and "report" not in review_text:
+            errs.append(f"[{tid}] review record does not mention diff/report — cannot verify "
+                        f"review was performed against actual changes. INVALID.")
+        if "test" in review_text and "red" not in review_text and "green" not in review_text:
+            errs.append(f"[{tid}] review mentions tests but does not attest red->green transition. "
+                        f"Verification checklist incomplete. INVALID.")
+
     return errs
 
 

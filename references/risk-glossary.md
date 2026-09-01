@@ -95,6 +95,7 @@
 ## Cross-References
 
 - **R1-R12 implementations** → `references/security-gates.md` (machine-enforced gates)
+- **R13-R28 gates** → this file
 - **T53 CONFLICT-resolution (R12)** → `references/conflict-resolution.md`
 - **Loop termination** → `references/circuit-breaker.md`
 - **Build phases** → `references/phases.md`

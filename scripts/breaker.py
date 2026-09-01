@@ -25,6 +25,7 @@ DEFAULT_STATE = os.path.join(os.getcwd(), ".keelwright_loop_state.json")
 
 # Caps (mirror SKILL.md circuit-breaker table)
 MAX_ITERS = int(os.environ.get("KEELWRIGHT_MAX_ITERS", "50"))
+ABSOLUTE_MAX_ITERS = int(os.environ.get("KEELWRIGHT_ABSOLUTE_MAX_ITERS", "100"))
 NO_PROGRESS_CAP = int(os.environ.get("KEELWRIGHT_NO_PROGRESS_CAP", "5"))
 WALL_CLOCK_SEC = int(os.environ.get("KEELWRIGHT_WALL_CLOCK_SEC", "7200"))
 SIMILARITY_CAP = int(os.environ.get("KEELWRIGHT_SIMILARITY_CAP", "3"))
@@ -75,8 +76,9 @@ def iter(progress: bool) -> int:
     elapsed = time.time() - s.get("start", time.time())
 
     reasons = []
-    if s["iters"] >= MAX_ITERS:
-        reasons.append(f"MAX_ITERS hit ({s['iters']}>={MAX_ITERS})")
+    hard_cap = min(MAX_ITERS, ABSOLUTE_MAX_ITERS)
+    if s["iters"] >= hard_cap:
+        reasons.append(f"hard cap {s['iters']}>={hard_cap}")
     if s["no_progress"] >= NO_PROGRESS_CAP:
         reasons.append(f"no-progress cap ({s['no_progress']}>={NO_PROGRESS_CAP})")
     if elapsed >= WALL_CLOCK_SEC:
@@ -89,8 +91,13 @@ def iter(progress: bool) -> int:
         save(s)
         # Proof a crashed run left behind
         try:
+            proof = {
+                "iter": s["iters"],
+                "reason": "; ".join(reasons),
+                "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            }
             with open(os.path.join(os.path.dirname(_state_path()), ".loop_stopped"), "w", encoding="utf-8") as f:
-                f.write("; ".join(reasons) + "\n")
+                json.dump(proof, f, ensure_ascii=False)
         except Exception:
             pass
         print("CIRCUIT-BREAKER FIRED: " + "; ".join(reasons) + ". STOP.")
@@ -120,6 +127,12 @@ def main() -> int:
             s["similar"] = s.get("similar", 0) + 1
             save(s)
         return iter(args.progress)
+    if args.similar:
+        # Allow similarity check without registering a full iteration.
+        s = load()
+        s["similar"] = s.get("similar", 0) + 1
+        save(s)
+        return iter(progress=False)
     # default: status
     status()
     return 0

@@ -41,14 +41,8 @@ python scripts/export_skill.py --include-runs
 # From local ZIP
 python scripts/import_skill.py ~/kw-qa/keelwright-export-20260831T120000Z.zip
 
-# From GitHub release (downloads ZIP, verifies SHA)
-python scripts/import_skill.py https://github.com/ratingtesting/keelwright/releases/download/v1.10.3/keelwright.zip
-
-# From GitHub repo (main branch)
-python scripts/import_skill.py ratingtesting/keelwright
-
 # Custom install dir (default: ~/.keelwright/skills/keelwright)
-python scripts/import_skill.py <source> --target ~/my-skills/keelwright
+python scripts/import_skill.py ~/kw-qa/keelwright-export-20260831T120000Z.zip --force
 ```
 
 **Safety (zip-slip guard + post-install checks):**
@@ -56,7 +50,7 @@ python scripts/import_skill.py <source> --target ~/my-skills/keelwright
 - Verifies `_MANIFEST.json` SHA256 matches
 - Runs `build_skill.py --check` after install (confirms layered index intact)
 - Optional: runs `runtime_integration_tester.py --self-test` (5 gates)
-- Opt-in: `--post-check` runs `validate_run.py` on any qa-results in zip
+- Opt-in: `--run-checks` runs `validate_run.py` on any qa-results in zip
 
 ---
 
@@ -71,7 +65,7 @@ KEELWRIGHT_SKILLS=/custom/path python scripts/import_skill.py <source>
 
 **Detected runtimes (bindings/):**
 - Hermes desktop: `~/.hermes/skills/` (legacy)
-- OpenClaw: `~/.opencaw/skills/` / ClawHub
+- OpenClaw: `~/.openclaw/skills/` / ClawHub
 - Cursor: `.cursor/skills/`
 - Codex: `~/.codex/skills/`
 - Cline: `~/.cline/skills/`

@@ -77,8 +77,13 @@ def extract_skill(zf: zipfile.ZipFile, target: Path, include_internal: bool):
     target.mkdir(parents=True, exist_ok=True)
     skip_prefixes = () if include_internal else ("internal/", "backups/")
     count = 0
+    max_files = 5000
+    max_total_bytes = 200 * 1024 * 1024
+    total_bytes = 0
     for info in zf.infolist():
         if info.is_dir():
+            continue
+        if getattr(info, "is_symlink", lambda: False)():
             continue
         arcname = info.filename
         # Skip non-skill files (QA run data lives elsewhere)
@@ -91,6 +96,12 @@ def extract_skill(zf: zipfile.ZipFile, target: Path, include_internal: bool):
             continue
         # Extract
         data = zf.read(info.filename)
+        if total_bytes + len(data) > max_total_bytes:
+            print(f"  [BLOCK] archive size budget exceeded — stopping extraction")
+            break
+        if count >= max_files:
+            print(f"  [BLOCK] archive file count budget exceeded — stopping extraction")
+            break
         dest = (target / arcname).resolve()
         # ZIP-SLIP GUARD: reject any entry that escapes the install target.
         target_resolved = target.resolve()
@@ -99,6 +110,7 @@ def extract_skill(zf: zipfile.ZipFile, target: Path, include_internal: bool):
             continue
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_bytes(data)
+        total_bytes += len(data)
         count += 1
     return count
 
