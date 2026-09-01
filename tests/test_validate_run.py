@@ -132,6 +132,49 @@ def test_gate6_cross_run_contamination_is_invalid():
         assert "cross-run contamination" in r.stdout
 
 
+def test_gate7_missing_review_record_is_invalid():
+    """requires_review=true but no review_report/review field -> INVALID."""
+    with tempfile.TemporaryDirectory() as td:
+        rd = Path(td)
+        _make_arm(rd, "T10", "control")
+        _make_arm(rd, "T10", "treatment")
+        rec = {"test_id": "T10", "verdict": "PASS",
+               "requires_review": True,
+               "api_calls_control": 5, "api_calls_treatment": 5}
+        r = _run(rd, [rec])
+        assert r.returncode == 1, f"GATE 7 should flag missing review, got rc=0: {r.stdout}"
+        assert "Review request not recorded" in r.stdout
+
+
+def test_gate8_review_missing_diff_attestation_is_invalid():
+    """Review mentions tests but does not attest diff/report or red->green -> INVALID."""
+    with tempfile.TemporaryDirectory() as td:
+        rd = Path(td)
+        _make_arm(rd, "T11", "control")
+        _make_arm(rd, "T11", "treatment")
+        rec = {"test_id": "T11", "verdict": "PASS",
+               "requires_review": True,
+               "review": "I checked the tests and they pass",
+               "api_calls_control": 5, "api_calls_treatment": 5}
+        r = _run(rd, [rec])
+        assert r.returncode == 1, f"GATE 8 should flag weak review, got rc=0: {r.stdout}"
+        assert "does not mention diff/report" in r.stdout or "red->green" in r.stdout
+
+
+def test_gate8_review_complete_passes():
+    """Review with diff report + red->green attestation -> valid."""
+    with tempfile.TemporaryDirectory() as td:
+        rd = Path(td)
+        _make_arm(rd, "T12", "control")
+        _make_arm(rd, "T12", "treatment")
+        rec = {"test_id": "T12", "verdict": "PASS",
+               "requires_review": True,
+               "review": "Review report attached. Diff matches disk. Tests moved from red to green.",
+               "api_calls_control": 5, "api_calls_treatment": 5}
+        r = _run(rd, [rec])
+        assert r.returncode == 0, f"GATE 8 complete review should pass, got rc=1: {r.stdout}"
+
+
 def test_all_gates_pass_clean_run():
     """A fully clean run with 2 tests passes all gates."""
     with tempfile.TemporaryDirectory() as td:

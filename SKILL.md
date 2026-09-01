@@ -205,6 +205,26 @@ No agent? `python scripts/runtime_integration_tester.py --skill-dir .` exercises
 
 ## 📜 Changelog
 
+### 1.10.4 — audit v3 references + doc fixes
+- Added missing references: `requesting-code-review.md`, `bindings/hermes.md`, `bindings/kilocode.md`.
+- `termination-conditions.md`, `subagent-patterns.md`, `import-export.md` promoted to Map table.
+- Fuzz threshold comment clarified; build_skill exclusion for `historical/` + `internal/`.
+
+### 1.10.3 — P2 security + breaker
+- R12 conflict-resolution gate added.
+- `breaker.py` JSON proof format for `.loop_stopped`.
+- `risk-glossary.md` expanded to 28 risks.
+
+### 1.10.2 — P1 CI + tests
+- `security.yml` build-check job added.
+- `tests/test_build_skill.py`, `tests/test_validate_run.py` created.
+- `fuzz/test_web_heuristic.py` threshold corrected to 13/56.
+
+### 1.10.1 — P0 blockers
+- `build_skill.py`: rglob recursive, symlink guard, `--inplace` confirmation.
+- `defense_health.py`: runtime-agnostic with `KEELWRIGHT_AGENT_PYTHON` + `KEELWRIGHT_HOME`.
+- `runtime_integration_tester.py`: discriminating logic (5 bad / 3 good).
+
 ### 1.10.0 — layered architecture (ADR-001, F46 real)
 - SKILL.md is now an **index** (~3K tokens). Heavy content moved to `references/*.md`.
 - `scripts/build_skill.py` reassembles full doc for public registries.
