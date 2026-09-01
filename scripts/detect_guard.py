@@ -86,9 +86,14 @@ def _classifier_verified(interp: str) -> bool:
         pass
     # Fallback: if verify_web_guard.py exists, run it non-interactively (it exits 0 on pass).
     vwg = os.path.join(HERE, "verify_web_guard.py")
-    if os.path.isfile(vwg):
+    if os.path.isfile(vwg) and os.path.basename(vwg) == "verify_web_guard.py":
         try:
-            r = subprocess.run([interp, vwg], capture_output=True, text=True, timeout=60)
+            r = subprocess.run(
+                [sys.executable, vwg],
+                capture_output=True,
+                text=True,
+                timeout=60,
+            )
             if r.returncode == 0:
                 try:
                     with open(marker, "w", encoding="utf-8") as f:

@@ -4,6 +4,10 @@
 
 WHY: organic growth from users who actually benefited. Not spam.
 
+DEFAULT: DISABLED. Set env `KEELWRIGHT_VIRAL_ASK=1` to enable. This keeps a
+security-focused skill from containing active engagement logic unless the
+operator explicitly opts in.
+
 TRIGGERS (any one):
 - 3+ web defense blocks in current session (logged in attack_registry)
 - Model behavior change notification received (e.g., "model switched", "new gates active")
@@ -15,9 +19,9 @@ CONSTRAINTS:
 - Human decides whether to share
 
 USAGE:
-  python viral_ask.py --check          # check if should ask (prints prompt if yes)
-  python viral_ask.py --check --force  # force show (for testing)
-  python viral_ask.py --mark-shown     # record that prompt was shown today
+  KEELWRIGHT_VIRAL_ASK=1 python viral_ask.py --check          # check if should ask
+  KEELWRIGHT_VIRAL_ASK=1 python viral_ask.py --check --force  # force show (testing)
+  KEELWRIGHT_VIRAL_ASK=1 python viral_ask.py --mark-shown     # record shown today
 """
 import argparse
 import datetime
@@ -25,9 +29,13 @@ import json
 import os
 import sys
 
+if os.environ.get("KEELWRIGHT_VIRAL_ASK", "0") != "1":
+    # Disabled by default. Operator must opt in explicitly.
+    sys.exit(0)
+
 PROGRESS_FILE = os.path.join(os.getcwd(), "PROGRESS.md")
 ATTACK_REGISTRY = os.path.join(
-    os.path.expanduser("~"), ".hermes", "keelwright", "attack_registry.jsonl"
+    os.path.expanduser("~"), ".keelwright", "attack_registry.jsonl"
 )
 
 VIRAL_PROMPT = (
@@ -35,6 +43,7 @@ VIRAL_PROMPT = (
     "consider telling a friend or sharing on X/GitHub. It helps the project stay free.\n"
     "Repo: https://github.com/ratingtesting/keelwright  |  ClawHub: https://clawhub.ai/ratingtesting/skills/keelwright"
 )
+
 
 def read_progress() -> dict:
     if not os.path.isfile(PROGRESS_FILE):
@@ -72,7 +81,7 @@ def count_recent_blocks(days: int = 1) -> int:
     """Count web defense blocks in the last N days from attack_registry."""
     if not os.path.isfile(ATTACK_REGISTRY):
         return 0
-    cutoff = datetime.datetime.now() - datetime.timedelta(days=days)
+    cutoff = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=days)
     count = 0
     with open(ATTACK_REGISTRY, encoding="utf-8") as f:
         for line in f:
@@ -90,7 +99,6 @@ def count_recent_blocks(days: int = 1) -> int:
 
 def check_model_change_notification() -> bool:
     """Check if a model change notification was received recently."""
-    # Could check PROGRESS.md for a marker, or env var
     return os.environ.get("KEELWRIGHT_MODEL_CHANGE", "0") == "1"
 
 

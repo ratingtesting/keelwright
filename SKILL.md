@@ -26,6 +26,18 @@ triggers:
 metadata:
   runtime-agnostic: true
   self-contained: true
+permissions:
+  filesystem:
+    - read
+    - write
+  shell:
+    - run_scripts
+    - run_tests
+  network:
+    - web_lookup
+    - github_release_check
+  install:
+    - require_explicit_opt_in
 ---
 
 # keelwright — an engine for vibe/loop coding
@@ -229,6 +241,13 @@ No agent? `python scripts/runtime_integration_tester.py --skill-dir .` exercises
 - SKILL.md is now an **index** (~3K tokens). Heavy content moved to `references/*.md`.
 - `scripts/build_skill.py` reassembles full doc for public registries.
 - Critical rules (R1–R12, autonomy, breaker) duplicated in index so they survive trim.
+
+### 1.10.8 — SkillSpector response + scope hygiene
+- Add explicit `permissions` block to `SKILL.md` frontmatter.
+- Disable `viral_ask.py` by default; require `KEELWRIGHT_VIRAL_ASK=1` to enable.
+- `verify_web_guard.py` execution tightened: run via `sys.executable`, only expected filename.
+- `AUDIT-STRATEGY.md` moved out of the published skill; canonical copy in operator strategy repo.
+- QA tool auto-install gated behind explicit `--with-tools` / `KEELWRIGHT_QA_TOOLS=1`.
 
 ### 1.9.1 — runtime-agnostic hotfix
 - `HERMES_SKILLS` → `KEELWRIGHT_SKILLS`; `find_skills_dir` scans Hermes/OpenClaw/Cursor/Codex/Cline.
