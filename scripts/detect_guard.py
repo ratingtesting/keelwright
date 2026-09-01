@@ -47,7 +47,8 @@ VERDICT
 
 Exit code mirrors the verdict: 0 = ACTIVE, 1 = DEGRADED, 2 = UNPROTECTED.
 The stdout message is plain language so an agent can paste it to the operator
-verbatim. Nothing here writes files, installs packages, or downloads models.
+verbatim. Nothing here installs packages or downloads models.
+Note: `_classifier_verified()` may write `.web_guard_verified` marker file as a cache.
 """
 from __future__ import annotations
 
