@@ -40,6 +40,19 @@ jobs:
           test -f NOTICE-MIT || (echo "NOTICE-MIT missing" && exit 1)
           echo "license check OK"
 
+  secrets-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: R1/R2 security scan
+        run: |
+          pip install gitleaks semgrep
+          gitleaks protect --staged --redact -v
+          PYTHONPATH= semgrep scan --config=auto --error .
+
   build-check:
     runs-on: ubuntu-latest
     steps:
@@ -50,3 +63,6 @@ jobs:
       - name: Verify skill index is up to date
         run: |
           python scripts/build_skill.py --check
+      - name: Assert SKILL.md index line count
+        run: |
+          test "$(wc -l < SKILL.md)" -le 250 || (echo "SKILL.md index exceeds 250 lines" && exit 1)

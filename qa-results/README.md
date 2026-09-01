@@ -100,13 +100,13 @@ This is documented honestly, not faked.
 
 ```bash
 # 1. Isolate the skill tree (prevents model from corrupting it)
-python workspace_guard.py isolate-skill-tree ~/AppData/Local/hermes/skills/keelwright
+python <skill_dir>/scripts/workspace_guard.py isolate-skill-tree <skill_dir>
 
 # 2. Paste qa-prompt-final.md into a fresh session on the model under test
 
 # 3. After run completes, restore and verify
-python workspace_guard.py restore-skill-tree ~/AppData/Local/hermes/skills/keelwright
-python snapshot_skill.py verify-additions
+python <skill_dir>/scripts/workspace_guard.py restore-skill-tree <skill_dir>
+python <skill_dir>/scripts/snapshot_skill.py verify-additions
 
 # 4. Validate results
 python scripts/validate_run.py <RUN_DIR> <RUN_DIR>/results.jsonl

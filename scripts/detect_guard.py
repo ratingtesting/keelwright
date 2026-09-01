@@ -100,6 +100,10 @@ def _classifier_verified(interp: str) -> bool:
     return False
 
 
+def _heuristic_present() -> bool:
+    return os.path.isfile(os.path.join(HERE, "web_heuristic_guard.py"))
+
+
 def main() -> int:
     interp = sys.executable or "python3"
 

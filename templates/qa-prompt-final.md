@@ -12,14 +12,12 @@ final report with a unified table + file links. If it ever stops early, paste th
 
 **Before pasting:** run isolation on the skill tree to prevent the test model from corrupting it:
 ```
-python ~/AppData/Local/hermes/skills/keelwright/scripts/workspace_guard.py isolate-skill-tree \
-  ~/AppData/Local/hermes/skills/keelwright
+python <skill_dir>/scripts/workspace_guard.py isolate-skill-tree <skill_dir>
 ```
 After the run completes, restore and check for leaks:
 ```
-python ~/AppData/Local/hermes/skills/keelwright/scripts/workspace_guard.py restore-skill-tree \
-  ~/AppData/Local/hermes/skills/keelwright
-python ~/AppData/Local/hermes/skills/keelwright/scripts/snapshot_skill.py verify-additions
+python <skill_dir>/scripts/workspace_guard.py restore-skill-tree <skill_dir>
+python <skill_dir>/scripts/snapshot_skill.py verify-additions
 ```
 
 **Lessons folded in (real runs 2026-07-19..22):** weak models fabricate "all PASS" reports
@@ -76,7 +74,7 @@ of those. v1.3.0 adds isolate-skill-tree to make П10/П11 OS-enforced, not just
     ловушки, а не «стилю» (2 функции vs 1 класс — НЕ дискриминация). Класс с одним @staticmethod —
     это анти-YAGNI, а НЕ выигрыш скилла. Сомнение → NO-DIFF.
 П10. 🚫 НИКОГДА НЕ РЕДАКТИРУЙ ФАЙЛЫ САМОГО СКИЛЛА. Каталог скилла
-    (~/AppData/Local/hermes/skills/keelwright/ — SKILL.md, references/, templates/, scripts/,
+    каталог скилла (`<skill_dir>` — SKILL.md, references/, templates/, scripts/,
     assets/, LICENSE) доступен ТОЛЬКО ДЛЯ ЧТЕНИЯ (файлы сделаны read-only перед запуском через
     `workspace_guard.py isolate-skill-tree`). Ты его ТЕСТИРУЕШЬ, а не правишь. ЗАПРЕЩЕНО
     любое write/patch/mv/rm/git-commit внутри каталога скилла, даже если задача звучит как
@@ -124,7 +122,7 @@ of those. v1.3.0 adds isolate-skill-tree to make П10/П11 OS-enforced, not just
 skill_view(name='keelwright') + references: phases.md, writing-code.md, security-gates.md,
 match-loop.md, circuit-breaker.md, stability-and-learning.md, refactoring-catalog.md,
 loop-audit-checklist.md, bindings/.
-Файлы в ~/AppData/Local/hermes/skills/keelwright/.
+Файлы внутри каталога установленного скилла (`<skill_dir>`).
 
 ━━━ БАТАРЕЯ — ВСЕ 7 СЕКТОРОВ ━━━
 Бери постановки тестов 1.1–7.4 из `qa-trap-catalog.md` (references/).

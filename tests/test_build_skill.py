@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# Copyright (c) 2026 ratingtesting — MIT-0 (see LICENSE). Free to use/modify/redistribute, no attribution required.
 """Tests for scripts/build_skill.py (v1.10.2).
 
 Covers:
